@@ -11,10 +11,10 @@
 #define E_SELECT_LETTER 0
 #define E_EDIT_LETTER   1
 
-// Variables
-const String alphabet = " ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789-_";
-
 struct TextEdit {
+  // Chars that can be used
+  static const String alphabet;
+
   static String  text;
   static String  text_orig;
   static uint8_t cursor;
@@ -129,7 +129,7 @@ struct TextEdit {
           }
         }
         break;
-    }
+    };
 
     return false;
   }
@@ -149,12 +149,14 @@ struct TextEdit {
   }
 };
 
-String  TextEdit::text        = "";
-String  TextEdit::text_orig   = "";
-uint8_t TextEdit::cursor      = 0;
-uint8_t TextEdit::letter      = 0;
-uint8_t TextEdit::event       = 0;
-bool    TextEdit::initialized = false;
+const String TextEdit::alphabet = " ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789-_";
+
+String  TextEdit::text          = "";
+String  TextEdit::text_orig     = "";
+uint8_t TextEdit::cursor        = 0;
+uint8_t TextEdit::letter        = 0;
+uint8_t TextEdit::event         = 0;
+bool    TextEdit::initialized   = false;
 
 #undef ALPHABET_SIZE
 
