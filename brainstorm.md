@@ -1,6 +1,6 @@
 # ToDo List
   - DONE:: Create a text editor on the screen with encoder
-  - Create a quick menu for editing the database entries
+  - DONE:: Create a quick menu for editing the database entries
     - 'SETTINGS'->'DEVICES'
     - 'SETTINGS'->'MIDI NOTES'
     - 'SETTINGS'->'COLORS'

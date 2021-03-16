@@ -27,6 +27,10 @@ struct Screen {
     lcd->setCursor(x, y);
     lcd->print(text);
   }
+  void print(uint8_t x, uint8_t y, uint8_t num) {
+    lcd->setCursor(x, y);
+    lcd->print(num);
+  }
 
   /*
    * x      = starting position on x axis
