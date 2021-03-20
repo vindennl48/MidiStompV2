@@ -2,6 +2,7 @@
 #define MENU_GLOBAL_SETTINGS_H
 
 #include "Hardware.h"
+#include "MenuMidiNotes.h"
 
 // Definitions
 #define E_DEVICES       0
@@ -40,8 +41,18 @@ struct MenuGlobalSettings {
           initialize = true;
           break;
         }
+        if ( active ) {
+          if ( MenuMidiNotes::loop() ) {
+            initialize = false;
+            active     = false;
+          }
+          break;
+        }
 
-        if ( HW::knob.is_left() ) {
+        if ( HW::knob.is_pressed() ) {
+          active = true;
+        }
+        else if ( HW::knob.is_left() ) {
           event      = E_DEVICES;
           initialize = false;
         }
