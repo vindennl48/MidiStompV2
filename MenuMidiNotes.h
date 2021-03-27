@@ -1,76 +1,65 @@
 #ifndef MENU_MIDI_NOTES_H
 #define MENU_MIDI_NOTES_H
 
+
 #include "hardware.h"
 #include "Database.h"
+#include "Menu.h"
 #include "MidiEdit.h"
 
-// Definitions
-#define E_NOTE_SELECT  0
-#define E_NOTE_EDIT    1
 
-struct MenuMidiNotes {
-  static uint8_t event;
-  static uint8_t initialize;
-  static uint8_t midi_id;
-  static Midi    midi;
+#define E_NOTE_SELECT 0
+#define E_NOTE_EDIT   1
+// MIDI_MAX - Database.h
 
-  static bool loop() {
-    switch(event) {
+
+struct MidiMenuNotes {
+  Menu    m;
+  Midi    midi;
+  uint8_t midi_id = 0;
+
+  String make_midi_str() {
+    midi          = GET_MIDI(midi_id);
+    String result = String(midi_id) + ")" + midiKind[midi.kind] + " " + String(midi.note);
+    return result;
+  }
+
+  bool loop() {
+    switch(m.e()) {
       case E_NOTE_SELECT:
-        if ( !initialize ) {
-          initialize = true;
-
-          midi        = GET_MIDI(midi_id);
-          String ID   = String(midi_id) + ")";
-          String kind = midiKind[midi.kind];
-          String note = String(midi.note);
+        if ( m.not_initialized() ) {
           HW::screen.print_with_nline(0,0, "::EDIT MIDI::");
-          HW::screen.print_with_nline(0,1, ID + kind + " " + note);
-          //HW::screen.print_with_nline(0,1, ID);
-          break;
+          HW::screen.print_with_nline(0,1, make_midi_str());
         }
-
-        if ( HW::knob.is_pressed() ) {
-          initialize = false;
-          event      = E_NOTE_EDIT;
-        }
-        else if ( HW::knob.is_long_pressed() ) {
-          initialize = false;
-          return true;
-        }
-        else if ( HW::knob.is_left() ) {
-          initialize = false;
-          if ( midi_id != 0 ) { midi_id -= 1; }
+        else if ( HW::knob.is_left() )  {
+          if ( midi_id != 0 ) midi_id -= 1; 
+          m.jump_to(E_NOTE_SELECT);
         }
         else if ( HW::knob.is_right() ) {
-          initialize = false;
           midi_id += 1;
-          if ( midi_id >= MIDI_MAX ) { midi_id = MIDI_MAX-1; }
+          if ( midi_id >= MIDI_MAX ) midi_id = MIDI_MAX-1;
+          m.jump_to(E_NOTE_SELECT);
         }
+        else if ( HW::knob.is_pressed() )      { m.jump_to(E_NOTE_EDIT); }
+        else if ( HW::knob.is_long_pressed() ) { return m.back(); }
         break;
 
       case E_NOTE_EDIT:
-        if ( !initialize ) {
-          initialize = true;
-          MidiEdit::setup(&midi);
-          break;
-        }
-        if ( MidiEdit::loop() ) {
-          initialize = false;
-          event      = E_NOTE_SELECT;
-          break;
+        if ( m.not_initialized() ) {}
+        else {
+          if ( midi_edit.loop(&midi) ) { m.jump_to(E_NOTE_SELECT); }
         }
         break;
+
+      default:
+        m.jump_to(0);
     };
 
     return false;
   }
-};
 
-uint8_t MenuMidiNotes::event      = 0;
-uint8_t MenuMidiNotes::initialize = false;
-uint8_t MenuMidiNotes::midi_id    = 0;
-Midi    MenuMidiNotes::midi;
+} menu_midi_notes;
+
+
 
 #endif

@@ -4,46 +4,41 @@
 // Definitions
 #define NUM_KINDS 4
 
-#include <Arduino.h>
-#include "Standard.h"
 #include "Hardware.h"
-#include "Database.h"
+#include "Menu.h"
+
+#define E_SELECT      0
+#define E_CHANGE_TYPE 1
+#define E_CHANGE_NOTE 2
 
 struct MidiEdit {
-  static Midi    *midi;
-  static uint8_t event;
-  static bool    initialize;
+  Menu m;
 
-  static void setup(Midi *midi) {
-    initialize = false;
-
-    HW::screen.print_with_nline(0,0,"Type:");
-    HW::screen.print(6,0,midiKind[midi->kind]);
-    HW::screen.print_with_nline(0,1,"Note:");
-    HW::screen.print(6,1,midi->note);
-  }
-
-  static bool loop() {
-    switch(event) {
-      case 0:
-        if ( !initialize ) {
-          initialize = true;
-          break;
+  bool loop(Midi *midi) {
+    switch(m.e()) {
+      case E_SELECT:
+        if ( m.not_initialized() ) {
+          HW::screen.print_with_nline(0,0,"Type:");
+          HW::screen.print(6,0,midiKind[midi->kind]);
+          HW::screen.print_with_nline(0,1,"Note:");
+          HW::screen.print(6,1,midi->note);
         }
-
-        if ( HW::knob.is_long_pressed() ) {
-          initialize = false;
-          return true;
-        }
+        else if ( HW::knob.is_long_pressed() ) { return m.back(); }
         break;
+
+      default:
+        m.jump_to(0);
     };
 
     return false;
   }
-};
 
-Midi    *MidiEdit::midi;
-uint8_t  MidiEdit::event      = 0;
-bool     MidiEdit::initialize = false;
+} midi_edit;
+
+
+#undef E_SELECT
+#undef E_CHANGE_TYPE
+#undef E_CHANGE_NOTE
+
 
 #endif
