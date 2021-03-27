@@ -3,6 +3,7 @@
 
 #include "hardware.h"
 #include "Database.h"
+#include "MidiEdit.h"
 
 // Definitions
 #define E_NOTE_SELECT  0
@@ -26,16 +27,40 @@ struct MenuMidiNotes {
           String note = String(midi.note);
           HW::screen.print_with_nline(0,0, "::EDIT MIDI::");
           HW::screen.print_with_nline(0,1, ID + kind + " " + note);
+          //HW::screen.print_with_nline(0,1, ID);
           break;
         }
 
-        if ( HW::knob.is_long_pressed() ) {
+        if ( HW::knob.is_pressed() ) {
+          initialize = false;
+          event      = E_NOTE_EDIT;
+        }
+        else if ( HW::knob.is_long_pressed() ) {
           initialize = false;
           return true;
+        }
+        else if ( HW::knob.is_left() ) {
+          initialize = false;
+          if ( midi_id != 0 ) { midi_id -= 1; }
+        }
+        else if ( HW::knob.is_right() ) {
+          initialize = false;
+          midi_id += 1;
+          if ( midi_id >= MIDI_MAX ) { midi_id = MIDI_MAX-1; }
         }
         break;
 
       case E_NOTE_EDIT:
+        if ( !initialize ) {
+          initialize = true;
+          MidiEdit::setup(&midi);
+          break;
+        }
+        if ( MidiEdit::loop() ) {
+          initialize = false;
+          event      = E_NOTE_SELECT;
+          break;
+        }
         break;
     };
 

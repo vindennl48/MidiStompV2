@@ -7,39 +7,33 @@
 #include <Arduino.h>
 #include "Standard.h"
 #include "Hardware.h"
-#include "MidiEdit.h"
+#include "Database.h"
 
 struct MidiEdit {
-  static DB::Midi *midi;
-  static uint8_t  event;
-  static bool     initialized;
-  static String   kind[NUM_KINDS];
+  static Midi    *midi;
+  static uint8_t event;
+  static bool    initialize;
 
-  static void setup(DB::Midi *midi) {
-    initialized    = false;
-    MidiEdit::midi = midi;
+  static void setup(Midi *midi) {
+    initialize = false;
 
-    HW::screen.clear();
-    HW::screen.print(0,0,"Type:");
-    HW::screen.print(6,0,MidiEdit::kind[midi->kind]);
-    HW::screen.print(0,1,"Note:");
+    HW::screen.print_with_nline(0,0,"Type:");
+    HW::screen.print(6,0,midiKind[midi->kind]);
+    HW::screen.print_with_nline(0,1,"Note:");
     HW::screen.print(6,1,midi->note);
   }
 
   static bool loop() {
     switch(event) {
       case 0:
-        if ( !initialized ) {
-          initialized = true;
+        if ( !initialize ) {
+          initialize = true;
+          break;
         }
-        else {
-        }
-        break;
-      case 1:
-        if ( !initialized ) {
-          initialized = true;
-        }
-        else {
+
+        if ( HW::knob.is_long_pressed() ) {
+          initialize = false;
+          return true;
         }
         break;
     };
@@ -48,15 +42,8 @@ struct MidiEdit {
   }
 };
 
-DB::Midi *MidiEdit::midi;
-uint8_t  MidiEdit::event           = 0;
-bool     MidiEdit::initialized     = false;
-String   MidiEdit::kind[NUM_KINDS] = {
-  "None",
-  "Note",
-  "CC",
-  "PC/BANK"
-};
-
+Midi    *MidiEdit::midi;
+uint8_t  MidiEdit::event      = 0;
+bool     MidiEdit::initialize = false;
 
 #endif
