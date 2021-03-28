@@ -79,8 +79,8 @@ struct Midi {
   String get_kind_str() { return midiKind[kind]; }
   void   set_kind(uint8_t new_kind) { if ( new_kind < MIDI_KIND_MAX ) kind = new_kind; }
 };
-#define MIDI_MAX   10
-#define MIDI_SHIFT 4
+#define MIDI_MAX       10
+#define MIDI_SHIFT     4
 #define SET_MIDI(midi) set_data<Midi>(midi, MIDI_MAX, MIDI_SHIFT)
 #define GET_MIDI(id)   get_data<Midi>(id,   MIDI_MAX, MIDI_SHIFT)
 /* :: END MIDI :: */
@@ -107,8 +107,8 @@ public:
     String get_name()                { return String(name); }
   } params[10];
 };
-#define DEVICE_MAX   4
-#define DEVICE_SHIFT ( ( sizeof(Midi) * MIDI_MAX ) + MIDI_SHIFT )
+#define DEVICE_MAX         4
+#define DEVICE_SHIFT       ( ( sizeof(Midi) * MIDI_MAX ) + MIDI_SHIFT )
 #define SET_DEVICE(device) set_data<Device>(device, DEVICE_MAX, DEVICE_SHIFT)
 #define GET_DEVICE(id)     get_data<Device>(id,     DEVICE_MAX, DEVICE_SHIFT)
 /* :: END DEVICE :: */

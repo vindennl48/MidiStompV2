@@ -61,5 +61,7 @@ struct MidiMenuNotes {
 } menu_midi_notes;
 
 
+#undef E_NOTE_SELECT
+#undef E_NOTE_EDIT
 
 #endif

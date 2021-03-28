@@ -5,6 +5,7 @@
 #include "Hardware.h"
 #include "Menu.h"
 #include "MenuMidiNotes.h"
+#include "MenuDevices.h"
 
 
 /* :: GLOBAL SETTINGS :: */
@@ -20,11 +21,15 @@ struct MenuGlobalSettings {
   bool loop() {
     switch(m.e()) {
       case E_DEVICES:
-        if ( m.not_initialized() ) {
+        if ( m.is_active() ) {
+          if ( menu_devices.loop() ) { m.jump_to(E_DEVICES); }
+        }
+        else if ( m.not_initialized() ) {
           HW::screen.print_with_nline(0,0,"::GBL SETTINGS::");
           HW::screen.print_with_nline(0,1,"> DEVICES");
         }
         else if ( HW::knob.is_right() ) { m.jump_to(E_MIDI_NOTES); }
+        else if ( HW::knob.is_pressed() ) { m.activate(); }
         break;
 
       case E_MIDI_NOTES:
