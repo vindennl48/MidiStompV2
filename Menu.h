@@ -23,6 +23,7 @@ struct Menu {
     d.initialized = true;
     return !result; 
   }
+  void    reinitialize()     { d.initialized = false; }
   bool    is_active()        { return d.active; }
   void    activate()         { d.initialized = false; d.active = true; }
   void    jump_to(uint8_t e) { d.d = 0; d.event = e; }
