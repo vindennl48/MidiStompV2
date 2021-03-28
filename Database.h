@@ -67,8 +67,18 @@ void set_data(T *data, uint16_t max, uint16_t shift) {
 
 
 /* :: MIDI :: */
+#define MIDI_KIND_MAX 3
+#define MIDI_NOTE_MAX 128
 String midiKind[] = { "NOTE", "CC", "PC" };
-struct Midi { uint8_t id = 0, kind = 0, note = 0;  };
+struct Midi {
+  uint8_t id = 0, kind = 0, note = 0;  
+  void   kind_up()      { kind += 1; if ( kind >= MIDI_KIND_MAX ) kind = MIDI_KIND_MAX-1; }
+  void   kind_down()    { if ( kind > 0 ) kind -= 1; }
+  void   note_up()      { note += 1; if ( note >= MIDI_NOTE_MAX ) note = MIDI_NOTE_MAX-1; }
+  void   note_down()    { if ( note > 0 ) note -= 1; }
+  String get_kind_str() { return midiKind[kind]; }
+  void   set_kind(uint8_t new_kind) { if ( new_kind < MIDI_KIND_MAX ) kind = new_kind; }
+};
 #define MIDI_MAX   10
 #define MIDI_SHIFT 4
 #define SET_MIDI(midi) set_data<Midi>(midi, MIDI_MAX, MIDI_SHIFT)
