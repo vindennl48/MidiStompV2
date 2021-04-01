@@ -59,7 +59,7 @@ struct MidiMenuNotes {
   }
 
 } menu_midi_notes;
-
+uint8_t menuMidiNotes() { return menu_midi_notes.loop(); }
 
 #undef E_NOTE_SELECT
 #undef E_NOTE_EDIT

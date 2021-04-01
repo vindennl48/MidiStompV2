@@ -54,8 +54,8 @@ struct MidiEdit {
 
           set_cursor();
         }
-        else if ( HW::knob.is_left() )         { cursor_down(); m.jump_to(E_SELECT); }
-        else if ( HW::knob.is_right() )        { cursor_up();   m.jump_to(E_SELECT); }
+        else if ( HW::knob.is_left() )         { cursor_down(); set_cursor(); }
+        else if ( HW::knob.is_right() )        { cursor_up();   set_cursor(); }
         else if ( HW::knob.is_pressed() )      {
           if      ( cursor == C_TYPE )   m.jump_to(E_CHANGE_TYPE);
           else if ( cursor == C_NOTE )   m.jump_to(E_CHANGE_NOTE);

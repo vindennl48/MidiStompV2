@@ -112,6 +112,7 @@ struct MenuDevices {
   }
 
 } menu_devices;
+uint8_t menuDevices() { return menu_devices.loop(); }
 
 #undef E_DEVICE_SELECT
 #undef E_DEVICE_NAME
