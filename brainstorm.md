@@ -55,6 +55,13 @@
 # Menu/SubMenu
   - 1 main menu, 3 sub-menus
   - 4 footswitches per menu
+  - Pedal
+    - two colors per pedal
+      - first color is on color
+      - second color is off color
+      - If no option is set for off color, when selected, it will only blink
+      - If option is selected for off color, then when selected, it will
+        alternate between on-off color
 
   
 # Preset

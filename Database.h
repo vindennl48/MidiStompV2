@@ -1,18 +1,6 @@
 #ifndef DATABASE_H
 #define DATABASE_H
 
-//#define MIDI_START    4
-//#define MIDI_SIZE     10
-
-//#define DEVICES_START 4
-//#define DEVICES_SIZE  4
-
-//#define COLORS_START  4
-//#define COLORS_SIZE   4
-
-//#define PRESETS_START 4
-//#define PRESETS_SIZE  4
-
 
 #define CHAR_LEN  16
 
@@ -69,7 +57,7 @@ void set_data(T *data, uint16_t max, uint16_t shift) {
 /* :: MIDI :: */
 #define MIDI_KIND_MAX 3
 #define MIDI_NOTE_MAX 128
-String midiKind[] = { "NOTE", "CC", "PC" };
+const String midiKind[] = { "NOTE", "CC", "PC" };
 struct Midi {
   uint8_t id = 0, kind = 0, note = 0;  
   void   kind_up()      { kind += 1; if ( kind >= MIDI_KIND_MAX ) kind = MIDI_KIND_MAX-1; }
@@ -113,5 +101,45 @@ public:
 #define GET_DEVICE(id)     get_data<Device>(id,     DEVICE_MAX, DEVICE_SHIFT)
 /* :: END DEVICE :: */
 
+
+/* :: COLOR :: */
+struct Color {
+  uint8_t id = 0;
+
+  union {
+    uint12_t value = 0;
+    struct{
+      unsigned r:4;
+      unsigned g:4;
+      unsigned b:4;
+    };
+  };
+} __attributes__((packed));
+#define COLOR_MAX        4
+#define COLOR_SHIFT      ( ( sizeof(Device) * DEVICE_MAX ) + DEVICE_SHIFT )
+#define SET_COLOR(color) set_data<Color>(color, COLOR_MAX, COLOR_SHIFT)
+#define GET_COLOR(id)    get_data<Color>(id,    COLOR_MAX, COLOR_SHIFT)
+/* :: END COLOR :: */
+
+
+/* :: PRESET :: */
+struct Preset {
+private:
+  char name[CHAR_LEN] = "UNTITLED       ";
+public:
+  uint8_t id = 0;
+
+  void   set_name(String new_name) { new_name.toCharArray(name, CHAR_LEN); }
+  String get_name()                { return String(name); }
+
+  struct Submenu {
+    Footswitch fsw[4];
+  } submenu[4];
+};
+#define PRESET_MAX         4
+#define PRESET_SHIFT       ( ( sizeof(Color) * COLOR_MAX ) + COLOR_SHIFT )
+#define SET_PRESET(preset) set_data<Preset>(preset, PRESET_MAX, PRESET_SHIFT)
+#define GET_PRESET(id)     get_data<Preset>(id,     PRESET_MAX, PRESET_SHIFT)
+/* :: END PRESET :: */
 
 #endif
