@@ -78,6 +78,14 @@
 #define PIN_D7_FALSE             PIN_SET_FALSE(   D, 7)
 #define PIN_D7_TOGGLE            PIN_SET_TOGGLE(  D, 7)
 
+#define PIN_B0                   BUILD_ARGS(      B, 0)
+#define PIN_B0_SETUP_INPUT       PIN_INPUT_SETUP( B, 0)
+#define PIN_B0_GET               PIN_GET_VALUE(   B, 0)
+#define PIN_B0_SETUP_OUTPUT      PIN_OUTPUT_SETUP(B, 0)
+#define PIN_B0_TRUE              PIN_SET_TRUE(    B, 0)
+#define PIN_B0_FALSE             PIN_SET_FALSE(   B, 0)
+#define PIN_B0_TOGGLE            PIN_SET_TOGGLE(  B, 0)
+
 #define PIN_B9                   BUILD_ARGS(      B, 1)
 #define PIN_B9_SETUP_INPUT       PIN_INPUT_SETUP( B, 1)
 #define PIN_B9_GET               PIN_GET_VALUE(   B, 1)

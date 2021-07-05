@@ -13,7 +13,7 @@ struct Menu {
       unsigned initialized:1;
       unsigned active:1;
     };
-  } __attribute__((packed)) d;
+  } d;
 
   Menu()  { d.d = 0; }
   ~Menu() {}

@@ -24,7 +24,7 @@ struct Encoder {
         unsigned state:2;         // 0 off, 1 CW, 2 CCW
       };
     };
-  } __attribute__((packed)) f;
+  } f;
 
   // example: encoder.setup(PIN_D5, PIN_D6, PIN_D7);
   void setup(

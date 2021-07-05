@@ -26,7 +26,7 @@ struct Button {
         unsigned press_type:1;   // 0 on up-stroke, 1 on down-stroke
       };
     };
-  } __attribute__((packed)) f;
+  } f;
 
   void setup(
       volatile uint8_t *ddr,

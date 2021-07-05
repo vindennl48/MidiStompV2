@@ -94,3 +94,6 @@
   - Presets
     - ID: 1-64. { name: "SLOUGH", bpm: 120, midi_command: [ pedal_id, param_id, value ]x20, sub_menu: [ menu1 - menu4 ] }
 
+# HARDWARE
+  ## Midi Loop
+  Starts with Focusrite Out -> Midi Stomp In -> Midi Stomp Out -> 

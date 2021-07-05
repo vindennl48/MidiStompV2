@@ -125,14 +125,15 @@ struct Color {
 
 
 /* :: SUBMENU :: */
-struct SubMenu {
-  uint8_t    id = 0;
+//struct SubMenu {
+  //uint8_t    id = 0;
   //Footswitch fsw[4];
-};
-#define SUBMENU_MAX          2
-#define SUBMENU_SHIFT        ( ( sizeof(Color) * COLOR_MAX ) + COLOR_SHIFT )
-#define SET_SUBMENU(submenu) set_data<SubMenu>(submenu, SUBMENU_MAX, SUBMENU_SHIFT)
-#define GET_SUBMENU(id)      get_data<SubMenu>(id,      SUBMENU_MAX, SUBMENU_SHIFT)
+  ////Footswitch fsw[4];
+//};
+//#define SUBMENU_MAX          2
+//#define SUBMENU_SHIFT        ( ( sizeof(Color) * COLOR_MAX ) + COLOR_SHIFT )
+//#define SET_SUBMENU(submenu) set_data<SubMenu>(submenu, SUBMENU_MAX, SUBMENU_SHIFT)
+//#define GET_SUBMENU(id)      get_data<SubMenu>(id,      SUBMENU_MAX, SUBMENU_SHIFT)
 /* :: END SUBMENU :: */
 
 
@@ -143,7 +144,7 @@ private:
 public:
   uint8_t id         = 0;
   uint8_t submenu_id = 0;
-  //MidiOut midi_out[10];
+  MidiOut midi_out[10];
 
   void   set_name(String new_name) { new_name.toCharArray(name, CHAR_LEN); }
   String get_name()                { return String(name); }
