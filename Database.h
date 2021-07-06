@@ -105,22 +105,22 @@ public:
 
 
 /* :: COLOR :: */
-struct Color {
-  uint8_t id = 0;
-
-  union {
-    uint16_t data = 0;
-    struct{
-      unsigned r:4;
-      unsigned g:4;
-      unsigned b:4;
-    };
-  };
-};
-#define COLOR_MAX        4
-#define COLOR_SHIFT      ( ( sizeof(Device) * DEVICE_MAX ) + DEVICE_SHIFT )
-#define SET_COLOR(color) set_data<Color>(color, COLOR_MAX, COLOR_SHIFT)
-#define GET_COLOR(id)    get_data<Color>(id,    COLOR_MAX, COLOR_SHIFT)
+// struct Color {
+//   uint8_t id = 0;
+// 
+//   union {
+//     uint16_t data = 0;
+//     struct{
+//       unsigned r:4;
+//       unsigned g:4;
+//       unsigned b:4;
+//     };
+//   };
+// };
+// #define COLOR_MAX        4
+// #define COLOR_SHIFT      ( ( sizeof(Device) * DEVICE_MAX ) + DEVICE_SHIFT )
+// #define SET_COLOR(color) set_data<Color>(color, COLOR_MAX, COLOR_SHIFT)
+// #define GET_COLOR(id)    get_data<Color>(id,    COLOR_MAX, COLOR_SHIFT)
 /* :: END COLOR :: */
 
 
@@ -137,21 +137,21 @@ struct SubMenu {
 
 
 /* :: PRESET :: */
-struct Preset {
-private:
-  char name[CHAR_LEN] = "UNTITLED       ";
-public:
-  uint8_t id         = 0;
-  uint8_t submenu_id = 0;
-  //MidiOut midi_out[10];
-
-  void   set_name(String new_name) { new_name.toCharArray(name, CHAR_LEN); }
-  String get_name()                { return String(name); }
-};
-#define PRESET_MAX         1
-#define PRESET_SHIFT       ( ( sizeof(SubMenu) * SUBMENU_MAX ) + SUBMENU_SHIFT )
-#define SET_PRESET(preset) set_data<Preset>(preset, PRESET_MAX, PRESET_SHIFT)
-#define GET_PRESET(id)     get_data<Preset>(id,     PRESET_MAX, PRESET_SHIFT)
+// struct Preset {
+// private:
+//   char name[CHAR_LEN] = "UNTITLED       ";
+// public:
+//   uint8_t id         = 0;
+//   uint8_t submenu_id = 0;
+//   //MidiOut midi_out[10];
+// 
+//   void   set_name(String new_name) { new_name.toCharArray(name, CHAR_LEN); }
+//   String get_name()                { return String(name); }
+// };
+// #define PRESET_MAX         1
+// #define PRESET_SHIFT       ( ( sizeof(SubMenu) * SUBMENU_MAX ) + SUBMENU_SHIFT )
+// #define SET_PRESET(preset) set_data<Preset>(preset, PRESET_MAX, PRESET_SHIFT)
+// #define GET_PRESET(id)     get_data<Preset>(id,     PRESET_MAX, PRESET_SHIFT)
 /* :: END PRESET :: */
 
 

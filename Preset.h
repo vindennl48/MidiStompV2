@@ -1,17 +1,22 @@
 #ifndef PRESET_H
 #define PRESET_H
 
-#define NUM_PEDAL_PARAMS 16
+#define NUM_PEDAL_PARAMS 20
 #define NUM_FSW          4
 #define NUM_STATES       3
 
+#define STR_LEN     12
+#define STR_LEN_MAX STR_LEN+1
+
 struct Color {
-  String  name;
-  uint8_t r,g,b;
+  // 16 bytes
+  char    name[STR_LEN_MAX] = "UNTITLED";
+  uint8_t r,g,b             = 0;
 };
 
 struct Param {
-  String name;
+  // 14 bytes
+  char name[STR_LEN_MAX] = "UNTITLED";
 
   union {
     struct {
@@ -19,16 +24,23 @@ struct Param {
       unsigned pitch:7;
     };
   };
+
+  Param() {
+    this->type  = 0;
+    this->pitch = 0;
+  }
 };
 
 struct Pedal {
-  String  name;
-  uint8_t Channel;
-  Param   params[NUM_PARAMS];
+  // 14 bytes
+  char    name[STR_LEN_MAX] = "UNTITLED";
+  uint8_t channel           = 0;
+  // 16 params
 };
 
 struct Footswitch {
-  Color   colors[NUM_STATES];
+  // 8 bytes
+  uint8_t colors[NUM_STATES];
   uint8_t velocities[NUM_STATES];
 
   // States of footswitch
@@ -46,12 +58,21 @@ struct Footswitch {
       unsigned param:4;
     };
   };
+
+  Footswitch() {
+    this->mode  = 0;
+    this->state = 0;
+    this->pedal = 0;
+    this->param = 0;
+  }
 };
 
 struct Preset {
-  String     name;
-  boolean    is_dirty;
-  Footswitch fsw[NUM_FSW];
+  // 14 bytes
+  char    name[STR_LEN_MAX] = "UNTITLED";
+  boolean is_dirty          = false;
+  // 4 footswitches
+  // 1 main footswitch menu + 3 footswitch sub-menus
 };
 
 #endif
