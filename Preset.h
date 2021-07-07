@@ -8,11 +8,6 @@
 #define STR_LEN     12
 #define STR_LEN_MAX STR_LEN+1
 
-struct Color {
-  // 16 bytes
-  char    name[STR_LEN_MAX] = "UNTITLED";
-  uint8_t r,g,b             = 0;
-};
 
 struct Param {
   // 14 bytes
@@ -38,32 +33,44 @@ struct Pedal {
   // 16 params
 };
 
+#define FSW_MODE_OFF     0
+#define FSW_MODE_TOGGLE  2
+#define FSW_MODE_CYCLE   3
+#define FSW_MODE_ONESHOT 1
 struct Footswitch {
   // 8 bytes
-  uint8_t colors[NUM_STATES];
-  uint8_t velocities[NUM_STATES];
+  uint8_t colors[NUM_STATES] = { 0, 1, 2 };
+  uint8_t velocities[NUM_STATES] = { 0 };
 
   // States of footswitch
   union {
     struct {
-      unsigned mode:4;
-      unsigned state:4;
+      unsigned mode:4;   // 0 OFF, 1 Toggle, 2 Cycle, 3 OneShot
+      unsigned state:4;  // 0 OFF,    1 ON1,   2 ON2
     };
   };
 
   // Pedal Param = PP
   union {
     struct {
-      unsigned pedal:4;
-      unsigned param:4;
+      unsigned pedal:3;
+      unsigned param:5;
     };
   };
 
   Footswitch() {
-    this->mode  = 0;
+    this->mode  = FSW_MODE_TOGGLE;
     this->state = 0;
     this->pedal = 0;
     this->param = 0;
+  }
+
+  void increase_state() {
+    state += 1;
+    if ( mode == FSW_MODE_CYCLE ) {
+      if ( state >= 3 ) state = 0;
+    }
+    else if ( state >= 2 ) state = 0;
   }
 };
 

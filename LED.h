@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include "ShiftRegisterPWM.h"
+#include "Database.h"
 #include "Standard.h"
 #include "Channel.h"
 
@@ -26,6 +27,12 @@ struct LED {
     r.set(r_new, time);
     g.set(g_new, time);
     b.set(b_new, time);
+  }
+
+  void set(Color color, uint16_t time = DEFAULT_LED_TIME_MS) {
+    r.set(color.r, time);
+    g.set(color.g, time);
+    b.set(color.b, time);
   }
 
   void dim()    {

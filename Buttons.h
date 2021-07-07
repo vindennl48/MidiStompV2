@@ -5,7 +5,7 @@
 #include "Standard.h"
 #include "Button.h"
 
-#define NUM_BUTTONS  4
+#define NUM_BTNS  4
 
 struct Buttons {
   Button btn1, btn2, btn3, btn4;
@@ -20,7 +20,7 @@ struct Buttons {
   }
 
   void loop() {
-    for (int i=0; i<NUM_BUTTONS; i++) at(i)->loop();
+    for (int i=0; i<NUM_BTNS; i++) at(i)->loop();
   }
 
   Button* at(uint8_t pos) {
