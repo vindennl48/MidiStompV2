@@ -1,17 +1,6 @@
 #ifndef HARDWARE_H
 #define HARDWARE_H
 
-#include <Arduino.h>
-#include "Standard.h"
-#include "Screen.h"
-#include "Encoder.h"
-#include "LEDs.h"
-#include "Buttons.h"
-
-#define LCD_ADDR     0x27
-#define LCD_WIDTH    16
-#define LCD_HEIGHT   2
-
 struct HW {
 
   static Screen  screen;
@@ -59,9 +48,5 @@ Screen  HW::screen;
 Encoder HW::knob;
 LEDs    HW::leds;
 Buttons HW::btns;
-
-#undef LCD_ADDR
-#undef LCD_WIDTH
-#undef LCD_HEIGHT
 
 #endif

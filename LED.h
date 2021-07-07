@@ -1,12 +1,6 @@
 #ifndef LED_H
 #define LED_H
 
-#include <Arduino.h>
-#include "ShiftRegisterPWM.h"
-#include "Database.h"
-#include "Standard.h"
-#include "Channel.h"
-
 #define IS_DIM    0
 #define IS_BRIGHT 1
 

@@ -1,15 +1,9 @@
 #ifndef LEDS_H
 #define LEDS_H
 
-#include <Arduino.h>
-#include "Standard.h"
-#include "ShiftRegisterPWM.h"
-#include "LED.h"
-
 #define NUM_SHIFT_REGISTERS   2
 #define SHIFT_REG_RESOLUTION  100
 
-#define NUM_LEDS              4
 #define LED1_SR_PINS          3,  2,  1
 #define LED2_SR_PINS          7,  6,  5
 #define LED3_SR_PINS          11, 10, 9
@@ -33,7 +27,7 @@ struct LEDs {
   }
 
   void loop() {
-    for (int i=0; i<NUM_LEDS; i++) at(i)->loop();
+    for (int i=0; i<NUM_FSW; i++) at(i)->loop();
   }
 
   LED* at(uint8_t pos) {

@@ -1,16 +1,10 @@
 #ifndef BUTTON_H
 #define BUTTON_H
 
-#include <Arduino.h>
-#include "Standard.h"
-
 #define LONG_PRESS_MS     500
 
 #define STATE_SHORT_PRESS 1
 #define STATE_LONG_PRESS  2
-
-#define PRESS_TYPE_UP     0
-#define PRESS_TYPE_DOWN   1
 
 struct Button {
   unsigned long    timer;

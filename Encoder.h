@@ -1,10 +1,6 @@
 #ifndef ENCODER_H
 #define ENCODER_H
 
-#include <Arduino.h>
-#include "Standard.h"
-#include "Button.h"
-
 #define ENC_OFF 0
 #define ENC_CW  1
 #define ENC_CCW 2

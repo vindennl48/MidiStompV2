@@ -1,12 +1,6 @@
 #ifndef CHANNEL_H
 #define CHANNEL_H
 
-#include <Arduino.h>
-#include "ShiftRegisterPWM.h"
-#include "Standard.h"
-
-#define DEFAULT_LED_TIME_MS   50
-
 struct Channel {
 
   uint8_t          setpoint, actual, points, i_wait, i_wait_total = 0;

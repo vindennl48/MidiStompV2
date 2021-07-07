@@ -1,13 +1,6 @@
 #ifndef SCREEN_H
 #define SCREEN_H
 
-#include <Arduino.h>
-#include <LiquidCrystal_I2C.h>
-#include "Standard.h"
-
-#define X_MAX_SIZE 16
-#define Y_MAX_SIZE 2
-
 struct Screen {
 
   LiquidCrystal_I2C *lcd;
@@ -48,7 +41,7 @@ struct Screen {
 
   // Print text then clear the rest of line with spaces
   void print_with_nline(uint8_t x, uint8_t y, String text) {
-    uint8_t rest = X_MAX_SIZE;
+    uint8_t rest = LCD_WIDTH;
     rest = rest - x - text.length();
 
     print(x, y, text);
