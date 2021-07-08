@@ -25,6 +25,16 @@ void set_data(T *data, uint16_t start) {
 /*  :: END TEMPLATES :: */
 
 
+void get_data(char* phrase, uint16_t start) {
+  eeprom_read_block(
+    phrase,
+    (void*)start,
+    STR_LEN_MAX
+  );
+}
+#define GET_TEXT(phrase, id) get_data(phrase, EEPROM_START_MENUS+(STR_LEN_MAX*id))
+
+
 /*  :: COLOR :: */
 struct Color {
   // 16 bytes
@@ -72,7 +82,7 @@ struct Pedal {
 /*  :: FOOTSWITCH :: */
 struct Footswitch {
   // 8 bytes
-  uint8_t colors[NUM_STATES] = { 0, 1, 2 };
+  uint8_t colors[NUM_STATES]     = { 0, 1, 2 };
   uint8_t velocities[NUM_STATES] = { 0 };
 
   // States of footswitch
@@ -121,30 +131,41 @@ struct Preset {
 
 /*  :: RESET EEPROM :: */
 void reset_eeprom() {
+//  {
+//    Color color;
+//    for (int i=0; i<EEPROM_NUM_COLORS; i++) set_data<Color>( &color, EEPROM_START_COLORS + (sizeof(Color) * i) );
+//  }
+
   {
-    Color color;
-    for (int i=0; i<EEPROM_NUM_COLORS; i++) set_data<Color>(&color, EEPROM_START_COLORS + (sizeof(Color) * i) );
+    Pedal pedal;
+    for (int i=0; i<EEPROM_NUM_PEDALS; i++) set_data<Pedal>( &pedal, EEPROM_START_PEDALS + (sizeof(Pedal) * i) );
   }
 
-//  {
-//    Pedal pedal;
-//    for (int i=0; i<EEPROM_NUM_PEDALS; i++) set_data<Pedal>(*pedal, EEPROM_START_PEDALS + (sizeof(Pedal) * i) );
-//  }
-//
-//  {
-//    Param param;
-//    for (int i=0; i<EEPROM_NUM_PARAMS; i++) set_data<Param>(*param, EEPROM_START_PARAMS + (sizeof(Param) * i) );
-//  }
-//
-//  {
-//    Footswitch fsw;
-//    for (int i=0; i<EEPROM_NUM_FSW; i++) set_data<Footswitch>(*fsw, EEPROM_START_FSW + (sizeof(Footswitch) * i) );
-//  }
-//
-//  {
-//    Preset preset;
-//    for (int i=0; i<EEPROM_NUM_PRESET; i++) set_data<Preset>(*preset, EEPROM_START_PRESET + (sizeof(Preset) * i) );
-//  }
+  {
+    Param param;
+    for (int i=0; i<EEPROM_NUM_PARAMS; i++) set_data<Param>( &param, EEPROM_START_PARAMS + (sizeof(Param) * i) );
+  }
+
+  {
+    Footswitch fsw;
+    for (int i=0; i<EEPROM_NUM_FSW; i++) set_data<Footswitch>( &fsw, EEPROM_START_FSW + (sizeof(Footswitch) * i) );
+  }
+
+  {
+    Preset preset;
+    for (int i=0; i<EEPROM_NUM_PRESETS; i++) set_data<Preset>( &preset, EEPROM_START_PRESETS + (sizeof(Preset) * i) );
+  }
+
+  {
+    char word[STR_LEN_MAX] = "SETTINGS";
+    //set_data<char[STR_LEN_MAX]>( word, EEPROM_START_MENUS + (sizeof(word) * 0) );
+    eeprom_write_block((const void*)word, (void*)(EEPROM_START_MENUS + (STR_LEN_MAX * 0)), STR_LEN_MAX);
+
+    strcpy(word, "PRESET NAME");
+    //word = "PRESET NAME";
+    //set_data<char[STR_LEN_MAX]>( word, EEPROM_START_MENUS + (sizeof(word) * 1) );
+    eeprom_write_block((const void*)word, (void*)(EEPROM_START_MENUS + (STR_LEN_MAX * 1)), STR_LEN_MAX);
+  }
 
   /*for (int i=0; i<EEPROM_NUM_START_MENUS; i++) save_to_eeprom(*color, EEPROM_START_START_MENUS + (sizeof(char[13])*i) );*/
 }

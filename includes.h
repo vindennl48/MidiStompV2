@@ -39,7 +39,7 @@
 #define NUM_STATES           3
 
 #define STR_LEN              12
-#define STR_LEN_MAX          STR_LEN+1
+#define STR_LEN_MAX          (STR_LEN+1)
 
 // Button
 #define PRESS_TYPE_UP        0
