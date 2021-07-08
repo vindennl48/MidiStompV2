@@ -40,4 +40,4 @@ app/assets/stylesheets/README.md
 /forget
 
 # Ignore temp files
-temp.*
+#temp.*
