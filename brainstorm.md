@@ -1,3 +1,81 @@
+# Settings Menu
+  - When long-pressing the encoder, you have access to the settings menu
+  - On screen, you have direct access to:
+    - Naming the current preset
+    - Saving the current preset (if there are changes)
+    - Changing the Preset loading MIDI notes
+      - When changing presets, a list of MIDI notes get sent out
+        to turn on specific pedals for that preset.
+    - Copy Preset to another preset
+    - Reset Preset
+    - Go to Global Settings menu
+      - Change Pedals
+        - Change Pedal Name
+        - Change MIDI Channel
+        - Change parameters
+          - Change Param Name
+          - Change Param MIDI Note
+      - Change Colors
+        - Change Color Name
+        - Change Color values
+      - Factory Reset
+  - To change the footswitch settings, simply click on the pedal you want to
+    edit.
+    - Change footswitch activation type: OFF / TOGGLE / CYCLE / ONESHOT
+    - Change Colors for OFF, ON1, ON2
+    - Change Parameter to affect when is_pressed is activated OR switch to sub-menu
+      - set velocity value / patch value
+    - Change Parameter to affect when is_long_pressed is activated OR switch to sub-menu
+      - set velocity value / patch value
+      
+## Menu Breakdown
+  - ::SETTINGS
+  - > SAVE  (if there were changes)
+  -   NAME
+  -   PARAMS
+  -   COPY
+  -   RESET
+  -   GLOBAL
+
+  - ::GLOBAL
+  - > PEDALS
+      - NAME
+      - CHANNEL
+      - PARAMS
+        - NAME
+        - MIDI
+  -   COLORS
+      - NAME
+      - VALUES
+  -   RESET
+
+  - ::FSW 1
+  - > TYPE
+  -   COLORS
+  -   SHORT PRESS
+  -   LONG PRESS
+
+## List of words
+  - SETTINGS
+  - SAVE
+  - NAME
+  - PARAMS
+  - COPY
+  - RESET
+  - GLOBAL
+  - PEDALS
+  - CHANNEL
+  - MIDI
+  - COLORS
+  - VALUES
+  - FSW ( take out for space )
+  - TYPE
+  - SHORT PRESS
+  - LONG PRESS
+
+
+# OLD --------------------------------------------------------------------------
+
 # ToDo List
   - DONE:: Create a text editor on the screen with encoder
   - DONE:: Create a quick menu for editing the database entries

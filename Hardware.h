@@ -14,7 +14,7 @@ struct HW {
     LED_BOARD_SETUP;  // LED on the arduino board
 
     screen.setup(LCD_ADDR, LCD_WIDTH, LCD_HEIGHT);
-    knob.setup(PIN_D2, PIN_D3, PIN_D4);
+    knob.setup(PIN_D3, PIN_D2, PIN_D4);
     leds.setup();
     btns.setup();
 

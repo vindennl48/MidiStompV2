@@ -1,6 +1,7 @@
 #ifndef DATABASE_H
 #define DATABASE_H
 
+
 /*  :: TEMPLATES :: */
 template <typename T>
 T get_data(uint16_t start) {
@@ -47,8 +48,6 @@ struct Color {
     this->b = 0;
   }
 };
-#define GET_COLOR(id) get_data<Color>(EEPROM_START_COLORS+(sizeof(Color)*id))
-#define SET_COLOR(id, color) set_data<Color>(&color, EEPROM_START_COLORS+(sizeof(Color)*id))
 
 
 /*  :: PARAMETER :: */
@@ -129,6 +128,32 @@ struct Preset {
 
 
 
+/* :: DATABASE STRUCT :: */
+struct DB {
+  static Color color_at(uint8_t id)                    { return get_data<Color>(             EEPROM_START_COLORS + sizeof(Color) * id ); }
+  static void  color_save(uint8_t id, Color new_color) { return set_data<Color>( &new_color, EEPROM_START_COLORS + sizeof(Color) * id ); }
+
+  static Param param_at(uint8_t pedal_id, uint8_t id)                    { return get_data<Param>(             EEPROM_START_PARAMS + sizeof(Param) * EEPROM_NUM_PARAMS * pedal_id + sizeof(Param) * id ); }
+  static void  param_save(uint8_t pedal_id, uint8_t id, Param new_param) { return set_data<Param>( &new_param, EEPROM_START_PARAMS + sizeof(Param) * EEPROM_NUM_PARAMS * pedal_id + sizeof(Param) * id ); }
+
+  static Pedal pedal_at(uint8_t id)                    { return get_data<Pedal>(             EEPROM_START_PEDALS + sizeof(Pedal) * id ); }
+  static void  pedal_save(uint8_t id, Pedal new_pedal) { return set_data<Pedal>( &new_pedal, EEPROM_START_PEDALS + sizeof(Pedal) * id ); }
+
+  static Footswitch fsw_at(uint8_t preset_id, uint8_t id)                       { return get_data<Footswitch>(           EEPROM_START_FSW + sizeof(Footswitch) * EEPROM_NUM_FSW * preset_id + sizeof(Footswitch) * id ); }
+  static void       fsw_save(uint8_t preset_id, uint8_t id, Footswitch new_fsw) { return set_data<Footswitch>( &new_fsw, EEPROM_START_FSW + sizeof(Footswitch) * EEPROM_NUM_FSW * preset_id + sizeof(Footswitch) * id ); }
+
+  static Preset preset_at(uint8_t id)                      { return get_data<Preset>(              EEPROM_START_PRESETS + sizeof(Preset) * id ); }
+  static void   preset_save(uint8_t id, Preset new_preset) { return set_data<Preset>( &new_preset, EEPROM_START_PRESETS + sizeof(Preset) * id ); }
+
+  static void text_at(char *text, uint8_t id)   { eeprom_read_block( text, (void*)( EEPROM_START_MENUS + STR_LEN_MAX * id ), STR_LEN_MAX ); }
+  static void text_save(char *text, uint8_t id) { eeprom_write_block((const void*)text, (void*)(EEPROM_START_MENUS + (STR_LEN_MAX * id)), STR_LEN_MAX); }
+  //static Text text_at(uint8_t id)                  { return get_data<Text>(            EEPROM_START_MENUS + sizeof(Text) * id ); }
+  //static void text_save(uint8_t id, Text new_text) { return set_data<Text>( &new_text, EEPROM_START_MENUS + sizeof(Text) * id ); }
+};
+
+
+
+
 /*  :: RESET EEPROM :: */
 void reset_eeprom() {
 //  {
@@ -156,16 +181,40 @@ void reset_eeprom() {
     for (int i=0; i<EEPROM_NUM_PRESETS; i++) set_data<Preset>( &preset, EEPROM_START_PRESETS + (sizeof(Preset) * i) );
   }
 
+#ifdef CODING_RESET
   {
     char word[STR_LEN_MAX] = "SETTINGS";
-    //set_data<char[STR_LEN_MAX]>( word, EEPROM_START_MENUS + (sizeof(word) * 0) );
     eeprom_write_block((const void*)word, (void*)(EEPROM_START_MENUS + (STR_LEN_MAX * 0)), STR_LEN_MAX);
-
-    strcpy(word, "PRESET NAME");
-    //word = "PRESET NAME";
-    //set_data<char[STR_LEN_MAX]>( word, EEPROM_START_MENUS + (sizeof(word) * 1) );
-    eeprom_write_block((const void*)word, (void*)(EEPROM_START_MENUS + (STR_LEN_MAX * 1)), STR_LEN_MAX);
+    strcpy(word, "SAVE");
+    eeprom_write_block((const void*)word, (void*)(EEPROM_START_MENUS + (STR_LEN_MAX * 1)),  STR_LEN_MAX);
+    strcpy(word, "NAME");
+    eeprom_write_block((const void*)word, (void*)(EEPROM_START_MENUS + (STR_LEN_MAX * 2)),  STR_LEN_MAX);
+    strcpy(word, "PARAMS");
+    eeprom_write_block((const void*)word, (void*)(EEPROM_START_MENUS + (STR_LEN_MAX * 3)),  STR_LEN_MAX);
+    strcpy(word, "COPY");
+    eeprom_write_block((const void*)word, (void*)(EEPROM_START_MENUS + (STR_LEN_MAX * 4)),  STR_LEN_MAX);
+    strcpy(word, "RESET");
+    eeprom_write_block((const void*)word, (void*)(EEPROM_START_MENUS + (STR_LEN_MAX * 5)),  STR_LEN_MAX);
+    strcpy(word, "GLOBAL");
+    eeprom_write_block((const void*)word, (void*)(EEPROM_START_MENUS + (STR_LEN_MAX * 6)),  STR_LEN_MAX);
+    strcpy(word, "PEDALS");
+    eeprom_write_block((const void*)word, (void*)(EEPROM_START_MENUS + (STR_LEN_MAX * 7)),  STR_LEN_MAX);
+    strcpy(word, "CHANNEL");
+    eeprom_write_block((const void*)word, (void*)(EEPROM_START_MENUS + (STR_LEN_MAX * 8)),  STR_LEN_MAX);
+    strcpy(word, "MIDI");
+    eeprom_write_block((const void*)word, (void*)(EEPROM_START_MENUS + (STR_LEN_MAX * 9)),  STR_LEN_MAX);
+    strcpy(word, "COLORS");
+    eeprom_write_block((const void*)word, (void*)(EEPROM_START_MENUS + (STR_LEN_MAX * 10)), STR_LEN_MAX);
+    strcpy(word, "VALUES");
+    eeprom_write_block((const void*)word, (void*)(EEPROM_START_MENUS + (STR_LEN_MAX * 11)), STR_LEN_MAX);
+    strcpy(word, "TYPE");
+    eeprom_write_block((const void*)word, (void*)(EEPROM_START_MENUS + (STR_LEN_MAX * 12)), STR_LEN_MAX);
+    strcpy(word, "SHORT PRESS");
+    eeprom_write_block((const void*)word, (void*)(EEPROM_START_MENUS + (STR_LEN_MAX * 13)), STR_LEN_MAX);
+    strcpy(word, "LONG PRESS");
+    eeprom_write_block((const void*)word, (void*)(EEPROM_START_MENUS + (STR_LEN_MAX * 14)), STR_LEN_MAX);
   }
+#endif
 
   /*for (int i=0; i<EEPROM_NUM_START_MENUS; i++) save_to_eeprom(*color, EEPROM_START_START_MENUS + (sizeof(char[13])*i) );*/
 }
