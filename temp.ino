@@ -19,6 +19,7 @@ void setup() {
   /*load_preset();*/
 
   fsw[2].mode = FSW_MODE_CYCLE;
+  strcpy(preset.name, "PCORE       ");
 }
 
 void loop() {
@@ -30,6 +31,7 @@ void loop() {
         // Setup screen
         HW::screen.clear();
         HW::screen.print(0,0, preset.name);
+        HW::screen.print(10,1, "MENU 1");
 
         // Setup footswitches
         for (int i=0; i<NUM_FSW; i++) {

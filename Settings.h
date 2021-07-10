@@ -1,12 +1,13 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
-#define E_SETTINGS     0
-#define E_FSW_SETTINGS 1
-#define E_FSW_COLOR    2
+#define E_SETTINGS       0
+#define E_FSW_SETTINGS   1
+#define E_FSW_COLOR      2
+#define E_FSW_TYPE       3
 
 #define PRESET_MENU_SIZE 7
-#define FSW_MENU_SIZE    4
+#define FSW_MENU_SIZE    5
 
 struct Settings {
   static Menu    m;
@@ -59,9 +60,19 @@ struct Settings {
           HW::screen.print(2,1, text);
         }
         else {
-          if      ( HW::knob.is_left()  ) { x = CONTAIN(x-1, 1, (FSW_MENU_SIZE-1)); m.reinitialize(); }
-          else if ( HW::knob.is_right() ) { x = CONTAIN(x+1, 1, (FSW_MENU_SIZE-1)); m.reinitialize(); }
+          if      ( HW::knob.is_left()  )        { x = CONTAIN(x-1, 1, (FSW_MENU_SIZE-1)); m.reinitialize(); }
+          else if ( HW::knob.is_right() )        { x = CONTAIN(x+1, 1, (FSW_MENU_SIZE-1)); m.reinitialize(); }
           else if ( HW::knob.is_long_pressed() ) { x = 1; m.jump_to(E_SETTINGS); }
+          else if ( HW::knob.is_pressed() )      {
+            if ( fsw_menu[x] == EEPROM_TEXT_COLORS ) {
+              x = fsw[fsw_num].colors[fsw_state];
+              m.jump_to(E_FSW_COLOR);
+            }
+            if ( fsw_menu[x] == EEPROM_TEXT_TYPE ) {
+              x = fsw[fsw_num].mode;
+              m.jump_to(E_FSW_TYPE);
+            }
+          }
           else if ( HW::btns.at(fsw_num)->is_pressed() ) {
             fsw_state = ROTATE(fsw_state+1, 0, NUM_STATES);
             x = 1;
@@ -71,8 +82,31 @@ struct Settings {
         break;
 
       case E_FSW_COLOR:
-        if ( m.not_initialized() ) { }
-        else                       { }
+        if ( m.not_initialized() ) {
+          HW::screen.clear();
+          HW::leds.at(fsw_num)->set( DB::color_at(x) );
+          HW::screen.print(0,0, DB::color_at(x).name);
+        }
+        else                       {
+          if      ( HW::knob.is_left()  )        { x = CONTAIN(x-1, 0, (EEPROM_NUM_COLORS-1)); m.reinitialize(); }
+          else if ( HW::knob.is_right() )        { x = CONTAIN(x+1, 0, (EEPROM_NUM_COLORS-1)); m.reinitialize(); }
+          else if ( HW::knob.is_pressed() )      { fsw[fsw_num].colors[fsw_state] = x; x = 1; m.jump_to(E_FSW_SETTINGS); }
+          else if ( HW::knob.is_long_pressed() ) { x = 1; m.jump_to(E_FSW_SETTINGS); }
+        }
+        break;
+
+      case E_FSW_TYPE:
+        if ( m.not_initialized() ) {
+          HW::screen.clear();
+          HW::leds.at(fsw_num)->set( DB::color_at(x) );
+          HW::screen.print(0,0, DB::color_at(x).name);
+        }
+        else                       {
+          if      ( HW::knob.is_left()  )        { x = CONTAIN(x-1, 0, (EEPROM_NUM_COLORS-1)); m.reinitialize(); }
+          else if ( HW::knob.is_right() )        { x = CONTAIN(x+1, 0, (EEPROM_NUM_COLORS-1)); m.reinitialize(); }
+          else if ( HW::knob.is_pressed() )      { fsw[fsw_num].colors[fsw_state] = x; x = 1; m.jump_to(E_FSW_SETTINGS); }
+          else if ( HW::knob.is_long_pressed() ) { x = 1; m.jump_to(E_FSW_SETTINGS); }
+        }
         break;
     };
 
@@ -101,11 +135,18 @@ uint8_t Settings::fsw_menu[FSW_MENU_SIZE] = {
   EEPROM_TEXT_SETTINGS,
   EEPROM_TEXT_COLORS,
   EEPROM_TEXT_SHORT_PRESS,
-  EEPROM_TEXT_LONG_PRESS
+  EEPROM_TEXT_LONG_PRESS,
+  EEPROM_TEXT_TYPE
 };
 
 
 #undef E_SETTINGS
 #undef E_FSW_SETTINGS
+#undef E_FSW_COLOR
+#undef E_FSW_TYPE
+
+#undef PRESET_MENU_SIZE
+#undef FSW_MENU_SIZE
+
 
 #endif
