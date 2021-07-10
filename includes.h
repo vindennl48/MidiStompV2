@@ -80,6 +80,7 @@
 
 // MACROS
 #define CONTAIN(i, min, max) (i>min ? (i<max ? i : max) : min)
+#define ROTATE(i, min, max) (i>min ? (i<max ? i : min) : max)
 
 // Headers
 #include "Standard.h"

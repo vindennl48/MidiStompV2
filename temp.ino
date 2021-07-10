@@ -54,7 +54,7 @@ void loop() {
       break;
 
     case E_SETTINGS:
-      if ( Settings::loop() ) m.jump_to(E_MAIN);
+      if ( Settings::loop(fsw) ) m.jump_to(E_MAIN);
       break;
   };
 
