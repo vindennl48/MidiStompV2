@@ -10,28 +10,32 @@
 // Global Libraries
 #include <Arduino.h>
 #include <LiquidCrystal_I2C.h>
+#include <Wire.h>
 
 
 // Definitions
 
 // EEPROM map
-#define EEPROM_START_COLORS  0
-#define EEPROM_NUM_COLORS    14
+#define EEPROM_START_COLORS     0
+#define EEPROM_NUM_COLORS       100
 
-#define EEPROM_START_PEDALS  225
-#define EEPROM_NUM_PEDALS    2
+#define EEPROM_START_PEDALS     2400
+#define EEPROM_NUM_PEDALS       8
 
-#define EEPROM_START_PARAMS  254
-#define EEPROM_NUM_PARAMS    20
+#define EEPROM_START_PARAMS     2568
+#define EEPROM_NUM_PARAMS       256
 
-#define EEPROM_START_FSW     535
-#define EEPROM_NUM_FSW       32
+#define EEPROM_START_FSW        7944
+#define EEPROM_NUM_FSW          1600
 
-#define EEPROM_START_PRESETS 792
-#define EEPROM_NUM_PRESETS   2
+#define EEPROM_START_PRESETS    31944
+#define EEPROM_NUM_PRESETS      100
 
-#define EEPROM_START_MENUS   821
-#define EEPROM_NUM_MENUS     15
+#define EEPROM_START_MENUS      34044
+#define EEPROM_NUM_MENUS        20
+
+#define EEPROM_START_OPTS       34074
+#define EEPROM_NUM_OPTS         20
 //--
 //EEPROM MENU TEXT LOCATIONS
 #define EEPROM_TEXT_SETTINGS    0
@@ -53,12 +57,16 @@
 // Settings
 #define NUM_PEDAL_PARAMS 20
 #define NUM_FSW          4
+#define NUM_SUB_MENUS    4
 #define NUM_STATES       3
+
+#define NUM_MENU_ITEMS   10
 
 #define STR_LEN          12
 #define STR_LEN_MAX      (STR_LEN+1)
 
-#define CODING_RESET     //undef to remove useless bytes from code
+//#define CODING_RESET     //undef to remove useless bytes from code
+
 
 // Button
 #define PRESS_TYPE_UP   0
@@ -79,12 +87,16 @@
 #define DEFAULT_LED_TIME_MS 50
 
 // MACROS
-#define CONTAIN(i, min, max) (i>min ? (i<max ? i : max) : min)
-#define ROTATE(i, min, max) (i>min ? (i<max ? i : min) : max)
+#define CONTAIN(i, min, max) (i>(min) ? (i<(max) ? i : (max)) : (min))
+#define ROTATE(i, min, max) (i>(min) ? (i<(max) ? i : (min)) : (max))
 
 // Headers
 #include "Standard.h"
+#include "Menu.h"
+#include "I2C_EEPROM.h"
 #include "Database.h"
+Preset     preset;
+Footswitch fsw[NUM_SUB_MENUS][NUM_FSW];
 #include "Button.h"
 #include "Encoder.h"
 #include "Buttons.h"
@@ -94,7 +106,7 @@
 #include "LEDs.h"
 #include "Screen.h"
 #include "Hardware.h"
-#include "Menu.h"
+#include "MenuLoop.h"
 #include "Settings.h"
 
 #endif

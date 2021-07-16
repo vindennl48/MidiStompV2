@@ -6,19 +6,18 @@
 
 
 // Variables
-Menu m;
-
-Preset     preset;
-Footswitch fsw[NUM_FSW];
+// Preset and fsw are in includes.h
+Menu    m;
+uint8_t submenu = 0;
 
 void setup() {
   HW::setup();
 
   // Load up preset and footswitches from eeprom
-  /*reset_eeprom();*/
+  reset_eeprom();
   /*load_preset();*/
 
-  fsw[2].mode = FSW_MODE_CYCLE;
+  fsw[submenu][2].mode = FSW_MODE_CYCLE;
   strcpy(preset.name, "PCORE       ");
 }
 
@@ -35,18 +34,18 @@ void loop() {
 
         // Setup footswitches
         for (int i=0; i<NUM_FSW; i++) {
-          if ( fsw[i].mode == FSW_MODE_ONESHOT ) HW::btns.at(i)->set_press_type(PRESS_TYPE_DOWN);
+          if ( fsw[submenu][i].mode == FSW_MODE_ONESHOT ) HW::btns.at(i)->set_press_type(PRESS_TYPE_DOWN);
           else                                   HW::btns.at(i)->set_press_type(PRESS_TYPE_UP);
 
-          HW::leds.at(i)->set( DB::color_at( fsw[i].colors[fsw[i].state] ) );
+          HW::leds.at(i)->set( DB::color_at( fsw[submenu][i].colors[fsw[submenu][i].state] ) );
         }
       }
 
       else {
         for (int i=0; i<NUM_FSW; i++) {
           if ( HW::btns.at(i)->is_pressed() ) {
-            fsw[i].increase_state();
-            HW::leds.at(i)->set( DB::color_at( fsw[i].colors[fsw[i].state] ) );
+            fsw[submenu][i].increase_state();
+            HW::leds.at(i)->set( DB::color_at( fsw[submenu][i].colors[fsw[submenu][i].state] ) );
           }
           else if ( HW::btns.at(i)->is_long_pressed() ) {}
         }
@@ -56,7 +55,7 @@ void loop() {
       break;
 
     case E_SETTINGS:
-      if ( Settings::loop(fsw) ) m.jump_to(E_MAIN);
+      if ( Settings::loop() ) m.jump_to(E_MAIN);
       break;
   };
 

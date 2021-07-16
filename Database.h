@@ -2,40 +2,6 @@
 #define DATABASE_H
 
 
-/*  :: TEMPLATES :: */
-template <typename T>
-T get_data(uint16_t start) {
-  T data;
-
-  eeprom_read_block(
-    (void*)&data,
-    (void*)start,
-    sizeof(T)
-  );
-  return data;
-}
-
-template <typename T>
-void set_data(T *data, uint16_t start) {
-  eeprom_write_block(
-    (const void*)data,
-    (void*)start,
-    sizeof(T)
-  );
-}
-/*  :: END TEMPLATES :: */
-
-
-void get_data(char* phrase, uint16_t start) {
-  eeprom_read_block(
-    phrase,
-    (void*)start,
-    STR_LEN_MAX
-  );
-}
-#define GET_TEXT(phrase, id) get_data(phrase, EEPROM_START_MENUS+(STR_LEN_MAX*id))
-
-
 /*  :: COLOR :: */
 struct Color {
   // 16 bytes
@@ -81,8 +47,7 @@ struct Pedal {
 /*  :: FOOTSWITCH :: */
 struct Footswitch {
   // 8 bytes
-  uint8_t colors[NUM_STATES]     = { 0, 1, 2 };
-  uint8_t velocities[NUM_STATES] = { 0 };
+  uint8_t colors[NUM_STATES] = { 0, 1, 2 };
 
   // States of footswitch
   union {
@@ -93,18 +58,17 @@ struct Footswitch {
   };
 
   // Pedal Param = PP
-  union {
+  union PP {
     struct {
       unsigned pedal:3;
       unsigned param:5;
+      unsigned velocity:8;
     };
-  };
+  } output[NUM_STATES] = { 0 };
 
   Footswitch() {
     this->mode  = FSW_MODE_TOGGLE;
     this->state = 0;
-    this->pedal = 0;
-    this->param = 0;
   }
 
   void increase_state() {
@@ -126,40 +90,47 @@ struct Preset {
   // 1 main footswitch menu + 3 footswitch sub-menus
 };
 
-
+struct MenuItem { char data[STR_LEN_MAX]; };
 
 /* :: DATABASE STRUCT :: */
 struct DB {
-  static Color color_at(uint8_t id)                    { return get_data<Color>(             EEPROM_START_COLORS + sizeof(Color) * id ); }
-  static void  color_save(uint8_t id, Color new_color) { return set_data<Color>( &new_color, EEPROM_START_COLORS + sizeof(Color) * id ); }
+  static Color color_at(     uint8_t id)                                        { return get_data<Color>(                EEPROM_START_COLORS + sizeof(Color) * id ); }
+  static void  color_save(   uint8_t id, Color new_obj)                         { return set_data<Color>(      &new_obj, EEPROM_START_COLORS + sizeof(Color) * id ); }
 
-  static Param param_at(uint8_t pedal_id, uint8_t id)                    { return get_data<Param>(             EEPROM_START_PARAMS + sizeof(Param) * EEPROM_NUM_PARAMS * pedal_id + sizeof(Param) * id ); }
-  static void  param_save(uint8_t pedal_id, uint8_t id, Param new_param) { return set_data<Param>( &new_param, EEPROM_START_PARAMS + sizeof(Param) * EEPROM_NUM_PARAMS * pedal_id + sizeof(Param) * id ); }
+  static Pedal pedal_at(     uint8_t id)                                        { return get_data<Pedal>(                EEPROM_START_PEDALS + sizeof(Pedal) * id ); }
+  static void  pedal_save(   uint8_t id, Pedal new_obj)                         { return set_data<Pedal>(      &new_obj, EEPROM_START_PEDALS + sizeof(Pedal) * id ); }
 
-  static Pedal pedal_at(uint8_t id)                    { return get_data<Pedal>(             EEPROM_START_PEDALS + sizeof(Pedal) * id ); }
-  static void  pedal_save(uint8_t id, Pedal new_pedal) { return set_data<Pedal>( &new_pedal, EEPROM_START_PEDALS + sizeof(Pedal) * id ); }
+  static Preset preset_at(    uint8_t id)                                        { return get_data<Preset>(               EEPROM_START_PRESETS + sizeof(Preset) * id ); }
+  static void  preset_save(   uint8_t id, Preset new_obj)                        { return set_data<Preset>(     &new_obj, EEPROM_START_PRESETS + sizeof(Preset) * id ); }
 
-  static Footswitch fsw_at(uint8_t preset_id, uint8_t id)                       { return get_data<Footswitch>(           EEPROM_START_FSW + sizeof(Footswitch) * EEPROM_NUM_FSW * preset_id + sizeof(Footswitch) * id ); }
-  static void       fsw_save(uint8_t preset_id, uint8_t id, Footswitch new_fsw) { return set_data<Footswitch>( &new_fsw, EEPROM_START_FSW + sizeof(Footswitch) * EEPROM_NUM_FSW * preset_id + sizeof(Footswitch) * id ); }
+  static Param param_at(     uint8_t parent_id, uint8_t id)                     { return get_data<Param>(                EEPROM_START_PARAMS + sizeof(Param) * EEPROM_NUM_PARAMS * parent_id + sizeof(Param) * id ); }
+  static void param_save(    uint8_t parent_id, uint8_t id, Param new_obj)      { return set_data<Param>(      &new_obj, EEPROM_START_PARAMS + sizeof(Param) * EEPROM_NUM_PARAMS * parent_id + sizeof(Param) * id ); }
 
-  static Preset preset_at(uint8_t id)                      { return get_data<Preset>(              EEPROM_START_PRESETS + sizeof(Preset) * id ); }
-  static void   preset_save(uint8_t id, Preset new_preset) { return set_data<Preset>( &new_preset, EEPROM_START_PRESETS + sizeof(Preset) * id ); }
+  static Footswitch fsw_at(uint8_t parent_id, uint8_t id)                     { return get_data<Footswitch>(           EEPROM_START_FSW + sizeof(Footswitch) * EEPROM_NUM_FSW * parent_id + sizeof(Footswitch) * id ); }
+  static void fsw_save(    uint8_t parent_id, uint8_t id, Footswitch new_obj) { return set_data<Footswitch>( &new_obj, EEPROM_START_FSW + sizeof(Footswitch) * EEPROM_NUM_FSW * parent_id + sizeof(Footswitch) * id ); }
 
-  static void text_at(char *text, uint8_t id)   { eeprom_read_block( text, (void*)( EEPROM_START_MENUS + STR_LEN_MAX * id ), STR_LEN_MAX ); }
-  static void text_save(char *text, uint8_t id) { eeprom_write_block((const void*)text, (void*)(EEPROM_START_MENUS + (STR_LEN_MAX * id)), STR_LEN_MAX); }
-  //static Text text_at(uint8_t id)                  { return get_data<Text>(            EEPROM_START_MENUS + sizeof(Text) * id ); }
-  //static void text_save(uint8_t id, Text new_text) { return set_data<Text>( &new_text, EEPROM_START_MENUS + sizeof(Text) * id ); }
+  // Menu just saves the # of MenuItems for each menu
+  // Each menu has 10 reserved spots for MenuItems, however,
+  // you do not need to use all of the spots.
+  static uint8_t menu_at(       uint8_t id)                  { return get_data<uint8_t>(           EEPROM_START_MENUS + id ); }
+  static void    menu_save(     uint8_t id, uint8_t new_obj) { return set_data<uint8_t>( &new_obj, EEPROM_START_MENUS + id ); }
+
+  static void menu_item_at(uint8_t menu_id, uint8_t id, char *menu_item) { eReadBlock( EEPROM_START_MENUS + STR_LEN_MAX * NUM_MENU_ITEMS * menu_id + STR_LEN_MAX * id, (uint8_t*)menu_item, STR_LEN_MAX ); }
+  //static void    menu_item_save(uint8_t menu_id, uint8_t id, uint8_t new_obj) { return set_data<uint8_t>( &new_obj, EEPROM_START_MENUS + STR_LEN_MAX * NUM_MENU_ITEMS * menu_id + STR_LEN_MAX * id ); }
+
+  static void text_at(char *text, uint8_t id)                { eeprom_read_block( text, (void*)( EEPROM_START_MENUS + STR_LEN_MAX * id ), STR_LEN_MAX ); }
+  static void text_save(char *text, uint8_t id)              { eeprom_write_block((const void*)text, (void*)(EEPROM_START_MENUS + (STR_LEN_MAX * id)), STR_LEN_MAX); }
 };
-
-
 
 
 /*  :: RESET EEPROM :: */
 void reset_eeprom() {
-//  {
-//    Color color;
-//    for (int i=0; i<EEPROM_NUM_COLORS; i++) set_data<Color>( &color, EEPROM_START_COLORS + (sizeof(Color) * i) );
-//  }
+#ifdef CODING_RESET
+
+  {
+    Color color;
+    for (int i=0; i<EEPROM_NUM_COLORS; i++) set_data<Color>( &color, EEPROM_START_COLORS + (sizeof(Color) * i) );
+  }
 
   {
     Pedal pedal;
@@ -181,150 +152,52 @@ void reset_eeprom() {
     for (int i=0; i<EEPROM_NUM_PRESETS; i++) set_data<Preset>( &preset, EEPROM_START_PRESETS + (sizeof(Preset) * i) );
   }
 
-#ifdef CODING_RESET
   {
-    char word[STR_LEN_MAX] = "SETTINGS";
-    eeprom_write_block((const void*)word, (void*)(EEPROM_START_MENUS + (STR_LEN_MAX * 0)), STR_LEN_MAX);
-    strcpy(word, "SAVE");
-    eeprom_write_block((const void*)word, (void*)(EEPROM_START_MENUS + (STR_LEN_MAX * 1)),  STR_LEN_MAX);
-    strcpy(word, "NAME");
-    eeprom_write_block((const void*)word, (void*)(EEPROM_START_MENUS + (STR_LEN_MAX * 2)),  STR_LEN_MAX);
-    strcpy(word, "PARAMS");
-    eeprom_write_block((const void*)word, (void*)(EEPROM_START_MENUS + (STR_LEN_MAX * 3)),  STR_LEN_MAX);
-    strcpy(word, "COPY");
-    eeprom_write_block((const void*)word, (void*)(EEPROM_START_MENUS + (STR_LEN_MAX * 4)),  STR_LEN_MAX);
-    strcpy(word, "RESET");
-    eeprom_write_block((const void*)word, (void*)(EEPROM_START_MENUS + (STR_LEN_MAX * 5)),  STR_LEN_MAX);
-    strcpy(word, "GLOBAL");
-    eeprom_write_block((const void*)word, (void*)(EEPROM_START_MENUS + (STR_LEN_MAX * 6)),  STR_LEN_MAX);
-    strcpy(word, "PEDALS");
-    eeprom_write_block((const void*)word, (void*)(EEPROM_START_MENUS + (STR_LEN_MAX * 7)),  STR_LEN_MAX);
-    strcpy(word, "CHANNEL");
-    eeprom_write_block((const void*)word, (void*)(EEPROM_START_MENUS + (STR_LEN_MAX * 8)),  STR_LEN_MAX);
-    strcpy(word, "MIDI");
-    eeprom_write_block((const void*)word, (void*)(EEPROM_START_MENUS + (STR_LEN_MAX * 9)),  STR_LEN_MAX);
-    strcpy(word, "COLORS");
-    eeprom_write_block((const void*)word, (void*)(EEPROM_START_MENUS + (STR_LEN_MAX * 10)), STR_LEN_MAX);
-    strcpy(word, "VALUES");
-    eeprom_write_block((const void*)word, (void*)(EEPROM_START_MENUS + (STR_LEN_MAX * 11)), STR_LEN_MAX);
-    strcpy(word, "TYPE");
-    eeprom_write_block((const void*)word, (void*)(EEPROM_START_MENUS + (STR_LEN_MAX * 12)), STR_LEN_MAX);
-    strcpy(word, "SHORT PRESS");
-    eeprom_write_block((const void*)word, (void*)(EEPROM_START_MENUS + (STR_LEN_MAX * 13)), STR_LEN_MAX);
-    strcpy(word, "LONG PRESS");
-    eeprom_write_block((const void*)word, (void*)(EEPROM_START_MENUS + (STR_LEN_MAX * 14)), STR_LEN_MAX);
+    uint8_t menu_options = 7;
+    set_data<uint8_t>(&menu_options, EEPROM_START_MENUS + 0);
+    menu_options = 4;
+    set_data<uint8_t>(&menu_options, EEPROM_START_MENUS + 1);
+    menu_options = 4;
+    set_data<uint8_t>(&menu_options, EEPROM_START_MENUS + 2);
+    menu_options = 3;
+    set_data<uint8_t>(&menu_options, EEPROM_START_MENUS + 3);
+  }
+
+  {
+    struct SaveOpts {
+      char main_menu[10][STR_LEN_MAX] = {
+        "SETTINGS",
+        "SAVE",
+        "NAME",
+        "PARAMS",
+        "COPY",
+        "RESET",
+        "GLOBAL"
+      };
+      char global_menu[10][STR_LEN_MAX] = {
+        "GLOBAL",
+        "PEDALS",
+        "COLORS",
+        "RESET"
+      };
+      char pedal_menu[10][STR_LEN_MAX] = {
+        "NAME",
+        "CHANNEL",
+        "PARAMS",
+        "RESET"
+      };
+      char color_menu[10][STR_LEN_MAX] = {
+        "NAME",
+        "VALUES",
+        "RESET"
+      };
+    } save_opts;
+
+    set_data<SaveOpts>(&save_opts, EEPROM_START_OPTS);
   }
 #endif
-
-  /*for (int i=0; i<EEPROM_NUM_START_MENUS; i++) save_to_eeprom(*color, EEPROM_START_START_MENUS + (sizeof(char[13])*i) );*/
 }
 /*  :: END RESET EEPROM :: */
-
-
-
-
-
-
-
-
-
-/* :: MIDI :: */
-// #define MIDI_KIND_MAX 3
-// #define MIDI_NOTE_MAX 128
-// const String midiKind[] = { "NOTE", "CC", "PC" };
-// struct Midi {
-//   uint8_t id = 0, kind = 0, note = 0;  
-//   void   kind_up()      { kind += 1; if ( kind >= MIDI_KIND_MAX ) kind = MIDI_KIND_MAX-1; }
-//   void   kind_down()    { if ( kind > 0 ) kind -= 1; }
-//   void   note_up()      { note += 1; if ( note >= MIDI_NOTE_MAX ) note = MIDI_NOTE_MAX-1; }
-//   void   note_down()    { if ( note > 0 ) note -= 1; }
-//   String get_kind_str() { return midiKind[kind]; }
-//   void   set_kind(uint8_t new_kind) { if ( new_kind < MIDI_KIND_MAX ) kind = new_kind; }
-// };
-// #define MIDI_MAX       10
-// #define MIDI_SHIFT     4
-// #define SET_MIDI(midi) set_data<Midi>(midi, MIDI_MAX, MIDI_SHIFT)
-// #define GET_MIDI(id)   get_data<Midi>(id,   MIDI_MAX, MIDI_SHIFT)
-// /* :: END MIDI :: */
-// 
-// 
-// /* :: DEVICE :: */
-// struct Device {
-// private:
-//   char name[CHAR_LEN] = "UNTITLED       ";
-// public:
-//   uint8_t id      = 0;
-//   uint8_t channel = 0;
-// 
-//   void   set_name(String new_name) { new_name.toCharArray(name, CHAR_LEN); }
-//   String get_name()                { return String(name); }
-// 
-//   struct parameter {
-//   private:
-//     char name[CHAR_LEN] = "PARAM          ";
-//   public:
-//     uint8_t midi_id = 0;
-// 
-//     void   set_name(String new_name) { new_name.toCharArray(name, CHAR_LEN); }
-//     String get_name()                { return String(name); }
-//   } params[10];
-// };
-// #define DEVICE_MAX         4
-// #define DEVICE_SHIFT       ( ( sizeof(Midi) * MIDI_MAX ) + MIDI_SHIFT )
-// #define SET_DEVICE(device) set_data<Device>(device, DEVICE_MAX, DEVICE_SHIFT)
-// #define GET_DEVICE(id)     get_data<Device>(id,     DEVICE_MAX, DEVICE_SHIFT)
-/* :: END DEVICE :: */
-
-
-/* :: COLOR :: */
-// struct Color {
-//   uint8_t id = 0;
-// 
-//   union {
-//     uint16_t data = 0;
-//     struct{
-//       unsigned r:4;
-//       unsigned g:4;
-//       unsigned b:4;
-//     };
-//   };
-// };
-// #define COLOR_MAX        4
-// #define COLOR_SHIFT      ( ( sizeof(Device) * DEVICE_MAX ) + DEVICE_SHIFT )
-// #define SET_COLOR(color) set_data<Color>(color, COLOR_MAX, COLOR_SHIFT)
-// #define GET_COLOR(id)    get_data<Color>(id,    COLOR_MAX, COLOR_SHIFT)
-/* :: END COLOR :: */
-
-
-/* :: SUBMENU :: */
-// struct SubMenu {
-//   uint8_t    id = 0;
-//   //Footswitch fsw[4];
-// };
-// #define SUBMENU_MAX          2
-// #define SUBMENU_SHIFT        ( ( sizeof(Color) * COLOR_MAX ) + COLOR_SHIFT )
-// #define SET_SUBMENU(submenu) set_data<SubMenu>(submenu, SUBMENU_MAX, SUBMENU_SHIFT)
-// #define GET_SUBMENU(id)      get_data<SubMenu>(id,      SUBMENU_MAX, SUBMENU_SHIFT)
-/* :: END SUBMENU :: */
-
-
-/* :: PRESET :: */
-// struct Preset {
-// private:
-//   char name[CHAR_LEN] = "UNTITLED       ";
-// public:
-//   uint8_t id         = 0;
-//   uint8_t submenu_id = 0;
-//   //MidiOut midi_out[10];
-// 
-//   void   set_name(String new_name) { new_name.toCharArray(name, CHAR_LEN); }
-//   String get_name()                { return String(name); }
-// };
-// #define PRESET_MAX         1
-// #define PRESET_SHIFT       ( ( sizeof(SubMenu) * SUBMENU_MAX ) + SUBMENU_SHIFT )
-// #define SET_PRESET(preset) set_data<Preset>(preset, PRESET_MAX, PRESET_SHIFT)
-// #define GET_PRESET(id)     get_data<Preset>(id,     PRESET_MAX, PRESET_SHIFT)
-/* :: END PRESET :: */
 
 
 #endif
