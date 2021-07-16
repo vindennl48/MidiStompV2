@@ -115,7 +115,7 @@ struct DB {
   static uint8_t menu_at(       uint8_t id)                  { return get_data<uint8_t>(           EEPROM_START_MENUS + id ); }
   static void    menu_save(     uint8_t id, uint8_t new_obj) { return set_data<uint8_t>( &new_obj, EEPROM_START_MENUS + id ); }
 
-  static void menu_item_at(uint8_t menu_id, uint8_t id, char *menu_item) { eReadBlock( EEPROM_START_MENUS + STR_LEN_MAX * NUM_MENU_ITEMS * menu_id + STR_LEN_MAX * id, (uint8_t*)menu_item, STR_LEN_MAX ); }
+  static void menu_item_at(uint8_t menu_id, uint8_t id, char *menu_item) { eReadBlock( EEPROM_START_OPTS + STR_LEN_MAX * NUM_MENU_ITEMS * menu_id + STR_LEN_MAX * id, (uint8_t*)menu_item, STR_LEN_MAX ); }
   //static void    menu_item_save(uint8_t menu_id, uint8_t id, uint8_t new_obj) { return set_data<uint8_t>( &new_obj, EEPROM_START_MENUS + STR_LEN_MAX * NUM_MENU_ITEMS * menu_id + STR_LEN_MAX * id ); }
 
   static void text_at(char *text, uint8_t id)                { eeprom_read_block( text, (void*)( EEPROM_START_MENUS + STR_LEN_MAX * id ), STR_LEN_MAX ); }
@@ -127,42 +127,72 @@ struct DB {
 void reset_eeprom() {
 #ifdef CODING_RESET
 
+  #ifdef EEPROM_RESET_COLORS
   {
     Color color;
     for (int i=0; i<EEPROM_NUM_COLORS; i++) set_data<Color>( &color, EEPROM_START_COLORS + (sizeof(Color) * i) );
-  }
 
+    color.r = 255; color.g = 0; color.b = 0;
+    set_data<Color>( &color, EEPROM_START_COLORS + (sizeof(Color) * 0) );
+
+    color.r = 0; color.g = 255; color.b = 0;
+    set_data<Color>( &color, EEPROM_START_COLORS + (sizeof(Color) * 1) );
+
+    color.r = 0; color.g = 0; color.b = 255;
+    set_data<Color>( &color, EEPROM_START_COLORS + (sizeof(Color) * 2) );
+
+    color.r = 255; color.g = 255; color.b = 0;
+    set_data<Color>( &color, EEPROM_START_COLORS + (sizeof(Color) * 3) );
+
+    color.r = 255; color.g = 0; color.b = 255;
+    set_data<Color>( &color, EEPROM_START_COLORS + (sizeof(Color) * 4) );
+  }
+  #endif
+
+  #ifdef EEPROM_RESET_PEDALS
   {
     Pedal pedal;
     for (int i=0; i<EEPROM_NUM_PEDALS; i++) set_data<Pedal>( &pedal, EEPROM_START_PEDALS + (sizeof(Pedal) * i) );
   }
+  #endif
 
+  #ifdef EEPROM_RESET_FSW
   {
     Param param;
     for (int i=0; i<EEPROM_NUM_PARAMS; i++) set_data<Param>( &param, EEPROM_START_PARAMS + (sizeof(Param) * i) );
   }
+  #endif
 
+  #ifdef EEPROM_RESET_FSW
   {
     Footswitch fsw;
     for (int i=0; i<EEPROM_NUM_FSW; i++) set_data<Footswitch>( &fsw, EEPROM_START_FSW + (sizeof(Footswitch) * i) );
   }
+  #endif
 
+  #ifdef EEPROM_RESET_PRESETS
   {
     Preset preset;
     for (int i=0; i<EEPROM_NUM_PRESETS; i++) set_data<Preset>( &preset, EEPROM_START_PRESETS + (sizeof(Preset) * i) );
   }
+  #endif
 
+  #ifdef EEPROM_RESET_MENUS
   {
     uint8_t menu_options = 7;
     set_data<uint8_t>(&menu_options, EEPROM_START_MENUS + 0);
     menu_options = 4;
     set_data<uint8_t>(&menu_options, EEPROM_START_MENUS + 1);
-    menu_options = 4;
+    menu_options = 6;
     set_data<uint8_t>(&menu_options, EEPROM_START_MENUS + 2);
-    menu_options = 3;
+    menu_options = 4;
     set_data<uint8_t>(&menu_options, EEPROM_START_MENUS + 3);
+    menu_options = 3;
+    set_data<uint8_t>(&menu_options, EEPROM_START_MENUS + 4);
   }
+  #endif
 
+  #ifdef EEPROM_RESET_OPTS
   {
     struct SaveOpts {
       char main_menu[10][STR_LEN_MAX] = {
@@ -180,6 +210,14 @@ void reset_eeprom() {
         "COLORS",
         "RESET"
       };
+      char fsw_menu[10][STR_LEN_MAX] = {
+        "FSW",
+        "TYPE",
+        "COLOR",
+        "SHORT PRESS",
+        "LONG PRESS",
+        "RESET"
+      };
       char pedal_menu[10][STR_LEN_MAX] = {
         "NAME",
         "CHANNEL",
@@ -195,6 +233,7 @@ void reset_eeprom() {
 
     set_data<SaveOpts>(&save_opts, EEPROM_START_OPTS);
   }
+  #endif
 #endif
 }
 /*  :: END RESET EEPROM :: */

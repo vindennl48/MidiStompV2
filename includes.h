@@ -54,6 +54,17 @@
 #define EEPROM_TEXT_SHORT_PRESS 13
 #define EEPROM_TEXT_LONG_PRESS  14
 
+//RESET EEPROM - Undef to remove
+//#define CODING_RESET
+//#define EEPROM_RESET_COLORS
+//#define EEPROM_RESET_PEDALS
+//#define EEPROM_RESET_PARAMS
+//#define EEPROM_RESET_FSW
+//#define EEPROM_RESET_PRESETS
+//#define EEPROM_RESET_MENUS
+//#define EEPROM_RESET_OPTS
+//-- END RESET EEPROM--
+
 // Settings
 #define NUM_PEDAL_PARAMS 20
 #define NUM_FSW          4
@@ -64,9 +75,6 @@
 
 #define STR_LEN          12
 #define STR_LEN_MAX      (STR_LEN+1)
-
-//#define CODING_RESET     //undef to remove useless bytes from code
-
 
 // Button
 #define PRESS_TYPE_UP   0

@@ -10,6 +10,25 @@
 Menu    m;
 uint8_t submenu = 0;
 
+// void setup() {
+//   HW::setup();
+// 
+//   /*HW::screen.clear();*/
+//   /*HW::screen.print(0,0, "Reset..");*/
+//   /*reset_eeprom();*/
+//   /*HW::screen.print(0,0, "Done!");*/
+// 
+//   char myoption[STR_LEN_MAX];
+//   DB::menu_item_at(0, 0, myoption);
+// 
+//   HW::screen.clear();
+//   HW::screen.print_with_nline(0,0, myoption);
+// }
+// 
+// void loop() {
+//   HW::loop();
+// }
+
 void setup() {
   HW::setup();
 
@@ -17,7 +36,16 @@ void setup() {
   reset_eeprom();
   /*load_preset();*/
 
-  fsw[submenu][2].mode = FSW_MODE_CYCLE;
+  for (int i=0; i<4; i++) {
+    fsw[submenu][i].mode = FSW_MODE_CYCLE;
+    fsw[submenu][i].colors[0] = 0;
+    fsw[submenu][i].colors[1] = 1;
+    fsw[submenu][i].colors[2] = 2;
+  }
+
+  fsw[submenu][2].colors[2] = 3;
+  fsw[submenu][3].colors[2] = 4;
+
   strcpy(preset.name, "PCORE       ");
 }
 

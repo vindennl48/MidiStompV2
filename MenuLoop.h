@@ -17,21 +17,21 @@ struct MenuLoop {
     this->x       = 1;
     this->menu_id = menu_id;
     this->size    = DB::menu_at(menu_id);
+    m.back();
   }
 
   uint8_t loop() {
     if ( m.not_initialized() ) {
-      HW::screen.clear();
+      //HW::screen.clear();
       if ( x == 1 ) HW::screen.print(0,0, "::");
       else          HW::screen.print(0,0, "  ");
 
       DB::menu_item_at(menu_id, x-1, option);
-      HW::screen.print(0,0, "::");
-      HW::screen.print(2,0, option);
+      HW::screen.print_with_nline(2,0, option);
 
       DB::menu_item_at(menu_id, x, option);
       HW::screen.print(0,1, "> ");
-      HW::screen.print(2,1, option);
+      HW::screen.print_with_nline(2,1, option);
     }
     else {
       if ( HW::knob.is_left() ) {
