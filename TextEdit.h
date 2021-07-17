@@ -1,131 +1,86 @@
 #ifndef TEXT_EDIT_H
 #define TEXT_EDIT_H
 
-#include <Arduino.h>
-#include "Standard.h"
-#include "Hardware.h"
+#define ALPHABET_SIZE 38
 
-// Definitions
-#define ALPHABET_SIZE   38
-#define TEXT_SIZE       16
 #define E_SELECT_LETTER 0
 #define E_EDIT_LETTER   1
 
 struct TextEdit {
-  // Chars that can be used
-  static const String alphabet;
+  static Menu    m;
+  static char    *text_old;
+  static char    text_new[STR_LEN_MAX];
+  static uint8_t cursor, letter;
 
-  static String  text;
-  static String  text_orig;
-  static uint8_t cursor;
-  static uint8_t letter;
-  static uint8_t event;
-  static bool    initialized;
-
-  static void setup(String in_text) {
-    if ( in_text.length() != TEXT_SIZE ) {
-      uint8_t rest = TEXT_SIZE-in_text.length();
-      for (int i=0; i<rest; i++) in_text = in_text + ' ';
-    }
-
-    initialized = false;
-    text        = in_text;
-    text_orig   = in_text;
-    cursor      = 0;
-    letter      = 0;
-    event       = 0;
+  static void setup( char in_text[STR_LEN_MAX] ) {
+    text_old = in_text;
+    memcpy(text_new, in_text, STR_LEN_MAX);
+    cursor  = 0;
+    letter  = 0;
 
     HW::screen.clear();
-    HW::screen.print(0,1,"SAVE      CANCEL");
+    HW::screen.print(0,1, "SAVE      CANCEL");
     HW::screen.highlight(true);
   }
 
   static bool loop() {
-    switch(event) {
+    switch( m.e() ) {
+      default:
       case E_SELECT_LETTER:
-        if ( !initialized ) {
-          initialized = true;
-          HW::screen.print(0,0,text);
-          HW::screen.set_cursor(cursor,0);
+        if ( m.not_initialized() ) {
+          HW::screen.print_with_nline(0,0, text_new);
+          HW::screen.set_cursor(cursor, 0);
           HW::screen.blink(true);
         }
         else {
           if ( HW::knob.is_left() || HW::knob.is_right() ) {
+            if      ( HW::knob.is_left() )  cursor = CONTAIN(cursor-1, 0, STR_LEN+1);
+            else if ( HW::knob.is_right() ) cursor = CONTAIN(cursor+1, 0, STR_LEN+1);
 
-            if ( HW::knob.is_left() ) {
-              if ( cursor > 0 ) { cursor--; }
-            }
-            else if ( HW::knob.is_right() ) {
-              // +1 is for save and cancel options
-              if ( cursor < TEXT_SIZE+1 ) { cursor++; }
-            }
-
-            // save option
-            if ( cursor == TEXT_SIZE ) {
-              HW::screen.set_cursor(0,1);
-            }
-            // cancel option
-            else if ( cursor == TEXT_SIZE+1 ) {
-              HW::screen.set_cursor(10,1);
-            }
-            else {
-              HW::screen.set_cursor(cursor,0);
-            }
+            if      ( cursor == STR_LEN )   HW::screen.set_cursor(0, 1);
+            else if ( cursor == STR_LEN+1 ) HW::screen.set_cursor(10, 1);
+            else    HW::screen.set_cursor(cursor, 0);
           }
-
           else if ( HW::knob.is_pressed() ) {
-            if ( cursor < TEXT_SIZE ) {
-              event       = E_EDIT_LETTER;
-              initialized = false;
+            if      ( cursor < STR_LEN )  {
+              m.jump_to( E_EDIT_LETTER ); 
             }
-            else if ( cursor == TEXT_SIZE ) {
-              // Clean up
+            else if ( cursor == STR_LEN ) {  // SAVE
               HW::screen.highlight(false);
               HW::screen.blink(false);
-              // Save
-              return true;
+              memcpy(text_old, text_new, STR_LEN_MAX);
+              return m.back();
             }
-            else {
-              // Cancel
-              text = text_orig;
-              return true;
+            else { // CANCEL
+              return m.back();
             }
           }
         }
-
         break;
       case E_EDIT_LETTER:
-        if ( !initialized ) {
-          initialized = true;
+        if ( m.not_initialized() ) {
           HW::screen.blink(false);
           set_letter();
-          HW::screen.lcd->print(alphabet[letter]);
-          HW::screen.set_cursor(cursor,0);
+          HW::screen.lcd->print( DB::letter_at(letter) );
+          HW::screen.set_cursor(cursor, 0);
         }
         else {
           if ( HW::knob.is_left() || HW::knob.is_right() ) {
-            if ( HW::knob.is_left() ) {
-              if ( letter > 0 ) { letter--; }
-            }
-            else if ( HW::knob.is_right() ) {
-              if ( letter+1 < ALPHABET_SIZE ) { letter++; }
-            }
-
-            HW::screen.lcd->print(alphabet[letter]);
+            if      ( HW::knob.is_left() )  letter = CONTAIN(letter-1, 0, ALPHABET_SIZE-1);
+            else if ( HW::knob.is_right() ) letter = CONTAIN(letter+1, 0, ALPHABET_SIZE-1);
+            HW::screen.lcd->print( DB::letter_at(letter) );
             HW::screen.set_cursor(cursor,0);
           }
           else if ( HW::knob.is_pressed() ) {
-            // Undo changing letter
-            event       = E_SELECT_LETTER;
-            initialized = false;
-            text.setCharAt(cursor, alphabet[letter]);
+            // Change Letter
+            text_new[cursor] = DB::letter_at(letter);
+            m.jump_to( E_SELECT_LETTER );
           }
           else if ( HW::knob.is_long_pressed() ) {
             // Undo changing letter
-            event       = E_SELECT_LETTER;
-            initialized = false;
-            HW::screen.lcd->print(text[cursor]);
+            HW::screen.lcd->print( text_new[cursor] );
             HW::screen.set_cursor(cursor,0);
+            m.jump_to( E_SELECT_LETTER );
           }
         }
         break;
@@ -134,9 +89,10 @@ struct TextEdit {
     return false;
   }
 
+
   static void set_letter() {
     for (int i=0; i<ALPHABET_SIZE; i++) {
-      if ( alphabet[i] == text[cursor] ) {
+      if ( DB::letter_at(i) == text_new[cursor] ) {
         letter = i;
         return;
       }
@@ -144,20 +100,15 @@ struct TextEdit {
     letter = 0;
   }
 
-  static String get_text() {
-    return text;
-  }
 };
 
-const String TextEdit::alphabet = " ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789-_";
+Menu    TextEdit::m;
+char    *TextEdit::text_old;
+char    TextEdit::text_new[STR_LEN_MAX] = " ";
+uint8_t TextEdit::cursor                = 0;
+uint8_t TextEdit::letter                = 0;
 
-String  TextEdit::text          = "";
-String  TextEdit::text_orig     = "";
-uint8_t TextEdit::cursor        = 0;
-uint8_t TextEdit::letter        = 0;
-uint8_t TextEdit::event         = 0;
-bool    TextEdit::initialized   = false;
-
-#undef ALPHABET_SIZE
+#undef E_SELECT_LETTER
+#undef E_EDIT_LETTER
 
 #endif

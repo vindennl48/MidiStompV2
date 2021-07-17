@@ -1,5 +1,7 @@
 #include "Includes.h"
 
+#ifndef ALT_PROGRAM
+
 // Definitions
 #define E_MAIN     0
 #define E_SETTINGS 1
@@ -10,30 +12,10 @@
 Menu    m;
 uint8_t submenu = 0;
 
-// void setup() {
-//   HW::setup();
-// 
-//   /*HW::screen.clear();*/
-//   /*HW::screen.print(0,0, "Reset..");*/
-//   /*reset_eeprom();*/
-//   /*HW::screen.print(0,0, "Done!");*/
-// 
-//   char myoption[STR_LEN_MAX];
-//   DB::menu_item_at(0, 0, myoption);
-// 
-//   HW::screen.clear();
-//   HW::screen.print_with_nline(0,0, myoption);
-// }
-// 
-// void loop() {
-//   HW::loop();
-// }
-
 void setup() {
   HW::setup();
 
   // Load up preset and footswitches from eeprom
-  reset_eeprom();
   /*load_preset();*/
 
   for (int i=0; i<4; i++) {
@@ -92,23 +74,33 @@ void loop() {
 #undef E_MAIN
 #undef E_SETTINGS
 
+#endif
 
 
+#ifdef ALT_PROGRAM
 
-// Brainstorm
+Menu m;
+char name[STR_LEN_MAX] = "MITCH";
 
-#ifdef BRAINSTORM
+void setup() {
+  HW::setup();
 
-// To start out our eeprom journey, we will use the internal 1,024 bytes.
-// This will eventually switch to the 65,536 bytes eeprom chip.
+  // RESET EEPROM
+  /*HW::screen.clear();*/
+  /*HW::screen.print(0,0, "RESETTING..");*/
+  /*reset_eeprom();*/
+  /*HW::screen.print_with_nline(0,0, "DONE!");*/
+}
 
-EEPROM Map
+void loop() {
+  HW::loop();
 
-Colors:    Amount:14 | Unit Size:16 | Size:224 | Start:0
-Pedals:    Amount:2  | Unit Size:14 | Size:28  | Start:225
-Params:    Amount:20 | Unit Size:14 | Size:280 | Start:254
-FSwitches: Amount:32 | Unit Size:8  | Size:256 | Start:535
-Presets:   Amount:2  | Unit Size:14 | Size:28  | Start:792
-Menu Itms: Amount:15 | Unit Size:13 | Size:195 | Start:821 End:1016
+  if ( m.not_initialized() ) {
+    TextEdit::setup( name );
+  }
+  else {
+    if ( TextEdit::loop() ) m.reinitialize();
+  }
+}
 
 #endif

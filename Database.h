@@ -118,14 +118,15 @@ struct DB {
   static void menu_item_at(uint8_t menu_id, uint8_t id, char *menu_item) { eReadBlock( EEPROM_START_OPTS + STR_LEN_MAX * NUM_MENU_ITEMS * menu_id + STR_LEN_MAX * id, (uint8_t*)menu_item, STR_LEN_MAX ); }
   //static void    menu_item_save(uint8_t menu_id, uint8_t id, uint8_t new_obj) { return set_data<uint8_t>( &new_obj, EEPROM_START_MENUS + STR_LEN_MAX * NUM_MENU_ITEMS * menu_id + STR_LEN_MAX * id ); }
 
-  static void text_at(char *text, uint8_t id)                { eeprom_read_block( text, (void*)( EEPROM_START_MENUS + STR_LEN_MAX * id ), STR_LEN_MAX ); }
-  static void text_save(char *text, uint8_t id)              { eeprom_write_block((const void*)text, (void*)(EEPROM_START_MENUS + (STR_LEN_MAX * id)), STR_LEN_MAX); }
+  static char letter_at(uint8_t id) { return get_data<char>( EEPROM_START_LETTERS + id ); }
+  //static void text_at(char *text, uint8_t id)                { eeprom_read_block( text, (void*)( EEPROM_START_MENUS + STR_LEN_MAX * id ), STR_LEN_MAX ); }
+  //static void text_save(char *text, uint8_t id)              { eeprom_write_block((const void*)text, (void*)(EEPROM_START_MENUS + (STR_LEN_MAX * id)), STR_LEN_MAX); }
 };
 
 
 /*  :: RESET EEPROM :: */
 void reset_eeprom() {
-#ifdef CODING_RESET
+#ifdef EEPROM_RESET
 
   #ifdef EEPROM_RESET_COLORS
   {
@@ -189,6 +190,15 @@ void reset_eeprom() {
     set_data<uint8_t>(&menu_options, EEPROM_START_MENUS + 3);
     menu_options = 3;
     set_data<uint8_t>(&menu_options, EEPROM_START_MENUS + 4);
+  }
+  #endif
+
+  #ifdef EEPROM_RESET_LETTERS
+  {
+    struct Alphabet {
+      char letters[EEPROM_NUM_LETTERS_MAX] = " ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789-_";
+    } alphabet;
+    set_data<Alphabet>(&alphabet, EEPROM_START_LETTERS);
   }
   #endif
 

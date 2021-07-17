@@ -46,6 +46,10 @@ struct MenuLoop {
         m.back();
         return x;
       }
+      else if ( HW::knob.is_long_pressed() ) {
+        m.back();
+        return NUM_MENU_ITEMS;
+      }
     }
 
     return false;

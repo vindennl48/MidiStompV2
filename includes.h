@@ -36,34 +36,11 @@
 
 #define EEPROM_START_OPTS       34074
 #define EEPROM_NUM_OPTS         20
-//--
-//EEPROM MENU TEXT LOCATIONS
-#define EEPROM_TEXT_SETTINGS    0
-#define EEPROM_TEXT_SAVE        1
-#define EEPROM_TEXT_NAME        2
-#define EEPROM_TEXT_PARAMS      3
-#define EEPROM_TEXT_COPY        4
-#define EEPROM_TEXT_RESET       5
-#define EEPROM_TEXT_GLOBAL      6
-#define EEPROM_TEXT_PEDALS      7
-#define EEPROM_TEXT_CHANNEL     8
-#define EEPROM_TEXT_MIDI        9
-#define EEPROM_TEXT_COLORS      10
-#define EEPROM_TEXT_VALUES      11
-#define EEPROM_TEXT_TYPE        12
-#define EEPROM_TEXT_SHORT_PRESS 13
-#define EEPROM_TEXT_LONG_PRESS  14
 
-//RESET EEPROM - Undef to remove
-//#define CODING_RESET
-//#define EEPROM_RESET_COLORS
-//#define EEPROM_RESET_PEDALS
-//#define EEPROM_RESET_PARAMS
-//#define EEPROM_RESET_FSW
-//#define EEPROM_RESET_PRESETS
-//#define EEPROM_RESET_MENUS
-//#define EEPROM_RESET_OPTS
-//-- END RESET EEPROM--
+#define EEPROM_START_LETTERS    40535
+#define EEPROM_NUM_LETTERS      38
+#define EEPROM_NUM_LETTERS_MAX  (EEPROM_NUM_LETTERS+1)
+//--
 
 // Settings
 #define NUM_PEDAL_PARAMS 20
@@ -98,6 +75,23 @@
 #define CONTAIN(i, min, max) (i>(min) ? (i<(max) ? i : (max)) : (min))
 #define ROTATE(i, min, max) (i>(min) ? (i<(max) ? i : (min)) : (max))
 
+// FLAGS
+// RESET EEPROM - Undef to remove
+//#define EEPROM_RESET
+//#define EEPROM_RESET_COLORS
+//#define EEPROM_RESET_PEDALS
+//#define EEPROM_RESET_PARAMS
+//#define EEPROM_RESET_FSW
+//#define EEPROM_RESET_PRESETS
+//#define EEPROM_RESET_MENUS
+//#define EEPROM_RESET_OPTS
+//#define EEPROM_RESET_LETTERS
+//-- END RESET EEPROM--
+
+// FLAGS
+//#define ALT_PROGRAM
+// -- END FLAGS --
+
 // Headers
 #include "Standard.h"
 #include "Menu.h"
@@ -115,6 +109,7 @@ Footswitch fsw[NUM_SUB_MENUS][NUM_FSW];
 #include "Screen.h"
 #include "Hardware.h"
 #include "MenuLoop.h"
+#include "TextEdit.h"
 #include "Settings.h"
 
 #endif
