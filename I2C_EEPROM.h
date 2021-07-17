@@ -56,4 +56,6 @@ void set_data(T *data, uint16_t start) {
   );
 }
 
+#undef EEPROM_ADDRESS
+
 #endif

@@ -24,10 +24,18 @@ struct LEDs {
 
   void setup() {
     shift_reg.setup();
+    set(0,0,0);
   }
 
   void loop() {
     for (int i=0; i<NUM_FSW; i++) at(i)->loop();
+  }
+
+  void set(uint8_t r_new, uint8_t g_new, uint8_t b_new, uint16_t time = DEFAULT_LED_TIME_MS) {
+    for (int i=0; i<NUM_FSW; i++) at(i)->set(r_new, g_new, b_new, time);
+  }
+  void set(Color color, uint16_t time = DEFAULT_LED_TIME_MS) {
+    for (int i=0; i<NUM_FSW; i++) at(i)->set(color, time);
   }
 
   LED* at(uint8_t pos) {

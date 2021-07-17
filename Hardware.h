@@ -17,22 +17,6 @@ struct HW {
     knob.setup(PIN_D3, PIN_D2, PIN_D4);
     leds.setup();
     btns.setup();
-
-    leds.at(0)->set_dim(10,0,0);
-    leds.at(0)->set_bright(255,0,0);
-    leds.at(0)->bright();
-
-    leds.at(1)->set_dim(0,10,0);
-    leds.at(1)->set_bright(0,255,0);
-    leds.at(1)->bright();
-
-    leds.at(2)->set_dim(0,0,10);
-    leds.at(2)->set_bright(0,0,255);
-    leds.at(2)->bright();
-
-    leds.at(3)->set_dim(10,0,10);
-    leds.at(3)->set_bright(255,0,255);
-    leds.at(3)->bright();
   }
 
   static void loop() {
