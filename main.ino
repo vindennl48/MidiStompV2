@@ -1,6 +1,7 @@
 #include "Includes.h"
 
 #ifndef ALT_PROGRAM
+#ifndef RESET_EEPROM_PROGRAM
 
 // Definitions
 #define E_MAIN     0
@@ -75,32 +76,42 @@ void loop() {
 #undef E_SETTINGS
 
 #endif
+#endif
 
 
 #ifdef ALT_PROGRAM
 
-Menu m;
+Menu     m;
+ListLoop list_loop;
 /*char name[STR_LEN_MAX] = "MITCH";*/
 
 void setup() {
   HW::setup();
-
-  // RESET EEPROM
-  /*HW::screen.clear();*/
-  /*HW::screen.print(0,0, "RESETTING..");*/
-  /*reset_eeprom();*/
-  /*HW::screen.print_with_nline(0,0, "DONE!");*/
 }
 
 void loop() {
   HW::loop();
 
   if ( m.not_initialized() ) {
-    ColorEdit::setup(0);
+    list_loop.reset(EEPROM_START_COLORS, sizeof(Color), "COLORS", 100);
   }
   else {
-    if ( ColorEdit::loop() ) m.reinitialize();
+    if ( list_loop.loop() ) m.reinitialize();
   }
 }
 
+#endif
+
+#ifdef RESET_EEPROM_PROGRAM
+void setup() {
+  HW::setup();
+
+  /*// RESET EEPROM*/
+  HW::screen.clear();
+  HW::screen.print(0,0, "RESETTING..");
+  reset_eeprom();
+  HW::screen.print_with_nline(0,0, "DONE!");
+}
+
+void loop() {}
 #endif

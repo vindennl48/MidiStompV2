@@ -90,6 +90,7 @@
 
 // FLAGS
 //#define ALT_PROGRAM
+//#define RESET_EEPROM_PROGRAM
 // -- END FLAGS --
 
 // Headers

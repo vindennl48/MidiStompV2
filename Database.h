@@ -235,6 +235,7 @@ void reset_eeprom() {
         "RESET"
       };
       char color_menu[10][STR_LEN_MAX] = {
+        "COLOR",
         "NAME",
         "VALUES",
         "RESET"

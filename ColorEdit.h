@@ -61,9 +61,12 @@ struct ColorEdit {
               HW::screen.highlight(false);
               HW::screen.blink(false);
               DB::color_save(color_id, color);
+
+              for (int i=0; i<NUM_FSW; i++) HW::leds.at(i)->set(0,0,0);
               return m.back();
             }
             else {  // CANCEL
+              for (int i=0; i<NUM_FSW; i++) HW::leds.at(i)->set(0,0,0);
               return m.back();
             }
           }
