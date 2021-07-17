@@ -80,7 +80,7 @@ void loop() {
 #ifdef ALT_PROGRAM
 
 Menu m;
-char name[STR_LEN_MAX] = "MITCH";
+/*char name[STR_LEN_MAX] = "MITCH";*/
 
 void setup() {
   HW::setup();
@@ -96,10 +96,10 @@ void loop() {
   HW::loop();
 
   if ( m.not_initialized() ) {
-    TextEdit::setup( name );
+    ColorEdit::setup(0);
   }
   else {
-    if ( TextEdit::loop() ) m.reinitialize();
+    if ( ColorEdit::loop() ) m.reinitialize();
   }
 }
 
