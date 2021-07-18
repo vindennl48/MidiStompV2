@@ -7,12 +7,15 @@
 #define E_EDIT_LETTER   1
 
 struct TextEdit {
-  static Menu    m;
-  static char    *text_old;
-  static char    text_new[STR_LEN_MAX];
-  static uint8_t cursor, letter;
+  Menu    m;
+  char    *text_old;
+  char    text_new[STR_LEN_MAX] = " ";
+  uint8_t cursor                = 0;
+  uint8_t letter                = 0;
 
-  static void setup( char in_text[STR_LEN_MAX] ) {
+  TextEdit( char in_text[STR_LEN_MAX] ) { setup(in_text); }
+
+  void setup( char in_text[STR_LEN_MAX] ) {
     text_old = in_text;
     memcpy(text_new, in_text, STR_LEN_MAX);
     cursor  = 0;
@@ -23,7 +26,7 @@ struct TextEdit {
     HW::screen.highlight(true);
   }
 
-  static bool loop() {
+  bool loop() {
     switch( m.e() ) {
       default:
       case E_SELECT_LETTER:
@@ -90,7 +93,7 @@ struct TextEdit {
   }
 
 
-  static void set_letter() {
+  void set_letter() {
     for (int i=0; i<ALPHABET_SIZE; i++) {
       if ( DB::letter_at(i) == text_new[cursor] ) {
         letter = i;
@@ -100,13 +103,7 @@ struct TextEdit {
     letter = 0;
   }
 
-};
-
-Menu    TextEdit::m;
-char    *TextEdit::text_old;
-char    TextEdit::text_new[STR_LEN_MAX] = " ";
-uint8_t TextEdit::cursor                = 0;
-uint8_t TextEdit::letter                = 0;
+} *text_edit_p = nullptr;
 
 #undef E_SELECT_LETTER
 #undef E_EDIT_LETTER

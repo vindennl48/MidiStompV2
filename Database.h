@@ -13,7 +13,7 @@ struct Color {
     this->g = 0;
     this->b = 0;
   }
-};
+} *color_p = nullptr;
 
 
 /*  :: PARAMETER :: */
@@ -32,7 +32,7 @@ struct Param {
     this->type  = 0;
     this->pitch = 0;
   }
-};
+} *param_p = nullptr;
 
 
 /*  :: PEDAL :: */
@@ -41,7 +41,7 @@ struct Pedal {
   char    name[STR_LEN_MAX] = "UNTITLED";
   uint8_t channel           = 0;
   // 16 params
-};
+} *pedal_p = nullptr;
 
 
 /*  :: FOOTSWITCH :: */
@@ -90,18 +90,16 @@ struct Preset {
   // 1 main footswitch menu + 3 footswitch sub-menus
 };
 
-struct MenuItem { char data[STR_LEN_MAX]; };
-
 /* :: DATABASE STRUCT :: */
 struct DB {
-  static Color color_at(     uint8_t id)                                        { return get_data<Color>(                EEPROM_START_COLORS + sizeof(Color) * id ); }
-  static void  color_save(   uint8_t id, Color new_obj)                         { return set_data<Color>(      &new_obj, EEPROM_START_COLORS + sizeof(Color) * id ); }
+  static Color color_at(     uint8_t id)                { return get_data<Color>(          EEPROM_START_COLORS + sizeof(Color) * id ); }
+  static void  color_save(   uint8_t id, Color new_obj) { return set_data<Color>(&new_obj, EEPROM_START_COLORS + sizeof(Color) * id ); }
 
-  static Pedal pedal_at(     uint8_t id)                                        { return get_data<Pedal>(                EEPROM_START_PEDALS + sizeof(Pedal) * id ); }
-  static void  pedal_save(   uint8_t id, Pedal new_obj)                         { return set_data<Pedal>(      &new_obj, EEPROM_START_PEDALS + sizeof(Pedal) * id ); }
+  static Pedal pedal_at(     uint8_t id)                { return get_data<Pedal>(          EEPROM_START_PEDALS + sizeof(Pedal) * id ); }
+  static void  pedal_save(   uint8_t id, Pedal new_obj) { return set_data<Pedal>(&new_obj, EEPROM_START_PEDALS + sizeof(Pedal) * id ); }
 
-  static Preset preset_at(    uint8_t id)                                        { return get_data<Preset>(               EEPROM_START_PRESETS + sizeof(Preset) * id ); }
-  static void  preset_save(   uint8_t id, Preset new_obj)                        { return set_data<Preset>(     &new_obj, EEPROM_START_PRESETS + sizeof(Preset) * id ); }
+  static Preset preset_at(    uint8_t id)                  { return get_data<Preset>(         EEPROM_START_PRESETS + sizeof(Preset) * id ); }
+  static void  preset_save(   uint8_t id, Preset *new_obj) { return set_data<Preset>(new_obj, EEPROM_START_PRESETS + sizeof(Preset) * id ); }
 
   static Param param_at(     uint8_t parent_id, uint8_t id)                     { return get_data<Param>(                EEPROM_START_PARAMS + sizeof(Param) * EEPROM_NUM_PARAMS * parent_id + sizeof(Param) * id ); }
   static void param_save(    uint8_t parent_id, uint8_t id, Param new_obj)      { return set_data<Param>(      &new_obj, EEPROM_START_PARAMS + sizeof(Param) * EEPROM_NUM_PARAMS * parent_id + sizeof(Param) * id ); }

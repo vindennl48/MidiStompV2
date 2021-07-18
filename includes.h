@@ -72,8 +72,11 @@
 #define DEFAULT_LED_TIME_MS 50
 
 // MACROS
+#define LTRUE  1
+#define LFALSE 2
 #define CONTAIN(i, min, max) (i>(min) ? (i<(max) ? i : (max)) : (min))
 #define ROTATE(i, min, max) (i>(min) ? (i<(max) ? i : (min)) : (max))
+#define CLRPTR(ptr) if(ptr != nullptr) {delete ptr; ptr = nullptr;}
 
 // FLAGS
 // RESET EEPROM - Undef to remove
@@ -98,6 +101,7 @@
 #include "Menu.h"
 #include "I2C_EEPROM.h"
 #include "Database.h"
+uint8_t    preset_id = 0;
 Preset     preset;
 Footswitch fsw[NUM_SUB_MENUS][NUM_FSW];
 #include "Button.h"

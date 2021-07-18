@@ -1,189 +1,158 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
-#define E_MAIN               0
-#define E_GLOBAL             1
-#define E_GLOBAL_COLORS      2
-#define E_GLOBAL_COLOR       3
-#define E_GLOBAL_COLOR_NAME  4
-#define E_GLOBAL_COLOR_VALUE 5
-#define E_FSW                6
-#define E_PRESET_NAME        7
-
 struct Settings {
-  static Menu     m;
-  static MenuLoop mloop;
-  static ListLoop lloop;
-  static Color    color;
-  static uint8_t  fsw_num, submenu, state, temp;
+  Menu     m;
+  MenuLoop mloop;
 
-  static bool loop() {
-    switch( m.e() ) {
-      default:
-
-      case E_MAIN:
+  bool loop() {
+    switch(m.e()) {
+      /* :: PRESET SETTINGS :: */
+      case E_PRESET:
         if ( m.not_initialized() ) {
-          mloop.reset(0);
-          state = 0; // reset the fsw state
-          for (int i=0;i<4; i++) HW::leds.at(i)->set(0,0,0);
+          mloop.reset(EEPROM_PRESET_MENU);
         }
         else {
-          switch( mloop.loop() ) {
-            default:
-            case 0: // No response yet
-              break;
-            case 1: // SAVE
-              return m.back();
-              break;
-            case 2: // NAME
-              m.jump_to( E_PRESET_NAME );
-              break;
-            case 3: // PARAMS
+          switch(mloop.loop()) {
+            default: //loop
               break;
 
-            case 6: // GLOBAL
-              m.jump_to( E_GLOBAL );
+            case 1: //E_PRESET_SAVE
+              m.jump_to(E_PRESET_SAVE);
               break;
 
-            case NUM_MENU_ITEMS:
-              return m.back();
+            case 2: //E_PRESET_NAME
+              m.jump_to(E_PRESET_NAME);
+              break;
+
+            //case 3: //E_PRESET_PARAMS
+              //m.jump_to(E_PRESET_PARAMS);
+              //break;
+
+            //case 4: //E_PRESET_COPY
+              //m.jump_to(E_PRESET_COPY);
+              //break;
+
+            //case 5: //E_PRESET_RESET
+              //m.jump_to(E_PRESET_RESET);
+              //break;
+
+            case 6: //E_GLOBAL
+              m.jump_to(E_GLOBAL);
               break;
           };
+        }
+        break;
 
-          if      ( HW::btns.at(0)->is_pressed() ) { fsw_num = 0; m.jump_to(E_FSW); }
-          else if ( HW::btns.at(1)->is_pressed() ) { fsw_num = 1; m.jump_to(E_FSW); }
-          else if ( HW::btns.at(2)->is_pressed() ) { fsw_num = 2; m.jump_to(E_FSW); }
-          else if ( HW::btns.at(3)->is_pressed() ) { fsw_num = 3; m.jump_to(E_FSW); }
+      case E_PRESET_SAVE:
+        if ( m.not_initialized() ) {
+          confirm_p = new Confirm;
+        }
+        else {
+          switch( confirm.loop() ) {
+            case 0: //loop
+              break;
+
+            case LTRUE:
+              /*save*/
+              DB::preset_save(preset_id, &preset);
+            default:
+            case LFALSE:
+              /*cancel*/
+              m.jump_to(E_PRESET);
+              CLRPTR(confirm_p);
+              break;
+          };
         }
         break;
 
       case E_PRESET_NAME:
-        if ( m.not_initialized() ) { TextEdit::setup( preset.name ); }
-        else                       { if ( TextEdit::loop() ) m.jump_to( E_MAIN ); }
+        if ( m.not_initialized() ) {
+          text_edit_p = new TextEdit(preset.name);
+        }
+        else {
+          if ( *text_edit_p->loop() ) {
+            CLRPTR(text_edit_p);
+            m.jump_to(E_PRESET);
+          }
+        }
         break;
 
+      // PARAM SUBMENU
+      case E_PRESET_PARAMS:
+        if ( m.not_initialized() ) {
+        }
+        else {
+        }
+        break;
+
+      case E_PRESET_PARAM:
+        if ( m.not_initialized() ) {
+          mloop.reset(EEPROM_PRESET_PARAM_MENU);
+        }
+        else {
+        }
+        break;
+
+      case E_PRESET_PARAM_CHANGE:
+        if ( m.not_initialized() ) {
+        }
+        else {
+        }
+        break;
+
+      case E_PRESET_PARAM_VALUE:
+        if ( m.not_initialized() ) {
+        }
+        else {
+        }
+        break;
+
+      case E_PRESET_PARAM_RESET:
+        if ( m.not_initialized() ) {
+        }
+        else {
+        }
+        break;
+      // END PARAM SUBMENU
+
+      case E_PRESET_COPY:
+        if ( m.not_initialized() ) {
+        }
+        else {
+        }
+        break;
+
+      case E_PRESET_RESET:
+        if ( m.not_initialized() ) {
+        }
+        else {
+        }
+        break;
+      /* :: END PRESET SETTINGS :: */
+
+      /* :: GLOBAL SETTINGS :: */
       case E_GLOBAL:
         if ( m.not_initialized() ) {
-          mloop.reset(1);
+          mloop.reset(EEPROM_GLOBAL_MENU);
         }
         else {
-          switch( mloop.loop() ) {
-            default:
-            case 0:
-              break;
-            case 1:
-              break;
-            case 2:  // COLORS
-              m.jump_to( E_GLOBAL_COLORS );
-              break;
-
-            case NUM_MENU_ITEMS:
-              return m.back();
-              break;
-          };
         }
         break;
+      /* :: END GLOBAL SETTINGS :: */
 
-      case E_GLOBAL_COLORS:
-        if ( m.not_initialized() ) {
-          lloop.reset(EEPROM_START_COLORS, sizeof(Color), "COLORS", EEPROM_NUM_COLORS, true);
-        }
-        else {
-          temp = lloop.loop();
-          if ( temp == EEPROM_NUM_COLORS ) m.jump_to( E_GLOBAL );
-          else if ( temp ) {
-            temp -=1;
-            m.jump_to( E_GLOBAL_COLOR );
-          }
-        }
+
+      /* :: EXIT SETTINGS :: */
+      default:
+      case NUM_MENU_ITEMS:
+        return m.back();
         break;
-
-      case E_GLOBAL_COLOR:
-        if ( m.not_initialized() ) {
-          mloop.reset(4, String(DB::color_at(temp).name) );
-          for (int i=0; i<NUM_FSW; i++) HW::leds.at(i)->set( DB::color_at(temp) );
-        }
-        else {
-          switch( mloop.loop() ) {
-            default:
-            case 0:
-              break;
-            case 1:  // NAME
-              m.jump_to( E_GLOBAL_COLOR_NAME );
-              break;
-            case 2:  // VALUES
-              m.jump_to( E_GLOBAL_COLOR_VALUE );
-              break;
-
-            case NUM_MENU_ITEMS:
-              m.jump_to( E_GLOBAL_COLORS );
-              for (int i=0; i<NUM_FSW; i++) HW::leds.at(i)->set(0,0,0);
-              break;
-          };
-        }
-        break;
-
-      case E_GLOBAL_COLOR_NAME:
-        if ( m.not_initialized() ) {
-          color = DB::color_at(temp);
-          TextEdit::setup(color.name);
-        }
-        else {
-          if ( TextEdit::loop() ) {
-            DB::color_save(temp, color);
-            m.jump_to( E_GLOBAL_COLOR );
-          }
-        }
-        break;
-
-      case E_GLOBAL_COLOR_VALUE:
-        if ( m.not_initialized() ) { ColorEdit::setup(temp); }
-        else                       { if ( ColorEdit::loop() ) m.jump_to( E_GLOBAL_COLOR ); }
-        break;
-
-      case E_FSW:
-        if ( m.not_initialized() ) {
-          mloop.reset(2);
-          HW::leds.at(fsw_num)->set( DB::color_at( fsw[submenu][fsw_num].colors[state] ) );
-        }
-        else {
-          switch( mloop.loop() ) {
-            default:
-            case 0:
-              break;
-            case 1:
-              return m.back();
-              break;
-
-            case NUM_MENU_ITEMS:
-              return m.back();
-              break;
-          };
-        }
-        break;
+      /* :: END EXIT SETTINGS :: */
     };
 
     return false;
   }
 
-};
-
-Menu     Settings::m;
-MenuLoop Settings::mloop;
-ListLoop Settings::lloop;
-Color    Settings::color;
-uint8_t  Settings::fsw_num = 0;
-uint8_t  Settings::submenu = 0;
-uint8_t  Settings::state   = 0;
-uint8_t  Settings::temp    = 0;
-
-#undef E_MAIN
-#undef E_GLOBAL
-#undef E_GLOBAL_COLORS
-#undef E_GLOBAL_COLOR
-#undef E_GLOBAL_COLOR_NAME
-#undef E_GLOBAL_COLOR_VALUE
-#undef E_FSW
-#undef E_PRESET_NAME
+} *settings_p = nullptr;
 
 #endif

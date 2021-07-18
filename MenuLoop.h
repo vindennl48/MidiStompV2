@@ -4,32 +4,20 @@
 
 struct MenuLoop {
   Menu    m;
-  uint8_t menu_id, size, x;
-  char    option[STR_LEN_MAX] = {" "};
+  uint8_t menu_id             = 0;
+  uint8_t x                   = 0;
+  char    option[STR_LEN_MAX] = " ";
   String  title               = "";
 
-  MenuLoop() {
-    this->x       = 1;
-    this->menu_id = 0;
-    //this->size    = DB::menu_at(0);
-  }
-
-  void reset(uint8_t menu_id, String title) {
-    reset(menu_id);
-    this->title = title;
-  }
-
-  void reset(uint8_t menu_id) {
+  void reset(uint8_t menu_id, String title = "") {
     this->x       = 1;
     this->menu_id = menu_id;
-    this->size    = DB::menu_at(menu_id);
-    this->title   = "";
-    m.back();
+    this->title   = title;
+    m.back();     // reset
   }
 
   uint8_t loop() {
     if ( m.not_initialized() ) {
-      //HW::screen.clear();
       if ( x == 1 ) HW::screen.print(0,0, "::");
       else          HW::screen.print(0,0, "  ");
 
@@ -47,11 +35,11 @@ struct MenuLoop {
     }
     else {
       if ( HW::knob.is_left() ) {
-        x = CONTAIN(x-1, 1, size-1);
+        x = CONTAIN(x-1, 1, DB::menu_at(menu_id)-1);
         m.reinitialize();
       }
       else if ( HW::knob.is_right() ) {
-        x = CONTAIN(x+1, 1, size-1);
+        x = CONTAIN(x+1, 1, DB::menu_at(menu_id)-1);
         m.reinitialize();
       }
       else if ( HW::knob.is_pressed() ) {
