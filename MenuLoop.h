@@ -157,13 +157,19 @@ struct Confirm {
         }
       }
       else if ( HW::knob.is_pressed() ) {
-        if      ( cursor == 0 ) { return LTRUE; }
+        if      ( cursor == 0 ) {
+          HW::screen.highlight(false);
+          HW::screen.blink(false);
+          return LTRUE; 
+        }
         else if ( cursor == 1 ) { return LFALSE; }
       }
     }
     return false;
   }
 } *confirm_p = nullptr;
+
+
 
 
 #endif

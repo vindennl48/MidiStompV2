@@ -55,6 +55,8 @@ struct TextEdit {
               return m.back();
             }
             else { // CANCEL
+              HW::screen.highlight(false);
+              HW::screen.blink(false);
               return m.back();
             }
           }

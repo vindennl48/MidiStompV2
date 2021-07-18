@@ -66,6 +66,9 @@ struct ColorEdit {
               return m.back();
             }
             else {  // CANCEL
+              HW::screen.highlight(false);
+              HW::screen.blink(false);
+
               for (int i=0; i<NUM_FSW; i++) HW::leds.at(i)->set(0,0,0);
               return m.back();
             }
@@ -91,7 +94,7 @@ struct ColorEdit {
         }
         else {
           if ( HW::knob.is_left() || HW::knob.is_right() ) {
-            if      ( HW::knob.is_left() )  {
+            if ( HW::knob.is_left() )  {
               if ( *value == 0 ) { *value = 255; }
               else               { *value = ROTATE(*value-1, 0, 256); }
             }

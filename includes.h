@@ -116,6 +116,7 @@ Footswitch fsw[NUM_SUB_MENUS][NUM_FSW];
 #include "MenuLoop.h"
 #include "TextEdit.h"
 #include "ColorEdit.h"
+#include "ValueEdit.h"
 #include "Settings.h"
 
 #endif
