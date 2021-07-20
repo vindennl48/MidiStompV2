@@ -40,6 +40,12 @@
 #define EEPROM_START_LETTERS    40535
 #define EEPROM_NUM_LETTERS      38
 #define EEPROM_NUM_LETTERS_MAX  (EEPROM_NUM_LETTERS+1)
+
+// EEPROM MENUS
+#define EEPROM_PRESET_MENU       0
+#define EEPROM_GLOBAL_MENU       1
+#define EEPROM_GLOBAL_COLOR_MENU 4
+#define EEPROM_PRESET_PARAM_MENU 3 // NOT CORRECT
 //--
 
 // Settings
@@ -116,7 +122,7 @@ Footswitch fsw[NUM_SUB_MENUS][NUM_FSW];
 #include "MenuLoop.h"
 #include "TextEdit.h"
 #include "ColorEdit.h"
-#include "ValueEdit.h"
+//#include "ValueEdit.h"
 #include "Settings.h"
 
 #endif

@@ -93,7 +93,7 @@ struct Preset {
 /* :: DATABASE STRUCT :: */
 struct DB {
   static Color color_at(     uint8_t id)                { return get_data<Color>(          EEPROM_START_COLORS + sizeof(Color) * id ); }
-  static void  color_save(   uint8_t id, Color new_obj) { return set_data<Color>(&new_obj, EEPROM_START_COLORS + sizeof(Color) * id ); }
+  static void  color_save(   uint8_t id, Color *new_obj) { return set_data<Color>(new_obj, EEPROM_START_COLORS + sizeof(Color) * id ); }
 
   static Pedal pedal_at(     uint8_t id)                { return get_data<Pedal>(          EEPROM_START_PEDALS + sizeof(Pedal) * id ); }
   static void  pedal_save(   uint8_t id, Pedal new_obj) { return set_data<Pedal>(&new_obj, EEPROM_START_PEDALS + sizeof(Pedal) * id ); }

@@ -48,7 +48,7 @@ struct MenuLoop {
       }
       else if ( HW::knob.is_long_pressed() ) {
         m.back();
-        return NUM_MENU_ITEMS;
+        return 255;
       }
     }
 
@@ -64,20 +64,13 @@ struct ListLoop {
   uint16_t max                 = 99;
   uint8_t  is_color            = 0;
 
-  ListLoop() {
-    this->x       = 1;
-    this->address = 0;
-    this->size    = STR_LEN_MAX;
-  }
-
-  void reset(uint16_t address, uint8_t size, String title, uint16_t max, uint8_t is_color=0) {
+  ListLoop(uint16_t address, uint8_t size, String title, uint16_t max, uint8_t is_color=0) {
     this->x        = 1;
     this->address  = address;
     this->size     = size;
     this->title    = title;
     this->max      = max;
     this->is_color = is_color;
-    m.back();
   }
 
   uint16_t loop() {
@@ -109,26 +102,29 @@ struct ListLoop {
       }
       else if ( HW::knob.is_pressed() ) {
         m.back();
-        for (int i=0; i<NUM_FSW; i++) HW::leds.at(i)->set(0,0,0);
         return x;
       }
       else if ( HW::knob.is_long_pressed() ) {
         m.back();
-        for (int i=0; i<NUM_FSW; i++) HW::leds.at(i)->set(0,0,0);
-        return max;
+        x = max;
+        return x;
       }
     }
 
     return false;
   }
-};
+
+  uint16_t get_result() {
+    return x == max ? x : (x-1);
+  }
+} *list_loop_p = nullptr;
 
 
 struct Confirm {
   /* This is a yes/no confirmation screen that returns 1 for no, 2 for yes.
    * 0 is for maintaining the loop. */
   Menu    m;
-  uint8_t cursor = 0;
+  uint8_t cursor = 1;
 
   Confirm() {
     HW::screen.print_with_nline(0,0, "ARE YOU SURE?");

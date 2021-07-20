@@ -66,7 +66,15 @@ void loop() {
       break;
 
     case E_SETTINGS:
-      if ( Settings::loop() ) m.jump_to(E_MAIN);
+      if ( m.not_initialized() ) {
+        settings_p = new Settings;
+      }
+      else {
+        if ( settings_p->loop() ) {
+          m.jump_to(E_MAIN);
+          CLRPTR(settings_p);
+        }
+      }
       break;
   };
 
