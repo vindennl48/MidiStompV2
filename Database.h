@@ -23,7 +23,7 @@ struct Param {
 
   union {
     struct {
-      unsigned type:1;
+      unsigned type:2;   // 0=NONE, 1=Note, 2=CC, 3=PC
       unsigned pitch:7;
     };
   };
@@ -43,11 +43,20 @@ struct Pedal {
   // 16 params
 } *pedal_p = nullptr;
 
+// Pedal Param = PP
+union PedalParam {
+  struct {
+    unsigned pedal:3;
+    unsigned param:5;
+    unsigned velocity:8;
+  };
+} *pedal_param_p = nullptr;
 
 /*  :: FOOTSWITCH :: */
 struct Footswitch {
   // 8 bytes
-  uint8_t colors[NUM_STATES] = { 0, 1, 2 };
+  uint8_t    colors[NUM_STATES] = { 0, 1, 2 };
+  PedalParam output[NUM_STATES] = { 0  };
 
   // States of footswitch
   union {
@@ -56,15 +65,6 @@ struct Footswitch {
       unsigned state:4;  // 0 OFF,    1 ON1,   2 ON2
     };
   };
-
-  // Pedal Param = PP
-  union PP {
-    struct {
-      unsigned pedal:3;
-      unsigned param:5;
-      unsigned velocity:8;
-    };
-  } output[NUM_STATES] = { 0 };
 
   Footswitch() {
     this->mode  = FSW_MODE_TOGGLE;
@@ -85,33 +85,20 @@ struct Footswitch {
 struct Preset {
   // 14 bytes
   char    name[STR_LEN_MAX] = "UNTITLED";
-  boolean is_dirty          = false;
+  uint8_t is_dirty          = false;
   // 4 footswitches
   // 1 main footswitch menu + 3 footswitch sub-menus
 };
 
 /* :: DATABASE STRUCT :: */
 struct DB {
-  static Color color_at(     uint8_t id)                { return get_data<Color>(          EEPROM_START_COLORS + sizeof(Color) * id ); }
-  static void  color_save(   uint8_t id, Color *new_obj) { return set_data<Color>(new_obj, EEPROM_START_COLORS + sizeof(Color) * id ); }
+  EEPROM_FUNC(color,  Color,   EEPROM_START_COLORS);
+  EEPROM_FUNC(pedal,  Pedal,   EEPROM_START_PEDALS);
+  EEPROM_FUNC(preset, Preset,  EEPROM_START_PRESETS);
+  EEPROM_FUNC(menu,   uint8_t, EEPROM_START_MENUS);
 
-  static Pedal pedal_at(     uint8_t id)                { return get_data<Pedal>(          EEPROM_START_PEDALS + sizeof(Pedal) * id ); }
-  static void  pedal_save(   uint8_t id, Pedal new_obj) { return set_data<Pedal>(&new_obj, EEPROM_START_PEDALS + sizeof(Pedal) * id ); }
-
-  static Preset preset_at(    uint8_t id)                  { return get_data<Preset>(         EEPROM_START_PRESETS + sizeof(Preset) * id ); }
-  static void  preset_save(   uint8_t id, Preset *new_obj) { return set_data<Preset>(new_obj, EEPROM_START_PRESETS + sizeof(Preset) * id ); }
-
-  static Param param_at(     uint8_t parent_id, uint8_t id)                     { return get_data<Param>(                EEPROM_START_PARAMS + sizeof(Param) * EEPROM_NUM_PARAMS * parent_id + sizeof(Param) * id ); }
-  static void param_save(    uint8_t parent_id, uint8_t id, Param new_obj)      { return set_data<Param>(      &new_obj, EEPROM_START_PARAMS + sizeof(Param) * EEPROM_NUM_PARAMS * parent_id + sizeof(Param) * id ); }
-
-  static Footswitch fsw_at(uint8_t parent_id, uint8_t id)                     { return get_data<Footswitch>(           EEPROM_START_FSW + sizeof(Footswitch) * EEPROM_NUM_FSW * parent_id + sizeof(Footswitch) * id ); }
-  static void fsw_save(    uint8_t parent_id, uint8_t id, Footswitch new_obj) { return set_data<Footswitch>( &new_obj, EEPROM_START_FSW + sizeof(Footswitch) * EEPROM_NUM_FSW * parent_id + sizeof(Footswitch) * id ); }
-
-  // Menu just saves the # of MenuItems for each menu
-  // Each menu has 10 reserved spots for MenuItems, however,
-  // you do not need to use all of the spots.
-  static uint8_t menu_at(       uint8_t id)                  { return get_data<uint8_t>(           EEPROM_START_MENUS + id ); }
-  static void    menu_save(     uint8_t id, uint8_t new_obj) { return set_data<uint8_t>( &new_obj, EEPROM_START_MENUS + id ); }
+  EEPROM_FUNC_EXTEND(param, Param,      EEPROM_START_PARAMS, EEPROM_NUM_PARAMS);
+  EEPROM_FUNC_EXTEND(fsw,   Footswitch, EEPROM_START_FSW,    EEPROM_NUM_FSW);
 
   static void menu_item_at(uint8_t menu_id, uint8_t id, char *menu_item) { eReadBlock( EEPROM_START_OPTS + STR_LEN_MAX * NUM_MENU_ITEMS * menu_id + STR_LEN_MAX * id, (uint8_t*)menu_item, STR_LEN_MAX ); }
   //static void    menu_item_save(uint8_t menu_id, uint8_t id, uint8_t new_obj) { return set_data<uint8_t>( &new_obj, EEPROM_START_MENUS + STR_LEN_MAX * NUM_MENU_ITEMS * menu_id + STR_LEN_MAX * id ); }
