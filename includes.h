@@ -16,36 +16,36 @@
 // Definitions
 
 // EEPROM map
-#define EEPROM_START_COLORS     0
-#define EEPROM_NUM_COLORS       100
+#define EEP_START_COLORS     0
+#define EEP_NUM_COLORS       100
 
-#define EEPROM_START_PEDALS     2400
-#define EEPROM_NUM_PEDALS       8
+#define EEP_START_PEDALS     2400
+#define EEP_NUM_PEDALS       8
 
-#define EEPROM_START_PARAMS     2568
-#define EEPROM_NUM_PARAMS       256
+#define EEP_START_PARAMS     2568
+#define EEP_NUM_PARAMS       256
 
-#define EEPROM_START_FSW        7944
-#define EEPROM_NUM_FSW          1600
+#define EEP_START_FSW        7944
+#define EEP_NUM_FSW          1600
 
-#define EEPROM_START_PRESETS    31944
-#define EEPROM_NUM_PRESETS      100
+#define EEP_START_PRESETS    31944
+#define EEP_NUM_PRESETS      100
 
-#define EEPROM_START_MENUS      34044
-#define EEPROM_NUM_MENUS        20
+#define EEP_START_MENUS      34044
+#define EEP_NUM_MENUS        20
 
-#define EEPROM_START_OPTS       34074
-#define EEPROM_NUM_OPTS         20
+#define EEP_START_OPTS       34074
+#define EEP_NUM_OPTS         20
 
-#define EEPROM_START_LETTERS    40535
-#define EEPROM_NUM_LETTERS      38
-#define EEPROM_NUM_LETTERS_MAX  (EEPROM_NUM_LETTERS+1)
+#define EEP_START_LETTERS    40535
+#define EEP_NUM_LETTERS      38
+#define EEP_NUM_LETTERS_MAX  (EEP_NUM_LETTERS+1)
 
 // EEPROM MENUS
-#define EEPROM_PRESET_MENU       0
-#define EEPROM_GLOBAL_MENU       1
-#define EEPROM_GLOBAL_COLOR_MENU 4
-#define EEPROM_PRESET_PARAM_MENU 3 // NOT CORRECT
+#define EEP_PRESET_MENU       0
+#define EEP_GLOBAL_MENU       1
+#define EEP_GLOBAL_COLOR_MENU 4
+#define EEP_PRESET_PARAM_MENU 3 // NOT CORRECT
 //--
 
 // Settings
@@ -86,20 +86,20 @@
 
 // FLAGS
 // RESET EEPROM - Undef to remove
-//#define EEPROM_RESET
-//#define EEPROM_RESET_COLORS
-//#define EEPROM_RESET_PEDALS
-//#define EEPROM_RESET_PARAMS
-//#define EEPROM_RESET_FSW
-//#define EEPROM_RESET_PRESETS
-//#define EEPROM_RESET_MENUS
-//#define EEPROM_RESET_OPTS
-//#define EEPROM_RESET_LETTERS
+//#define EEP_RESET
+//#define EEP_RESET_COLORS
+//#define EEP_RESET_PEDALS
+//#define EEP_RESET_PARAMS
+//#define EEP_RESET_FSW
+//#define EEP_RESET_PRESETS
+//#define EEP_RESET_MENUS
+//#define EEP_RESET_OPTS
+//#define EEP_RESET_LETTERS
 //-- END RESET EEPROM--
 
 // FLAGS
 //#define ALT_PROGRAM
-//#define RESET_EEPROM_PROGRAM
+//#define RESET_EEP_PROGRAM
 // -- END FLAGS --
 
 // Headers

@@ -86,11 +86,11 @@ struct Settings {
 
       case E_GLOBAL_COLORS:
         if ( m.not_initialized() ) {
-          lloop.reset(EEPROM_START_COLORS, sizeof(Color), "COLORS", EEPROM_NUM_COLORS, true);
+          lloop.reset(EEP_START_COLORS, sizeof(Color), "COLORS", EEP_NUM_COLORS, true);
         }
         else {
           temp = lloop.loop();
-          if ( temp == EEPROM_NUM_COLORS ) m.jump_to( E_GLOBAL );
+          if ( temp == EEP_NUM_COLORS ) m.jump_to( E_GLOBAL );
           else if ( temp ) {
             temp -=1;
             m.jump_to( E_GLOBAL_COLOR );

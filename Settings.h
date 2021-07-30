@@ -27,7 +27,7 @@ struct Settings {
       /* :: PRESET SETTINGS :: */
       case E_PRESET:
         if ( m.not_initialized() ) {
-          mloop.reset(EEPROM_PRESET_MENU);
+          mloop.reset(EEP_PRESET_MENU);
         }
         else {
           switch(mloop.loop()) {
@@ -109,7 +109,7 @@ struct Settings {
 
       case E_PRESET_PARAM:
         if ( m.not_initialized() ) {
-          mloop.reset(EEPROM_PRESET_PARAM_MENU);
+          mloop.reset(EEP_PRESET_PARAM_MENU);
         }
         else {
         }
@@ -155,7 +155,7 @@ struct Settings {
       /* :: GLOBAL SETTINGS :: */
       case E_GLOBAL:
         if ( m.not_initialized() ) {
-          mloop.reset(EEPROM_GLOBAL_MENU);
+          mloop.reset(EEP_GLOBAL_MENU);
         }
         else {
           switch(mloop.loop()) {
@@ -191,17 +191,17 @@ struct Settings {
         if ( m.not_initialized() ) {
           if ( list_loop_p == nullptr ) {
             list_loop_p = new ListLoop(
-              EEPROM_START_COLORS,
+              EEP_START_COLORS,
               sizeof(Color),
               "COLORS",
-              EEPROM_NUM_COLORS,
+              EEP_NUM_COLORS,
               true
             );
           }
         }
         else {
           if ( list_loop_p->loop() ) {
-            if ( list_loop_p->get_result() == EEPROM_NUM_COLORS ) {
+            if ( list_loop_p->get_result() == EEP_NUM_COLORS ) {
               //cancel
               m.jump_to(E_GLOBAL);
               CLRPTR(list_loop_p);
@@ -217,7 +217,7 @@ struct Settings {
 
       case E_GLOBAL_COLOR:
         if ( m.not_initialized() ) {
-          mloop.reset(EEPROM_GLOBAL_COLOR_MENU, color_p->name);
+          mloop.reset(EEP_GLOBAL_COLOR_MENU, color_p->name);
         }
         else {
           switch(mloop.loop()) {

@@ -1,7 +1,7 @@
 #include "Includes.h"
 
 #ifndef ALT_PROGRAM
-#ifndef RESET_EEPROM_PROGRAM
+#ifndef RESET_EEP_PROGRAM
 
 // Definitions
 #define E_MAIN     0
@@ -101,7 +101,7 @@ void loop() {
   HW::loop();
 
   if ( m.not_initialized() ) {
-    list_loop.reset(EEPROM_START_COLORS, sizeof(Color), "COLORS", 100);
+    list_loop.reset(EEP_START_COLORS, sizeof(Color), "COLORS", 100);
   }
   else {
     if ( list_loop.loop() ) m.reinitialize();
@@ -110,7 +110,7 @@ void loop() {
 
 #endif
 
-#ifdef RESET_EEPROM_PROGRAM
+#ifdef RESET_EEP_PROGRAM
 void setup() {
   HW::setup();
 

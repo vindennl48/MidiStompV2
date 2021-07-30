@@ -1,10 +1,10 @@
-#ifndef I2C_EEPROM_H
-#define I2C_EEPROM_H
+#ifndef I2C_EEP_H
+#define I2C_EEP_H
 
-#define EEPROM_ADDRESS 0x50
+#define EEP_ADDRESS 0x50
 
 void eWriteByte(uint16_t address, uint8_t data) {
-  Wire.beginTransmission(EEPROM_ADDRESS);
+  Wire.beginTransmission(EEP_ADDRESS);
   Wire.write(address >> 8);
   Wire.write(address & 0xFF);
   Wire.write(data);
@@ -13,12 +13,12 @@ void eWriteByte(uint16_t address, uint8_t data) {
 }
 
 uint8_t eReadByte(uint16_t address) {
-  Wire.beginTransmission(EEPROM_ADDRESS);
+  Wire.beginTransmission(EEP_ADDRESS);
   Wire.write(address >> 8);
   Wire.write(address & 0xFF);
   Wire.endTransmission();
 
-  Wire.requestFrom(EEPROM_ADDRESS, 1);
+  Wire.requestFrom(EEP_ADDRESS, 1);
   return Wire.read();
 }
 
@@ -56,7 +56,7 @@ void set_data(T *data, uint16_t start) {
   );
 }
 
-#define EEPROM_FUNC(name, obj_class, start) \
+#define EEP_FUNC(name, obj_class, start) \
   static obj_class name##_at(uint8_t id) { \
     return get_data<obj_class>(start + sizeof(obj_class) * id); \
   } \
@@ -64,7 +64,7 @@ void set_data(T *data, uint16_t start) {
     set_data<obj_class>(new_obj, start + sizeof(obj_class) * id); \
   }
 
-#define EEPROM_FUNC_EXTEND(name, obj_class, start, num_obj) \
+#define EEP_FUNC_EXTEND(name, obj_class, start, num_obj) \
   static obj_class name##_at(uint8_t parent_id, uint8_t id) { \
     return get_data<obj_class>(start + sizeof(obj_class) * num_obj * parent_id + sizeof(obj_class) * id); \
   } \
@@ -72,6 +72,6 @@ void set_data(T *data, uint16_t start) {
     set_data<obj_class>(new_obj, start + sizeof(obj_class) * num_obj * parent_id + sizeof(obj_class) * id); \
   }
 
-#undef EEPROM_ADDRESS
+#undef EEP_ADDRESS
 
 #endif
