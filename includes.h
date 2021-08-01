@@ -33,7 +33,7 @@
 #define EEP_NUM_PRESETS      100
 #define EEP_NUM_FSW          (NUM_FSW * NUM_SUB_MENUS * EEP_NUM_PRESETS)
 #define EEP_NUM_MENUS        20
-#define EEP_NUM_OPTS         20
+#define EEP_NUM_OPTS         (EEP_NUM_MENUS * 10)
 #define EEP_NUM_LETTERS      38
 #define EEP_NUM_LETTERS_MAX  (EEP_NUM_LETTERS+1)
 
@@ -43,8 +43,8 @@
 #define EEP_START_FSW        (EEP_START_PARAMS+(sizeof(Param)*EEP_NUM_PARAMS)+1)
 #define EEP_START_PRESETS    (EEP_START_FSW+(sizeof(Footswitch)*EEP_NUM_FSW)+1)
 #define EEP_START_MENUS      (EEP_START_PRESETS+(sizeof(Preset)*EEP_NUM_PRESETS)+1)
-#define EEP_START_OPTS       (EEP_START_MENUS+(EEP_NUM_MENUS)+1)
-#define EEP_START_LETTERS    (EEP_START_OPTS+(STR_LEN_MAX * EEP_NUM_OPTS)+1)
+#define EEP_START_OPTS       (EEP_START_MENUS+(sizeof(SubMenu)*EEP_NUM_MENUS)+1)
+#define EEP_START_LETTERS    (EEP_START_OPTS+(sizeof(MenuOption)*EEP_NUM_OPTS)+1)
 
 // EEPROM MENUS
 #define EEP_PRESET_MENU       0
@@ -71,6 +71,14 @@
 // LED
 #define DEFAULT_LED_TIME_MS 50
 
+// MENUS/SETTINGS
+#define NUM_MENU_OPTIONS 10
+
+#define MENU_TYPE_DUMMY        0
+#define MENU_TYPE_SUB_MENU     1
+#define MENU_TYPE_FUNCTION     2
+#define MENU_TYPE_FUNC_AND_SUB 3
+
 // MACROS
 #define LTRUE  1  // True with 0 return
 #define LFALSE 2  // False with 0 return
@@ -80,19 +88,19 @@
 
 // -- FLAGS --
 // --- RESET EEPROM --- Undef to remove
-#define EEP_RESET
-#define EEP_RESET_COLORS
-#define EEP_RESET_PEDALS
-#define EEP_RESET_PARAMS
-#define EEP_RESET_FSW
-#define EEP_RESET_PRESETS
-#define EEP_RESET_MENUS
-#define EEP_RESET_OPTS
-#define EEP_RESET_LETTERS
+//#define EEP_RESET
+//#define EEP_RESET_COLORS
+//#define EEP_RESET_PEDALS
+//#define EEP_RESET_PARAMS
+//#define EEP_RESET_PEDAL_PARAMS
+//#define EEP_RESET_FSW
+//#define EEP_RESET_PRESETS
+//#define EEP_RESET_MENUS
+//#define EEP_RESET_LETTERS
 // --- END RESET EEPROM ---
 
-//#define ALT_PROGRAM
-#define RESET_EEP_PROGRAM
+#define ALT_PROGRAM
+//#define RESET_EEP_PROGRAM
 // -- END FLAGS --
 
 // Headers
@@ -112,10 +120,12 @@ uint8_t    preset_id = 0;
 #include "LEDs.h"
 #include "Screen.h"
 #include "Hardware.h"
+#include "Reset.h"
 #include "MenuLoop.h"
 #include "TextEdit.h"
 #include "ColorEdit.h"
 //#include "ValueEdit.h"
-#include "Settings.h"
+//#include "Settings.h"
+#include "test_menu.h"
 
 #endif

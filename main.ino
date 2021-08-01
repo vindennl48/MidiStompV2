@@ -91,22 +91,16 @@ void loop() {
 /* For testing random stuff */
 
 Menu     m;
-ListLoop list_loop;
-/*char name[STR_LEN_MAX] = "MITCH";*/
+MenuHost mh(0);
 
 void setup() {
   HW::setup();
+  mh.setup();
 }
 
 void loop() {
   HW::loop();
-
-  if ( m.not_initialized() ) {
-    list_loop.reset(EEP_START_COLORS, sizeof(Color), "COLORS", 100);
-  }
-  else {
-    if ( list_loop.loop() ) m.reinitialize();
-  }
+  mh.loop();
 }
 
 #endif
@@ -121,7 +115,13 @@ void setup() {
   HW::screen.clear();
   HW::screen.print(0,0, "RESETTING..");
   reset_eeprom();
-  HW::screen.print_with_nline(0,0, "DONE!");
+  HW::screen.clear();
+  HW::screen.print(0,0, "DONE!");
+
+#ifndef EEP_RESET
+  HW::screen.clear();
+  HW::screen.print(0,0, "FORGOT EEP_RESET");
+#endif
 }
 
 void loop() {}

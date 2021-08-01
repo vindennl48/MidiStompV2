@@ -26,6 +26,7 @@ void eWriteBlock(uint16_t address, const uint8_t *data, uint16_t size) {
   for (uint16_t i=0; i<size; i++) {
     eWriteByte(address + i, *(data+i));
   }
+  LED_BOARD_TOGGLE;
 }
 
 void eReadBlock(uint16_t address, uint8_t *data, uint16_t size) {

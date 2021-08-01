@@ -63,7 +63,7 @@ typedef PedalParam PedalParams[NUM_PARAMS_PER_FSW];
 /*  :: FOOTSWITCH :: */
 struct Footswitch {
   // 8 bytes
-  PedalParams output[NUM_STATES] = { 0 };
+  //PedalParams output[NUM_STATES] = { 0 };
   uint8_t     colors[NUM_STATES] = { 0, 1, 2 };
 
   // States of footswitch
@@ -99,12 +99,53 @@ struct Preset {
   // 1 main footswitch menu + 3 footswitch sub-menus
 } *preset_p = nullptr;
 
+
+/*  :: MENU STRUCTS :: */
+/* MenuOption 0 is always going to be a dummy option (impossible to select) */
+struct MenuOption {
+  char text[STR_LEN_MAX];
+
+  union {
+    struct {
+      unsigned type:2;    // 0=DUMMY, 1=SUBMENU, 2=FUNCTION, 3=FUNC THEN SUBMENU
+      unsigned value:8;   // submenu or function id to call
+      unsigned value2:8;  // value is function call, value2 is submenu (only in type 3)
+    };
+  };
+
+  MenuOption(const char text[STR_LEN_MAX], uint8_t type, uint8_t value=0, uint8_t value2=0) {
+    strcpy(this->text, text);
+    this->type   = type;
+    this->value  = value;
+    this->value2 = value2;
+  }
+  MenuOption() {}  // For pointers
+};
+
+
+struct SubMenu {
+  char    title[STR_LEN_MAX];
+  uint8_t num_options;
+
+  SubMenu(const char title[STR_LEN_MAX], uint8_t num_options) {
+    strcpy(this->title, title);
+    this->num_options = num_options;
+  }
+  SubMenu() {}  // For pointers
+};
+/*  :: END MENU STRUCTS :: */
+
+
+
 /* :: DATABASE STRUCT :: */
 struct DB {
   EEP_FUNC(color,  Color,   EEP_START_COLORS);
   EEP_FUNC(pedal,  Pedal,   EEP_START_PEDALS);
   EEP_FUNC(preset, Preset,  EEP_START_PRESETS);
-  EEP_FUNC(menu,   uint8_t, EEP_START_MENUS);
+  //EEP_FUNC(menu,   uint8_t, EEP_START_MENUS);
+
+  EEP_FUNC(sub_menu, SubMenu, EEP_START_MENUS);
+  EEP_FUNC_EXTEND(menu_option, MenuOption, EEP_START_OPTS, NUM_MENU_ITEMS);
 
   EEP_FUNC_EXTEND(param, Param,      EEP_START_PARAMS, EEP_NUM_PARAMS);
   EEP_FUNC_EXTEND(fsw,   Footswitch, EEP_START_FSW,    EEP_NUM_FSW);
@@ -117,135 +158,6 @@ struct DB {
   //static void text_save(char *text, uint8_t id)              { eeprom_write_block((const void*)text, (void*)(EEP_START_MENUS + (STR_LEN_MAX * id)), STR_LEN_MAX); }
 };
 
-
-/*  :: RESET EEPROM :: */
-void reset_eeprom() {
-#ifdef EEP_RESET
-
-  #ifdef EEP_RESET_COLORS
-  {
-    Color color;
-    for (int i=0; i<EEP_NUM_COLORS; i++) set_data<Color>( &color, EEP_START_COLORS + (sizeof(Color) * i) );
-
-    color.r = 255; color.g = 0; color.b = 0;
-    set_data<Color>( &color, EEP_START_COLORS + (sizeof(Color) * 0) );
-
-    color.r = 0; color.g = 255; color.b = 0;
-    set_data<Color>( &color, EEP_START_COLORS + (sizeof(Color) * 1) );
-
-    color.r = 0; color.g = 0; color.b = 255;
-    set_data<Color>( &color, EEP_START_COLORS + (sizeof(Color) * 2) );
-
-    color.r = 255; color.g = 255; color.b = 0;
-    set_data<Color>( &color, EEP_START_COLORS + (sizeof(Color) * 3) );
-
-    color.r = 255; color.g = 0; color.b = 255;
-    set_data<Color>( &color, EEP_START_COLORS + (sizeof(Color) * 4) );
-  }
-  #endif
-
-  #ifdef EEP_RESET_PEDALS
-  {
-    pedal_p = new Pedal;
-    for (int i=0; i<EEP_NUM_PEDALS; i++) DB::pedal_save(i, pedal_p);
-    CLRPTR(pedal_p);
-  }
-  #endif
-
-  #ifdef EEP_RESET_FSW
-  {
-    param_p = new Param;
-    for (int i=0; i<EEP_NUM_PARAMS; i++) DB::param_save_single(i, param_p);
-    CLRPTR(param_p);
-  }
-  #endif
-
-  #ifdef EEP_RESET_FSW
-  {
-    fsw_p = new Footswitch;
-    for (int i=0; i<EEP_NUM_FSW; i++) DB::fsw_save_single(i, fsw_p);
-    CLRPTR(fsw_p);
-  }
-  #endif
-
-  #ifdef EEP_RESET_PRESETS
-  {
-    preset_p = new Preset;
-    for (int i=0; i<EEP_NUM_PRESETS; i++) DB::preset_save(i, preset_p);
-    CLRPTR(preset_p);
-  }
-  #endif
-
-  #ifdef EEP_RESET_MENUS
-  {
-    uint8_t menu_options = 7;
-    set_data<uint8_t>(&menu_options, EEP_START_MENUS + 0);
-    menu_options = 4;
-    set_data<uint8_t>(&menu_options, EEP_START_MENUS + 1);
-    menu_options = 6;
-    set_data<uint8_t>(&menu_options, EEP_START_MENUS + 2);
-    menu_options = 4;
-    set_data<uint8_t>(&menu_options, EEP_START_MENUS + 3);
-    menu_options = 3;
-    set_data<uint8_t>(&menu_options, EEP_START_MENUS + 4);
-  }
-  #endif
-
-  #ifdef EEP_RESET_LETTERS
-  {
-    struct Alphabet {
-      char letters[EEP_NUM_LETTERS_MAX] = " ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789-_";
-    } alphabet;
-    set_data<Alphabet>(&alphabet, EEP_START_LETTERS);
-  }
-  #endif
-
-  #ifdef EEP_RESET_OPTS
-  {
-    struct SaveOpts {
-      char main_menu[10][STR_LEN_MAX] = {
-        "SETTINGS",
-        "SAVE",
-        "NAME",
-        "PARAMS",
-        "COPY",
-        "RESET",
-        "GLOBAL"
-      };
-      char global_menu[10][STR_LEN_MAX] = {
-        "GLOBAL",
-        "PEDALS",
-        "COLORS",
-        "RESET"
-      };
-      char fsw_menu[10][STR_LEN_MAX] = {
-        "FSW",
-        "TYPE",
-        "COLOR",
-        "SHORT PRESS",
-        "LONG PRESS",
-        "RESET"
-      };
-      char pedal_menu[10][STR_LEN_MAX] = {
-        "NAME",
-        "CHANNEL",
-        "PARAMS",
-        "RESET"
-      };
-      char color_menu[10][STR_LEN_MAX] = {
-        "COLOR",
-        "NAME",
-        "VALUES",
-        "RESET"
-      };
-    } save_opts;
-
-    set_data<SaveOpts>(&save_opts, EEP_START_OPTS);
-  }
-  #endif
-#endif
-}
-/*  :: END RESET EEPROM :: */
 
 
 #endif
