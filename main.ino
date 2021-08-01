@@ -88,6 +88,7 @@ void loop() {
 
 
 #ifdef ALT_PROGRAM
+/* For testing random stuff */
 
 Menu     m;
 ListLoop list_loop;
@@ -111,6 +112,8 @@ void loop() {
 #endif
 
 #ifdef RESET_EEP_PROGRAM
+/* For resetting the EEPROM */
+
 void setup() {
   HW::setup();
 

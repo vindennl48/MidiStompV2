@@ -42,9 +42,9 @@ struct Settings {
               m.jump_to(E_PRESET_NAME);
               break;
 
-            //case 3: //E_PRESET_PARAMS
-              //m.jump_to(E_PRESET_PARAMS);
-              //break;
+            case 3: //E_PRESET_PARAMS
+              m.jump_to(E_PRESET_PARAMS);
+              break;
 
             //case 4: //E_PRESET_COPY
               //m.jump_to(E_PRESET_COPY);

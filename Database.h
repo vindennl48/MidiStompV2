@@ -23,7 +23,7 @@ struct Param {
 
   union {
     struct {
-      unsigned type:2;   // 0=NONE, 1=Note, 2=CC, 3=PC
+      unsigned type:3;   // 0=NONE, 1=Note, 2=CC, 3=PC
       unsigned pitch:7;
     };
   };
@@ -45,18 +45,26 @@ struct Pedal {
 
 // Pedal Param = PP
 union PedalParam {
+  unsigned param_type:3;   // 0=OFF, 1=PEDAL, 2=SUBMENU, 3=PRESET
   struct {
+    unsigned reserved1:3;
+    unsigned special:8;    // 0=NONE, 1=PRESET++, 2=PRESET--, 3=PRESET+=20, 4=PRESET-=20
+    unsigned param_value:8;
+  };
+  struct {
+    unsigned reserved2:3;
     unsigned pedal:3;
     unsigned param:5;
     unsigned velocity:8;
   };
-} *pedal_param_p = nullptr;
+};
+typedef PedalParam PedalParams[NUM_PARAMS_PER_FSW];
 
 /*  :: FOOTSWITCH :: */
 struct Footswitch {
   // 8 bytes
-  uint8_t    colors[NUM_STATES] = { 0, 1, 2 };
-  PedalParam output[NUM_STATES] = { 0  };
+  PedalParams output[NUM_STATES] = { 0 };
+  uint8_t     colors[NUM_STATES] = { 0, 1, 2 };
 
   // States of footswitch
   union {
@@ -78,17 +86,18 @@ struct Footswitch {
     }
     else if ( state >= 2 ) state = 0;
   }
-};
+} *fsw_p = nullptr;
 
 
 /*  :: PRESET :: */
 struct Preset {
   // 14 bytes
-  char    name[STR_LEN_MAX] = "UNTITLED";
-  uint8_t is_dirty          = false;
+  PedalParams params            = {0};
+  char        name[STR_LEN_MAX] = "UNTITLED";
+  uint8_t     is_dirty          = false;
   // 4 footswitches
   // 1 main footswitch menu + 3 footswitch sub-menus
-};
+} *preset_p = nullptr;
 
 /* :: DATABASE STRUCT :: */
 struct DB {
@@ -137,29 +146,33 @@ void reset_eeprom() {
 
   #ifdef EEP_RESET_PEDALS
   {
-    Pedal pedal;
-    for (int i=0; i<EEP_NUM_PEDALS; i++) set_data<Pedal>( &pedal, EEP_START_PEDALS + (sizeof(Pedal) * i) );
+    pedal_p = new Pedal;
+    for (int i=0; i<EEP_NUM_PEDALS; i++) DB::pedal_save(i, pedal_p);
+    CLRPTR(pedal_p);
   }
   #endif
 
   #ifdef EEP_RESET_FSW
   {
-    Param param;
-    for (int i=0; i<EEP_NUM_PARAMS; i++) set_data<Param>( &param, EEP_START_PARAMS + (sizeof(Param) * i) );
+    param_p = new Param;
+    for (int i=0; i<EEP_NUM_PARAMS; i++) DB::param_save_single(i, param_p);
+    CLRPTR(param_p);
   }
   #endif
 
   #ifdef EEP_RESET_FSW
   {
-    Footswitch fsw;
-    for (int i=0; i<EEP_NUM_FSW; i++) set_data<Footswitch>( &fsw, EEP_START_FSW + (sizeof(Footswitch) * i) );
+    fsw_p = new Footswitch;
+    for (int i=0; i<EEP_NUM_FSW; i++) DB::fsw_save_single(i, fsw_p);
+    CLRPTR(fsw_p);
   }
   #endif
 
   #ifdef EEP_RESET_PRESETS
   {
-    Preset preset;
-    for (int i=0; i<EEP_NUM_PRESETS; i++) set_data<Preset>( &preset, EEP_START_PRESETS + (sizeof(Preset) * i) );
+    preset_p = new Preset;
+    for (int i=0; i<EEP_NUM_PRESETS; i++) DB::preset_save(i, preset_p);
+    CLRPTR(preset_p);
   }
   #endif
 
