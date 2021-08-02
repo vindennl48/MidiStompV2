@@ -91,11 +91,12 @@ void loop() {
 /* For testing random stuff */
 
 Menu     m;
-MenuHost mh(0);
+MenuHost mh(3);
 
 void setup() {
   HW::setup();
   mh.setup();
+  mh.change_title("FSW S1 M1");
 }
 
 void loop() {

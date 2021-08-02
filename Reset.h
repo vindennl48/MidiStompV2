@@ -119,6 +119,18 @@ void reset_eeprom() {
     menu_option[3] = MenuOption("RESET",  MENU_TYPE_DUMMY);
     DB::sub_menu_save(menu_id, &sub_menu);
     for (int i=0; i<num_options; i++) DB::menu_option_save(menu_id, i, &menu_option[i]);
+
+    menu_id     = 3;
+    num_options = 6;
+    sub_menu = SubMenu("FSW", num_options);
+    menu_option[0] = MenuOption("",           MENU_TYPE_DUMMY);
+    menu_option[1] = MenuOption("TYPE",       MENU_TYPE_DUMMY);
+    menu_option[2] = MenuOption("COLOR",      MENU_TYPE_DUMMY);
+    menu_option[3] = MenuOption("SHORTPRESS", MENU_TYPE_DUMMY);
+    menu_option[4] = MenuOption("LONGPRESS",  MENU_TYPE_DUMMY);
+    menu_option[5] = MenuOption("RESET",      MENU_TYPE_DUMMY);
+    DB::sub_menu_save(menu_id, &sub_menu);
+    for (int i=0; i<num_options; i++) DB::menu_option_save(menu_id, i, &menu_option[i]);
   }
   #endif
 
@@ -132,49 +144,6 @@ void reset_eeprom() {
   }
   #endif
 
-//  #ifdef EEP_RESET_OPTS
-//  {
-//    struct SaveOpts {
-//      char main_menu[10][STR_LEN_MAX] = {
-//        "SETTINGS",
-//        "SAVE",
-//        "NAME",
-//        "PARAMS",
-//        "COPY",
-//        "RESET",
-//        "GLOBAL"
-//      };
-//      char global_menu[10][STR_LEN_MAX] = {
-//        "GLOBAL",
-//        "PEDALS",
-//        "COLORS",
-//        "RESET"
-//      };
-//      char fsw_menu[10][STR_LEN_MAX] = {
-//        "FSW",
-//        "TYPE",
-//        "COLOR",
-//        "SHORT PRESS",
-//        "LONG PRESS",
-//        "RESET"
-//      };
-//      char pedal_menu[10][STR_LEN_MAX] = {
-//        "NAME",
-//        "CHANNEL",
-//        "PARAMS",
-//        "RESET"
-//      };
-//      char color_menu[10][STR_LEN_MAX] = {
-//        "COLOR",
-//        "NAME",
-//        "VALUES",
-//        "RESET"
-//      };
-//    } save_opts;
-//
-//    set_data<SaveOpts>(&save_opts, EEP_START_OPTS);
-//  }
-//  #endif
 #endif
 }
 

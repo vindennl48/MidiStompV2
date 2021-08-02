@@ -22,6 +22,10 @@ struct MenuHost {
     sub_menu = DB::sub_menu_at(sub_menu_id);
   }
 
+  void change_title(char title[STR_LEN_MAX]) {
+    strcpy(sub_menu.title, title);
+  }
+
   uint8_t loop() {
     switch(m.e()) {
       default:
