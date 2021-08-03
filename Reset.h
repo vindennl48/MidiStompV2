@@ -91,8 +91,8 @@ void reset_eeprom() {
     num_options = 7;
     sub_menu = SubMenu("PRESET", num_options);
     menu_option[0] = MenuOption("",       MENU_TYPE_DUMMY);
-    menu_option[1] = MenuOption("SAVE",   MENU_TYPE_DUMMY);
-    menu_option[2] = MenuOption("NAME",   MENU_TYPE_DUMMY);
+    menu_option[1] = MenuOption("SAVE",   MENU_TYPE_FUNCTION, 1);
+    menu_option[2] = MenuOption("NAME",   MENU_TYPE_FUNCTION, 2);
     menu_option[3] = MenuOption("PARAMS", MENU_TYPE_FUNC_AND_SUB, /*FUNC ID*/ 0, /*SUBMENU ID*/ 2);
     menu_option[4] = MenuOption("COPY",   MENU_TYPE_DUMMY);
     menu_option[5] = MenuOption("RESET",  MENU_TYPE_DUMMY);

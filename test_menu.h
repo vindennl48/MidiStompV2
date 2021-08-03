@@ -4,15 +4,30 @@
 #define E_SUBMENU   0
 #define E_OPTION    1
 
+typedef uint8_t (*SelectedFunction)(Menu*);
+
+SelectedFunction get_selected_function(uint8_t id) {
+  switch(id) {
+    case 1: return &submenu_preset_save;
+    case 2: return &submenu_preset_name;
+    case 3: return &submenu_preset_params;
+    case 4: return &submenu_preset_copy;
+    case 5: return &submenu_preset_reset;
+  };
+
+  return nullptr;
+}
+
 struct MenuHost {
   /* Function to run the entire menu system */
 
-  Menu       m;
-  MenuHost   *sub_menu_host;
-  SubMenu    sub_menu;
-  MenuOption menu_option_1, menu_option_2;
-  uint8_t    sub_menu_id = 0;
-  uint8_t    x = 1;
+  Menu             m, m_sub;
+  MenuHost         *sub_menu_host;
+  SubMenu          sub_menu;
+  MenuOption       menu_option_1, menu_option_2;
+  SelectedFunction selected_function;
+  uint8_t          sub_menu_id    = 0;
+  uint8_t          x              = 1;
 
   MenuHost(uint8_t sub_menu_id) {
     this->sub_menu_id = sub_menu_id;
@@ -22,7 +37,7 @@ struct MenuHost {
     sub_menu = DB::sub_menu_at(sub_menu_id);
   }
 
-  void change_title(char title[STR_LEN_MAX]) {
+  void change_title(const char title[STR_LEN_MAX]) {
     strcpy(sub_menu.title, title);
   }
 
@@ -73,7 +88,9 @@ struct MenuHost {
             sub_menu_host = new MenuHost(menu_option_2.value);
             sub_menu_host->setup();
           }
-          else if ( menu_option_2.type == MENU_TYPE_FUNCTION ) { }
+          else if ( menu_option_2.type == MENU_TYPE_FUNCTION ) {
+            selected_function = get_selected_function(menu_option_2.value);
+          }
           else if ( menu_option_2.type == MENU_TYPE_FUNC_AND_SUB) { }
         }
         else {
@@ -84,7 +101,7 @@ struct MenuHost {
             }
           }
           else if ( menu_option_2.type == MENU_TYPE_FUNCTION ) {
-            m.jump_to(E_SUBMENU);
+            if ( selected_function(&m_sub) ) m.jump_to(E_SUBMENU);
           }
           else if ( menu_option_2.type == MENU_TYPE_FUNC_AND_SUB ) {
             m.jump_to(E_SUBMENU);

@@ -57,8 +57,7 @@ union PedalParam {
     unsigned param:5;
     unsigned velocity:8;
   };
-};
-typedef PedalParam PedalParams[NUM_PARAMS_PER_FSW];
+} *pedal_param_p = nullptr;
 
 /*  :: FOOTSWITCH :: */
 struct Footswitch {
@@ -92,11 +91,11 @@ struct Footswitch {
 /*  :: PRESET :: */
 struct Preset {
   // 14 bytes
-  PedalParams params            = {0};
-  char        name[STR_LEN_MAX] = "UNTITLED";
-  uint8_t     is_dirty          = false;
+  char    name[STR_LEN_MAX] = "UNTITLED";
+  uint8_t is_dirty          = false;
   // 4 footswitches
   // 1 main footswitch menu + 3 footswitch sub-menus
+  // 10 pedal params on preset load
 } *preset_p = nullptr;
 
 

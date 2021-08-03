@@ -9,27 +9,21 @@
 
 
 // Variables
-// Preset and fsw are in includes.h
-Menu    m;
-uint8_t submenu = 0;
+// preset_id and fsw_submenu_id are in includes.h
+Menu     m;
+MenuHost *mh_p = nullptr;
 
 void setup() {
   HW::setup();
 
   // Load up preset and footswitches from eeprom
-  /*load_preset();*/
 
-  for (int i=0; i<4; i++) {
-    fsw[submenu][i].mode = FSW_MODE_CYCLE;
-    fsw[submenu][i].colors[0] = 0;
-    fsw[submenu][i].colors[1] = 1;
-    fsw[submenu][i].colors[2] = 2;
-  }
+  preset_p  = new Preset;
+  fsw_p     = new Footswitch[NUM_FSW*NUM_SUB_MENUS];
 
-  fsw[submenu][2].colors[2] = 3;
-  fsw[submenu][3].colors[2] = 4;
-
-  strcpy(preset.name, "PCORE       ");
+  *preset_p = DB::preset_at(preset_id);
+  for (int i=0; i<(NUM_FSW*NUM_SUB_MENUS); i++)
+    fsw_p[i] = DB::fsw_at(preset_id, i);
 }
 
 void loop() {
@@ -40,23 +34,23 @@ void loop() {
       if ( m.not_initialized() ) {
         // Setup screen
         HW::screen.clear();
-        HW::screen.print(0,0, preset.name);
-        HW::screen.print(10,1, "MENU 1");
+        HW::screen.print(0,0, preset_p->name);
+        HW::screen.print(10,1, String("MENU ") + String(fsw_submenu_id+1));
 
         // Setup footswitches
         for (int i=0; i<NUM_FSW; i++) {
-          if ( fsw[submenu][i].mode == FSW_MODE_ONESHOT ) HW::btns.at(i)->set_press_type(PRESS_TYPE_DOWN);
+          if ( fsw_p[(NUM_FSW*fsw_submenu_id)+i].mode == FSW_MODE_ONESHOT ) HW::btns.at(i)->set_press_type(PRESS_TYPE_DOWN);
           else                                   HW::btns.at(i)->set_press_type(PRESS_TYPE_UP);
 
-          HW::leds.at(i)->set( DB::color_at( fsw[submenu][i].colors[fsw[submenu][i].state] ) );
+          HW::leds.at(i)->set( DB::color_at( fsw_p[(NUM_FSW*fsw_submenu_id)+i].colors[fsw_p[(NUM_FSW*fsw_submenu_id)+i].state] ) );
         }
       }
 
       else {
         for (int i=0; i<NUM_FSW; i++) {
           if ( HW::btns.at(i)->is_pressed() ) {
-            fsw[submenu][i].increase_state();
-            HW::leds.at(i)->set( DB::color_at( fsw[submenu][i].colors[fsw[submenu][i].state] ) );
+            fsw_p[(NUM_FSW*fsw_submenu_id)+i].increase_state();
+            HW::leds.at(i)->set( DB::color_at( fsw_p[(NUM_FSW*fsw_submenu_id)+i].colors[fsw_p[(NUM_FSW*fsw_submenu_id)+i].state] ) );
           }
           else if ( HW::btns.at(i)->is_long_pressed() ) {}
         }
@@ -67,12 +61,13 @@ void loop() {
 
     case E_SETTINGS:
       if ( m.not_initialized() ) {
-        settings_p = new Settings;
+        mh_p = new MenuHost(0);
+        mh_p->setup();
       }
       else {
-        if ( settings_p->loop() ) {
+        if ( mh_p->loop() ) {
           m.jump_to(E_MAIN);
-          CLRPTR(settings_p);
+          CLRPTR(mh_p);
         }
       }
       break;
@@ -91,12 +86,11 @@ void loop() {
 /* For testing random stuff */
 
 Menu     m;
-MenuHost mh(3);
+MenuHost mh(0);
 
 void setup() {
   HW::setup();
   mh.setup();
-  mh.change_title("FSW S1 M1");
 }
 
 void loop() {

@@ -44,7 +44,12 @@
 #define EEP_START_PRESETS    (EEP_START_FSW+(sizeof(Footswitch)*EEP_NUM_FSW)+1)
 #define EEP_START_MENUS      (EEP_START_PRESETS+(sizeof(Preset)*EEP_NUM_PRESETS)+1)
 #define EEP_START_OPTS       (EEP_START_MENUS+(sizeof(SubMenu)*EEP_NUM_MENUS)+1)
-#define EEP_START_LETTERS    (EEP_START_OPTS+(sizeof(MenuOption)*EEP_NUM_OPTS)+1)
+#define EEP_START_LETTERS    65490  // At very end of EEPROM
+
+#define EEP_RAM_PRESET        (EEP_START_OPTS+(sizeof(MenuOption)*EEP_NUM_OPTS)+1)
+#define EEP_RAM_PRESET_PARAMS (EEP_RAM_PRESET+(sizeof(Preset))+1)
+#define EEP_RAM_FSW           (EEP_RAM_PRESET_PARAMS+(sizeof(PresetParam)*NUM_PARAMS_PER_FSW)+1)
+#define EEP_RAM_FSW_PARAMS    (EEP_RAM_FSW+(sizeof(Footswitch)*NUM_FSW*NUM_SUB_MENUS)+1)
 
 // EEPROM MENUS
 #define EEP_PRESET_MENU       0
@@ -99,16 +104,20 @@
 //#define EEP_RESET_LETTERS
 // --- END RESET EEPROM ---
 
-#define ALT_PROGRAM
+//#define ALT_PROGRAM
 //#define RESET_EEP_PROGRAM
 // -- END FLAGS --
+
+// -- VARS --
+uint8_t preset_id      = 0;
+uint8_t fsw_submenu_id = 0;
+// -- END VARS --
 
 // Headers
 #include "Standard.h"
 #include "Menu.h"
 #include "I2C_EEPROM.h"
 #include "Database.h"
-uint8_t    preset_id = 0;
 //Preset     preset;
 //Footswitch fsw[NUM_SUB_MENUS][NUM_FSW];
 #include "Button.h"
@@ -126,6 +135,7 @@ uint8_t    preset_id = 0;
 #include "ColorEdit.h"
 //#include "ValueEdit.h"
 //#include "Settings.h"
+#include "submenu_preset.h"
 #include "test_menu.h"
 
 #endif
