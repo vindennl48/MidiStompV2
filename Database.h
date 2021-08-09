@@ -38,38 +38,67 @@ struct Param {
 /*  :: PEDAL :: */
 struct Pedal {
   // 14 bytes
-  char    name[STR_LEN_MAX] = "UNTITLED";
-  uint8_t channel           = 0;
-  // 16 params
+  char     name[STR_LEN_MAX] = "UNTITLED";
+  unsigned channel:4;
+  // 32 params
+
+  Pedal() { channel = 0; }
+
 } *pedal_p = nullptr;
 
 // Pedal Param = PP
 union PedalParam {
-  unsigned param_type:3;   // 0=OFF, 1=PEDAL, 2=SUBMENU, 3=PRESET
+  // 2 bytes
   struct {
-    unsigned reserved1:3;
-    unsigned special:8;    // 0=NONE, 1=PRESET++, 2=PRESET--, 3=PRESET+=20, 4=PRESET-=20
-    unsigned param_value:8;
-  };
-  struct {
-    unsigned reserved2:3;
     unsigned pedal:3;
     unsigned param:5;
-    unsigned velocity:8;
+    unsigned velocity:7;
   };
 } *pedal_param_p = nullptr;
 
 /*  :: FOOTSWITCH :: */
 struct Footswitch {
-  // 8 bytes
-  //PedalParams output[NUM_STATES] = { 0 };
-  uint8_t     colors[NUM_STATES] = { 0, 1, 2 };
+/* Outline of Features
+ *   - Activated by single press OR press and hold
+ *     - Activate when button is pressed down (quicker reaction)
+ *       will prevent press-and-hold feature
+ *     - Otherwise, activate when button is pressed then released
+ *   - When activated, up to 5 MIDI notes will be sent.
+ *     A different set of 5 notes get sent depending on the state.
+ *     (Up to 3 states)
+ *   - 4 Modes
+ *     - OFF:     Button is not in use
+ *     - TOGGLE:  Button will switch between state 0 and state 1
+ *     - CYCLE:   Button will switch between state 0, 1, and 2
+ *     - ONESHOT: Button will only send out first bank of 5 MIDI notes
+ *                on every press.
+ *   - There is also a press-and-hold option to release 5 extra MIDI notes
+ *     This is only available when the FSW activates after press down and release.
+ *   - SPECIALTY FUNCTIONS
+ *     - Instead of sending MIDI notes, alternatively, we can perform some special functions
+ *       - SWITCH PRESET: This can either switch to a specific preset instantly, OR, can
+ *                        jump to the next/next 10/next 20/previous/previous 10/ previous 20.
+ *                        This number of jumps can be set in the first pedal_param value.
+ *       - SWITCH SUBMENU: This allows switching submenus within the same preset.  The
+ *                         submenu number is determined by the first pedal_param value.
+ *       - LOOP QUANTIZE: Requires MIDI clock input; When pressing a FSW, this waits for
+ *                        the next down-beat on the MIDI clock before sending out a MIDI
+ *                        message to a looper pedal to start.  Essentially mimics quantize.
+ * */
+
+  uint8_t colors[NUM_STATES] = { 0, 1, 2 };
 
   // States of footswitch
   union {
     struct {
-      unsigned mode:4;   // 0 OFF, 1 Toggle, 2 Cycle, 3 OneShot
-      unsigned state:4;  // 0 OFF,    1 ON1,   2 ON2
+      unsigned press_type:1; // 0 PRESS_TYPE_DOWN, 1 PRESS_TYPE_UP
+      unsigned mode:3;       // 0 OFF, 1 Toggle, 2 Cycle, 3 OneShot
+                             //   SPECIALTY: 
+                             //     4 Switch Submenu,
+                             //     5 Jump to preset x,
+                             //     6 Switch Preset by n number of presets,
+                             //     7 Loop Quantize
+      unsigned state:2;      // 0 OFF, 1 ON1, 2 ON2
     };
   };
 
@@ -90,6 +119,15 @@ struct Footswitch {
 
 /*  :: PRESET :: */
 struct Preset {
+/* Outline of Features
+ *   - Display Preset Name
+ *   - Display Active Preset Submenu
+ *   - On Preset Load, Send out up to 5(*) MIDI notes. (* might need more..)
+ *   - Have 4 FSW and maintain their status / settings
+ *   - Has 4 submenus of 4 FSW for added flexibility.
+ *     (Essentially, each preset has 16 FSW to choose from)
+ * */
+
   // 14 bytes
   char    name[STR_LEN_MAX] = "UNTITLED";
   uint8_t is_dirty          = false;
@@ -139,15 +177,18 @@ struct SubMenu {
 /* :: DATABASE STRUCT :: */
 struct DB {
   EEP_FUNC(color,  Color,   EEP_START_COLORS);
+
   EEP_FUNC(pedal,  Pedal,   EEP_START_PEDALS);
+  EEP_FUNC_EXTEND(param, Param,      EEP_START_PARAMS, NUM_PEDAL_PARAMS);
+
   EEP_FUNC(preset, Preset,  EEP_START_PRESETS);
-  //EEP_FUNC(menu,   uint8_t, EEP_START_MENUS);
+  EEP_FUNC_EXTEND(preset_param, PedalParam, EEP_START_PRESET_PARAMS, NUM_PRESET_PARAMS);
+
+  EEP_FUNC_EXTEND(fsw,   Footswitch, EEP_START_FSW,    (NUM_FSW*NUM_SUB_MENUS));
+  EEP_FUNC_EXTEND(fsw_param,   PedalParam, EEP_START_FSW_PARAMS, (NUM_PARAMS_PER_FSW*(NUM_STATES+1)));
 
   EEP_FUNC(sub_menu, SubMenu, EEP_START_MENUS);
   EEP_FUNC_EXTEND(menu_option, MenuOption, EEP_START_OPTS, NUM_MENU_ITEMS);
-
-  EEP_FUNC_EXTEND(param, Param,      EEP_START_PARAMS, EEP_NUM_PARAMS);
-  EEP_FUNC_EXTEND(fsw,   Footswitch, EEP_START_FSW,    EEP_NUM_FSW);
 
   static void menu_item_at(uint8_t menu_id, uint8_t id, char *menu_item) { eReadBlock( EEP_START_OPTS + STR_LEN_MAX * NUM_MENU_ITEMS * menu_id + STR_LEN_MAX * id, (uint8_t*)menu_item, STR_LEN_MAX ); }
   //static void    menu_item_save(uint8_t menu_id, uint8_t id, uint8_t new_obj) { return set_data<uint8_t>( &new_obj, EEP_START_MENUS + STR_LEN_MAX * NUM_MENU_ITEMS * menu_id + STR_LEN_MAX * id ); }

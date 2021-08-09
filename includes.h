@@ -16,6 +16,7 @@
 // Definitions
 // Settings
 #define NUM_PEDAL_PARAMS   32          // Number of params per pedal
+#define NUM_PRESET_PARAMS  5           // Number of params per preset load
 #define NUM_PARAMS_PER_FSW 10          // Number of params that activate on fsw stomp
 #define NUM_FSW            4           // Number of hardware fsw
 #define NUM_SUB_MENUS      4           // Number of total sub-menus per preset
@@ -27,46 +28,53 @@
 #define STR_LEN_MAX        (STR_LEN+1) // Max chars plus null terminated char
 
 // -- EEPROM MAP --
-#define EEP_NUM_COLORS       100
-#define EEP_NUM_PEDALS       8
-#define EEP_NUM_PARAMS       (NUM_PEDAL_PARAMS * EEP_NUM_PEDALS)
-#define EEP_NUM_PRESETS      100
-#define EEP_NUM_FSW          (NUM_FSW * NUM_SUB_MENUS * EEP_NUM_PRESETS)
-#define EEP_NUM_MENUS        20
-#define EEP_NUM_OPTS         (EEP_NUM_MENUS * 10)
-#define EEP_NUM_LETTERS      38
-#define EEP_NUM_LETTERS_MAX  (EEP_NUM_LETTERS+1)
+#define EEP_NUM_COLORS          100
+#define EEP_NUM_PEDALS          8
+#define EEP_NUM_PARAMS          (NUM_PEDAL_PARAMS * EEP_NUM_PEDALS)
+#define EEP_NUM_PRESETS         30
+#define EEP_NUM_PRESET_PARAMS   (EEP_NUM_PRESETS * NUM_PRESET_PARAMS)
+#define EEP_NUM_FSW             (NUM_FSW * NUM_SUB_MENUS * EEP_NUM_PRESETS)
+#define EEP_NUM_FSW_PARAMS      (NUM_PARAMS_PER_FSW * (NUM_STATES+1) * EEP_NUM_FSW) // NUM_STATES + 1 for long-press
+#define EEP_NUM_MENUS           20
+#define EEP_NUM_OPTS            (EEP_NUM_MENUS * 10)
+#define EEP_NUM_LETTERS         38
+#define EEP_NUM_LETTERS_MAX     (EEP_NUM_LETTERS+1)
 
-#define EEP_START_COLORS     0
-#define EEP_START_PEDALS     ((sizeof(Color)*EEP_NUM_COLORS)+1)
-#define EEP_START_PARAMS     (EEP_START_PEDALS+(sizeof(Pedal)*EEP_NUM_PEDALS)+1)
-#define EEP_START_FSW        (EEP_START_PARAMS+(sizeof(Param)*EEP_NUM_PARAMS)+1)
-#define EEP_START_PRESETS    (EEP_START_FSW+(sizeof(Footswitch)*EEP_NUM_FSW)+1)
-#define EEP_START_MENUS      (EEP_START_PRESETS+(sizeof(Preset)*EEP_NUM_PRESETS)+1)
-#define EEP_START_OPTS       (EEP_START_MENUS+(sizeof(SubMenu)*EEP_NUM_MENUS)+1)
-#define EEP_START_LETTERS    65490  // At very end of EEPROM
+#define EEP_START_COLORS        0
+#define EEP_START_PEDALS        ((sizeof(Color)*EEP_NUM_COLORS)+1)
+#define EEP_START_PARAMS        (EEP_START_PEDALS+(sizeof(Pedal)*EEP_NUM_PEDALS)+1)
+#define EEP_START_FSW           (EEP_START_PARAMS+(sizeof(Param)*EEP_NUM_PARAMS)+1)
+#define EEP_START_FSW_PARAMS    (EEP_START_FSW+(sizeof(Footswitch)*EEP_NUM_FSW)+1)
+#define EEP_START_PRESETS       (EEP_START_FSW_PARAMS+(sizeof(PedalParam)*EEP_NUM_FSW_PARAMS)+1)
+#define EEP_START_PRESET_PARAMS (EEP_START_PRESETS+(sizeof(Preset)*EEP_NUM_PRESETS)+1)
+#define EEP_START_MENUS         (EEP_START_PRESET_PARAMS+(sizeof(PedalParam)*EEP_NUM_PRESET_PARAMS)+1)
+#define EEP_START_OPTS          (EEP_START_MENUS+(sizeof(SubMenu)*EEP_NUM_MENUS)+1)
+#define EEP_START_LETTERS       65490 // At very end of EEPROM
 
-#define EEP_RAM_PRESET        (EEP_START_OPTS+(sizeof(MenuOption)*EEP_NUM_OPTS)+1)
-#define EEP_RAM_PRESET_PARAMS (EEP_RAM_PRESET+(sizeof(Preset))+1)
-#define EEP_RAM_FSW           (EEP_RAM_PRESET_PARAMS+(sizeof(PresetParam)*NUM_PARAMS_PER_FSW)+1)
-#define EEP_RAM_FSW_PARAMS    (EEP_RAM_FSW+(sizeof(Footswitch)*NUM_FSW*NUM_SUB_MENUS)+1)
+#define EEP_RAM_PRESET          (EEP_START_OPTS+(sizeof(MenuOption)*EEP_NUM_OPTS)+1)
+#define EEP_RAM_PRESET_PARAMS   (EEP_RAM_PRESET+(sizeof(Preset))+1)
+#define EEP_RAM_FSW             (EEP_RAM_PRESET_PARAMS+(sizeof(PedalParam)*NUM_PRESET_PARAMS)+1)
+#define EEP_RAM_FSW_PARAMS      (EEP_RAM_FSW+(sizeof(Footswitch)*NUM_FSW*NUM_SUB_MENUS)+1)
 
 // EEPROM MENUS
 #define EEP_PRESET_MENU       0
 #define EEP_GLOBAL_MENU       1
-#define EEP_GLOBAL_COLOR_MENU 4
-#define EEP_PRESET_PARAM_MENU 3 // NOT CORRECT
+#define EEP_PRESET_PARAM_MENU 2
+#define EEP_FSW_MENU          3
 // -- END EEPROM MAP --
 
-// Button
-#define PRESS_TYPE_UP   0   // Only activates when fsw is pressed THEN released
-#define PRESS_TYPE_DOWN 1   // Activates as soon as fsw pressed down; Cannot use long-press
-
 // Footswitch
-#define FSW_MODE_OFF     0  // NONE
-#define FSW_MODE_TOGGLE  2  // Press once for on, 2x for off
-#define FSW_MODE_CYCLE   3  // Press once for on, 2x for on2, 3x for off
-#define FSW_MODE_ONESHOT 1  // Every press only sends one set of params, no cycling or toggle
+#define PRESS_TYPE_UP    0  // Only activates when fsw is pressed THEN released
+#define PRESS_TYPE_DOWN  1  // Activates as soon as fsw pressed down; Cannot use long-press
+
+#define FSW_MODE_OFF      0  // NONE
+#define FSW_MODE_TOGGLE   1  // Press once for on, 2x for off
+#define FSW_MODE_CYCLE    2  // Press once for on, 2x for on2, 3x for off
+#define FSW_MODE_ONESHOT  3  // Every press only sends one set of params, no cycling or toggle
+#define FSW_MODE_SUBMENU  4  // Every press only sends one set of params, no cycling or toggle
+#define FSW_MODE_PRESET_X 5  // Every press only sends one set of params, no cycling or toggle
+#define FSW_MODE_PRESET_N 6  // Every press only sends one set of params, no cycling or toggle
+#define FSW_MODE_QUANTIZE 7  // Every press only sends one set of params, no cycling or toggle
 
 // Screen
 #define LCD_ADDR   0x27
@@ -99,7 +107,9 @@
 //#define EEP_RESET_PARAMS
 //#define EEP_RESET_PEDAL_PARAMS
 //#define EEP_RESET_FSW
+//#define EEP_RESET_FSW_PARAMS
 //#define EEP_RESET_PRESETS
+//#define EEP_RESET_PRESET_PARAMS
 //#define EEP_RESET_MENUS
 //#define EEP_RESET_LETTERS
 // --- END RESET EEPROM ---
@@ -109,8 +119,10 @@
 // -- END FLAGS --
 
 // -- VARS --
-uint8_t preset_id      = 0;
-uint8_t fsw_submenu_id = 0;
+uint8_t preset_id          = 0;
+uint8_t fsw_submenu_id     = 0;
+uint8_t fsw_selected       = 0;
+uint8_t fsw_selected_state = 0;
 // -- END VARS --
 
 // Headers
@@ -130,7 +142,8 @@ uint8_t fsw_submenu_id = 0;
 #include "Screen.h"
 #include "Hardware.h"
 #include "Reset.h"
-#include "MenuLoop.h"
+#include "ListLoop.h"
+#include "Confirm.h"
 #include "TextEdit.h"
 #include "ColorEdit.h"
 //#include "ValueEdit.h"

@@ -67,6 +67,18 @@ void reset_eeprom() {
   }
   #endif
 
+  #ifdef EEP_RESET_FSW_PARAMS
+  {
+    HW::screen.print_with_nline(0,1, "> FSWPRM");
+    pedal_param_p = new PedalParam;
+    for (int i=0; i<EEP_NUM_FSW_PARAMS; i++) {
+      DB::fsw_param_save_single(i, pedal_param_p);
+      HW::screen.print_with_nline(9,1, String(i));
+    }
+    CLRPTR(pedal_param_p);
+  }
+  #endif
+
   #ifdef EEP_RESET_PRESETS
   {
     HW::screen.print_with_nline(0,1, "> PRESETS");
@@ -76,6 +88,18 @@ void reset_eeprom() {
       HW::screen.print_with_nline(10,1, String(i));
     }
     CLRPTR(preset_p);
+  }
+  #endif
+
+  #ifdef EEP_RESET_PRESET_PARAMS
+  {
+    HW::screen.print_with_nline(0,1, "> PRSTPRMS");
+    pedal_param_p = new PedalParam;
+    for (int i=0; i<EEP_NUM_PRESET_PARAMS; i++) {
+      DB::preset_param_save_single(i, pedal_param_p);
+      HW::screen.print_with_nline(11,1, String(i));
+    }
+    CLRPTR(pedal_param_p);
   }
   #endif
 

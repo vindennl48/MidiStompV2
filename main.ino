@@ -4,8 +4,9 @@
 #ifndef RESET_EEP_PROGRAM
 
 // Definitions
-#define E_MAIN     0
-#define E_SETTINGS 1
+#define E_MAIN         0
+#define E_SETTINGS     1
+#define E_FSW_SETTINGS 2
 
 
 // Variables
@@ -19,10 +20,10 @@ void setup() {
   // Load up preset and footswitches from eeprom
 
   preset_p  = new Preset;
-  fsw_p     = new Footswitch[NUM_FSW*NUM_SUB_MENUS];
+  fsw_p     = new Footswitch[NUM_FSW];
 
   *preset_p = DB::preset_at(preset_id);
-  for (int i=0; i<(NUM_FSW*NUM_SUB_MENUS); i++)
+  for (int i=0; i<NUM_FSW; i++)
     fsw_p[i] = DB::fsw_at(preset_id, i);
 }
 
@@ -39,18 +40,16 @@ void loop() {
 
         // Setup footswitches
         for (int i=0; i<NUM_FSW; i++) {
-          if ( fsw_p[(NUM_FSW*fsw_submenu_id)+i].mode == FSW_MODE_ONESHOT ) HW::btns.at(i)->set_press_type(PRESS_TYPE_DOWN);
-          else                                   HW::btns.at(i)->set_press_type(PRESS_TYPE_UP);
-
-          HW::leds.at(i)->set( DB::color_at( fsw_p[(NUM_FSW*fsw_submenu_id)+i].colors[fsw_p[(NUM_FSW*fsw_submenu_id)+i].state] ) );
+          HW::btns.at(i)->set_press_type(fsw_p[i].press_type);
+          HW::leds.at(i)->set( DB::color_at( fsw_p[i].colors[fsw_p[i].state] ) );
         }
       }
 
       else {
         for (int i=0; i<NUM_FSW; i++) {
           if ( HW::btns.at(i)->is_pressed() ) {
-            fsw_p[(NUM_FSW*fsw_submenu_id)+i].increase_state();
-            HW::leds.at(i)->set( DB::color_at( fsw_p[(NUM_FSW*fsw_submenu_id)+i].colors[fsw_p[(NUM_FSW*fsw_submenu_id)+i].state] ) );
+            fsw_p[i].increase_state();
+            HW::leds.at(i)->set( DB::color_at( fsw_p[i].colors[fsw_p[i].state] ) );
           }
           else if ( HW::btns.at(i)->is_long_pressed() ) {}
         }
@@ -61,13 +60,58 @@ void loop() {
 
     case E_SETTINGS:
       if ( m.not_initialized() ) {
-        mh_p = new MenuHost(0);
-        mh_p->setup();
+        mh_p = new MenuHost;
+        mh_p->setup(EEP_PRESET_MENU);
+        HW::leds.set(0,0,0);
       }
       else {
         if ( mh_p->loop() ) {
           m.jump_to(E_MAIN);
           CLRPTR(mh_p);
+        }
+        else {
+          if ( mh_p->m.e() == 0 ) { // If on Preset Menu
+            for (int i=0; i<NUM_FSW; i++) {
+              if ( HW::btns.at(i)->is_pressed() ) {
+                fsw_selected       = i;
+                fsw_selected_state = fsw_p[i].state;
+                m.jump_to(E_FSW_SETTINGS);
+              }
+            }
+          }
+        }
+      }
+      break;
+
+    case E_FSW_SETTINGS:
+      if ( m.not_initialized() ) {
+        *mh_p = MenuHost();
+        mh_p->setup(EEP_FSW_MENU);
+        mh_p->change_title( String( "FSW" + String(fsw_selected+1) + " S" + String(fsw_selected_state+1) + " M" + String(fsw_submenu_id+1) ).c_str() );
+
+        HW::leds.set(0,0,0);
+        HW::leds.at(fsw_selected)->set( DB::color_at( fsw_p[fsw_selected].colors[fsw_selected_state] ) );
+      }
+      else {
+        if ( mh_p->loop() ) {
+          m.jump_to(E_MAIN);
+          CLRPTR(mh_p);
+        }
+        else {
+          if ( mh_p->m.e() == 0 ) { // If on Preset Menu
+            for (int i=0; i<NUM_FSW; i++) {
+              if ( HW::btns.at(i)->is_pressed() ) {
+                if ( fsw_selected == i ) {
+                  fsw_selected_state = ROTATE(fsw_selected_state+1, 0, 3);
+                }
+                else {
+                  fsw_selected       = i;
+                  fsw_selected_state = fsw_p[i].state;
+                }
+                m.reinitialize();
+              }
+            }
+          }
         }
       }
       break;
@@ -77,6 +121,7 @@ void loop() {
 
 #undef E_MAIN
 #undef E_SETTINGS
+#undef E_FSW_SETTINGS
 
 #endif
 #endif
@@ -85,17 +130,17 @@ void loop() {
 #ifdef ALT_PROGRAM
 /* For testing random stuff */
 
-Menu     m;
-MenuHost mh(0);
+Menu m;  // NEEDED
 
 void setup() {
-  HW::setup();
-  mh.setup();
+  HW::setup();  // NEEDED
+
+  HW::screen.clear();
+  HW::screen.print(0,0, String(EEP_RAM_FSW_PARAMS));
 }
 
 void loop() {
-  HW::loop();
-  mh.loop();
+  HW::loop();  // NEEDED
 }
 
 #endif

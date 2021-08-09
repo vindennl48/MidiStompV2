@@ -29,12 +29,9 @@ struct MenuHost {
   uint8_t          sub_menu_id    = 0;
   uint8_t          x              = 1;
 
-  MenuHost(uint8_t sub_menu_id) {
+  void setup(uint8_t sub_menu_id) {
     this->sub_menu_id = sub_menu_id;
-  }
-
-  void setup() {
-    sub_menu = DB::sub_menu_at(sub_menu_id);
+    sub_menu          = DB::sub_menu_at(sub_menu_id);
   }
 
   void change_title(const char title[STR_LEN_MAX]) {
@@ -85,8 +82,8 @@ struct MenuHost {
       case E_OPTION:
         if ( m.not_initialized() ) {
           if ( menu_option_2.type == MENU_TYPE_SUB_MENU ) {
-            sub_menu_host = new MenuHost(menu_option_2.value);
-            sub_menu_host->setup();
+            sub_menu_host = new MenuHost;
+            sub_menu_host->setup(menu_option_2.value);
           }
           else if ( menu_option_2.type == MENU_TYPE_FUNCTION ) {
             selected_function = get_selected_function(menu_option_2.value);
