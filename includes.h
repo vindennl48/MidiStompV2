@@ -20,6 +20,7 @@
 #define NUM_PARAMS_PER_FSW 10          // Number of params that activate on fsw stomp
 #define NUM_FSW            4           // Number of hardware fsw
 #define NUM_SUB_MENUS      4           // Number of total sub-menus per preset
+#define NUM_FSW_PER_PRESET (NUM_FSW*NUM_SUB_MENUS) // Number of total FSW per preset
 #define NUM_STATES         3           // Number of states to cycle per fsw
 
 #define NUM_MENU_ITEMS     10          // Number of total menu items allowed per settings menu
@@ -120,7 +121,7 @@
 
 // -- VARS --
 uint8_t preset_id          = 0;
-uint8_t fsw_submenu_id     = 0;
+uint8_t preset_submenu     = 0;
 uint8_t fsw_selected       = 0;
 uint8_t fsw_selected_state = 0;
 // -- END VARS --
