@@ -102,8 +102,18 @@ struct Settings {
       // PARAM SUBMENU
       case E_PRESET_PARAMS:
         if ( m.not_initialized() ) {
+          pedal_param_loop_p = new PedalParamLoop(preset_id, false);
         }
         else {
+          if ( pedal_param_loop_p->loop() ) {
+            if ( pedal_param_loop_p->get_result() != NUM_PEDAL_PARAMS ) {
+              m.jump_to(E_PRESET_PARAM);
+            }
+            else {
+              m.jump_to(E_PRESET);
+            }
+            CLRPTR(pedal_param_loop_p);
+          }
         }
         break;
 
@@ -112,6 +122,10 @@ struct Settings {
           mloop.reset(EEP_PRESET_PARAM_MENU);
         }
         else {
+          switch(mloop.loop()) {
+            case 0:
+              break;
+          };
         }
         break;
 
