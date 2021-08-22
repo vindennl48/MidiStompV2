@@ -11,7 +11,7 @@ struct ListLoop {
   uint8_t  is_color            = 0;
 
   ListLoop(uint16_t address, uint8_t size, String title, uint16_t max, uint8_t is_color=false, uint8_t start_point=0) {
-    this->x        = start_point+1;
+    this->x        = start_point>=max ? 1 : start_point+1;
     this->address  = address;
     this->size     = size;
     this->title    = title;

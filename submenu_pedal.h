@@ -77,4 +77,29 @@ uint8_t submenu_pedal_param_name(Menu *m) {
   return false;
 }
 
+uint8_t submenu_pedal_reset(Menu *m) {
+  uint8_t result = submenu_helper_confirm(m);
+
+  if ( result ) {
+    if ( result == LTRUE ) {
+      if ( pedal_p == nullptr )  pedal_p = new Pedal;
+      else                      *pedal_p = Pedal();
+
+      DB::pedal_save(sel_pedal_id, pedal_p);
+
+      if ( param_p == nullptr )  param_p = new Param;
+      else                      *param_p = Param();
+      for (int i=0; i<NUM_PEDAL_PARAMS; i++) DB::param_save(sel_pedal_id, i, param_p);
+
+      CLRPTR(pedal_p);
+      CLRPTR(param_p);
+    }
+
+    return true;
+  }
+
+  return false;
+}
+
+
 #endif

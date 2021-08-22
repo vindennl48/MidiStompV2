@@ -10,7 +10,7 @@ struct PedalParamLoop {
 
   PedalParamLoop(uint8_t parent_id, uint8_t is_fsw=true, uint8_t start_point=0) {
     // If is_fsw false, then this finds preset pedal params
-    this->x         = start_point+1;
+    this->x         = start_point>=NUM_PEDAL_PARAMS ? 1 : start_point+1;
     this->parent_id = parent_id;
     this->is_fsw    = is_fsw;
     this->size      = sizeof(PedalParam);

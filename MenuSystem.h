@@ -17,9 +17,10 @@
 #define F_SUBMENU_PEDAL_PARAMS          11
 #define F_SUBMENU_PEDAL_PARAM_NAME      12
 #define F_SUBMENU_PEDAL_CHAN            13
-#define F_SUBMENU_COLORS                14
-#define F_SUBMENU_COLOR_NAME            15
-#define F_SUBMENU_COLOR_EDIT            16
+#define F_SUBMENU_PEDAL_RESET           14
+#define F_SUBMENU_COLORS                15
+#define F_SUBMENU_COLOR_NAME            16
+#define F_SUBMENU_COLOR_EDIT            17
 
 typedef uint8_t (*SelectedFunction)(Menu*);
 
@@ -38,6 +39,7 @@ SelectedFunction get_selected_function(uint8_t id) {
     case F_SUBMENU_PEDAL_PARAMS:          return &submenu_pedal_params;
     case F_SUBMENU_PEDAL_PARAM_NAME:      return &submenu_pedal_param_name;
     case F_SUBMENU_PEDAL_CHAN:            return &submenu_pedal_channel;
+    case F_SUBMENU_PEDAL_RESET:           return &submenu_pedal_reset;
     case F_SUBMENU_COLORS:                return &submenu_colors;
     case F_SUBMENU_COLOR_NAME:            return &submenu_color_name;
     case F_SUBMENU_COLOR_EDIT:            return &submenu_color_edit;

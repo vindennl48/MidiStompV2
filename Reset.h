@@ -157,7 +157,7 @@ void reset_eeprom() {
     menu_option[1] = MenuOption("NAME",    MENU_TYPE_FUNCTION,     F_SUBMENU_PEDAL_NAME);
     menu_option[2] = MenuOption("PARAMS",  MENU_TYPE_FUNC_AND_SUB, F_SUBMENU_PEDAL_PARAMS, EEP_SUBMENU_PEDAL_PARAM);
     menu_option[3] = MenuOption("CHANNEL", MENU_TYPE_FUNCTION,     F_SUBMENU_PEDAL_CHAN);
-    menu_option[4] = MenuOption("RESET",   MENU_TYPE_DUMMY);
+    menu_option[4] = MenuOption("RESET",   MENU_TYPE_FUNCTION,     F_SUBMENU_PEDAL_RESET);
     DB::sub_menu_save(menu_id, &sub_menu);
     for (int i=0; i<num_options; i++) DB::menu_option_save(menu_id, i, &menu_option[i]);
 
