@@ -29,11 +29,11 @@ struct PedalParamLoop {
       if ( pedal_param_p == nullptr ) { pedal_param_p = new PedalParam; }
       if ( is_fsw ) {
         *pedal_param_p = DB::fsw_param_at(parent_id, x-1);
-        fsw_selected   = x-1;
+        sel_fsw_id     = x-1;
       }
       else {
-        *pedal_param_p        = DB::preset_param_at(parent_id, x-1);
-        preset_selected_param = x-1;
+        *pedal_param_p = DB::preset_param_at(parent_id, x-1);
+        sel_param_id   = x-1;
       }
 
       if ( pedal_param_p->pedal == EEP_NUM_PEDALS ) {

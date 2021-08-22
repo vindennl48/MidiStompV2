@@ -9,7 +9,7 @@ uint8_t submenu_colors(Menu *m) {
     if ( list_loop_p->loop() ) {
       if ( list_loop_p->get_result() != (EEP_NUM_COLORS+1) ) {
         //continue
-        color_selected = list_loop_p->get_result();
+        sel_color_id = list_loop_p->get_result();
         m->back();
       }
       else {
@@ -27,13 +27,13 @@ uint8_t submenu_colors(Menu *m) {
 uint8_t submenu_color_name(Menu *m) {
   if ( m->not_initialized() ) {
     if ( color_p == nullptr ) color_p = new Color;
-    *color_p = DB::color_at(color_selected);
+    *color_p = DB::color_at(sel_color_id);
 
     text_edit_p = new TextEdit(color_p->name);
   }
   else {
     if ( text_edit_p->loop() ) {
-      DB::color_save(color_selected, color_p);
+      DB::color_save(sel_color_id, color_p);
       CLRPTR(text_edit_p);
       CLRPTR(color_p)
       return m->back();
@@ -46,7 +46,7 @@ uint8_t submenu_color_name(Menu *m) {
 uint8_t submenu_color_edit(Menu *m) {
   if ( m->not_initialized() ) {
     if ( color_p == nullptr ) color_p = new Color;
-    *color_p = DB::color_at(color_selected);
+    *color_p = DB::color_at(sel_color_id);
 
     color_edit_p = new ColorEdit();
   }

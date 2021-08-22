@@ -22,9 +22,9 @@ void setup() {
   preset_p  = new Preset;
   fsw_p     = new Footswitch[NUM_FSW_PER_PRESET];
 
-  *preset_p = DB::preset_at(preset_id);
+  *preset_p = DB::preset_at(sel_preset_id);
   for (int i=0; i<NUM_FSW_PER_PRESET; i++)
-    fsw_p[i] = DB::fsw_at(preset_id, i);
+    fsw_p[i] = DB::fsw_at(sel_preset_id, i);
 }
 
 void loop() {
@@ -36,11 +36,11 @@ void loop() {
         // Setup screen
         HW::screen.clear();
         HW::screen.print(0,0, preset_p->name);
-        HW::screen.print(10,1, String("MENU ") + String(preset_submenu+1));
+        HW::screen.print(10,1, String("MENU ") + String(sel_preset_submenu_id+1));
 
         // Setup footswitches
         for (int i=0; i<NUM_FSW; i++) {
-          int j = (NUM_FSW * preset_submenu) + i;
+          int j = (NUM_FSW * sel_preset_submenu_id) + i;
 
           HW::btns.at(i)->set_press_type(fsw_p[j].press_type);
           HW::leds.at(i)->set( DB::color_at( fsw_p[j].colors[fsw_p[j].state] ) );
@@ -49,7 +49,7 @@ void loop() {
 
       else {
         for (int i=0; i<NUM_FSW; i++) {
-          int j = (NUM_FSW * preset_submenu) + i;
+          int j = (NUM_FSW * sel_preset_submenu_id) + i;
 
           if ( HW::btns.at(i)->is_pressed() ) {
             fsw_p[j].increase_state();
@@ -76,11 +76,11 @@ void loop() {
         else {
           if ( mh_p->m.e() == 0 ) { // If on Preset Menu
             for (int i=0; i<NUM_FSW; i++) {
-              int j = (NUM_FSW * preset_submenu) + i;
+              int j = (NUM_FSW * sel_preset_submenu_id) + i;
 
               if ( HW::btns.at(i)->is_pressed() ) {
-                fsw_selected       = j;
-                fsw_selected_state = fsw_p[j].state;
+                sel_fsw_id       = j;
+                sel_fsw_state_id = fsw_p[j].state;
                 m.jump_to(E_FSW_SETTINGS);
               }
             }
@@ -93,10 +93,10 @@ void loop() {
       if ( m.not_initialized() ) {
         *mh_p = MenuHost();
         mh_p->setup(EEP_SUBMENU_FSW);
-        mh_p->change_title( String( "FSW" + String(fsw_selected+1) + " S" + String(fsw_selected_state+1) + " M" + String(preset_submenu+1) ).c_str() );
+        mh_p->change_title( String( "FSW" + String(sel_fsw_id+1) + " S" + String(sel_fsw_state_id+1) + " M" + String(sel_preset_submenu_id+1) ).c_str() );
 
         HW::leds.set(0,0,0);
-        HW::leds.at(fsw_selected)->set( DB::color_at( fsw_p[fsw_selected].colors[fsw_selected_state] ) );
+        HW::leds.at(sel_fsw_id)->set( DB::color_at( fsw_p[sel_fsw_id].colors[sel_fsw_state_id] ) );
       }
       else {
         if ( mh_p->loop() ) {
@@ -106,15 +106,15 @@ void loop() {
         else {
           if ( mh_p->m.e() == 0 ) { // If on Preset Menu
             for (int i=0; i<NUM_FSW; i++) {
-              int j = (NUM_FSW * preset_submenu) + i;
+              int j = (NUM_FSW * sel_preset_submenu_id) + i;
 
               if ( HW::btns.at(i)->is_pressed() ) {
-                if ( fsw_selected == j ) {
-                  fsw_selected_state = ROTATE(fsw_selected_state+1, 0, 3);
+                if ( sel_fsw_id == j ) {
+                  sel_fsw_state_id = ROTATE(sel_fsw_state_id+1, 0, 3);
                 }
                 else {
-                  fsw_selected       = j;
-                  fsw_selected_state = fsw_p[j].state;
+                  sel_fsw_id       = j;
+                  sel_fsw_state_id = fsw_p[j].state;
                 }
                 m.reinitialize();
               }
@@ -155,7 +155,7 @@ void loop() {
 
   if ( m.not_initialized() ) {
     for (int i=0; i<10; i++) {
-      *pedal_param_p = DB::preset_param_at(preset_id, i);
+      *pedal_param_p = DB::preset_param_at(sel_preset_id, i);
       HW::screen.print(0,0, "pedal");
       HW::screen.print(0,1, "param");
 

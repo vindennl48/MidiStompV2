@@ -122,16 +122,13 @@
 // -- END FLAGS --
 
 // -- VARS --
-uint8_t preset_id             = 0;
-uint8_t preset_submenu        = 0;
-uint8_t preset_selected_param = 0;
-uint8_t pedal_selected        = 0;
-uint8_t pedal_param_selected  = 0;
-uint8_t color_selected        = 0;
-uint8_t fsw_selected          = 0;
-uint8_t fsw_selected_state    = 0;
-
-uint16_t value_edit = 0;  // Used for ValueEdit and other functions
+uint8_t sel_preset_id         = 0;
+uint8_t sel_preset_submenu_id = 0;
+uint8_t sel_param_id          = 0;  // For Preset params, Pedal params, and FSW Params
+uint8_t sel_pedal_id          = 0;
+uint8_t sel_color_id          = 0;
+uint8_t sel_fsw_id            = 0;
+uint8_t sel_fsw_state_id      = 0;
 // -- END VARS --
 
 // Headers

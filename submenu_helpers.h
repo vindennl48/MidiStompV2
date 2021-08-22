@@ -1,12 +1,25 @@
 #ifndef SUBMENU_HELPERS_H
 #define SUBMENU_HELPERS_H
 
+uint8_t submenu_helper_text(Menu *m, char text[STR_LEN_MAX]) {
+  if ( m->not_initialized() ) {
+    if ( text_edit_p != nullptr )  text_edit_p = new TextEdit(text);
+    else                          *text_edit_p = TextEdit(text);
+  }
+  else {
+    if ( text_edit_p->loop() ) {
+      CLRPTR(text_edit_p);
+      return m->back();
+    }
+  }
+
+  return false;
+}
+
 uint8_t submenu_helper_confirm(Menu *m) {
   if ( m->not_initialized() ) {
-    if ( confirm_p != nullptr )
-      confirm_p = new Confirm;
-    else
-      confirm_p = Confirm();
+    if ( confirm_p != nullptr )  confirm_p = new Confirm;
+    else                        *confirm_p = Confirm();
   }
   else {
     uint8_t result = confirm_p->loop();

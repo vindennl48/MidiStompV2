@@ -65,7 +65,7 @@ struct ColorEdit {
               HW::screen.blink(false);
 
               result = LTRUE;
-              DB::color_save(color_selected, color_p);
+              DB::color_save(sel_color_id, color_p);
               return result;
             }
             else {  // CANCEL
@@ -73,7 +73,7 @@ struct ColorEdit {
               HW::screen.blink(false);
 
               result   = LFALSE;
-              *color_p = DB::color_at(color_selected);
+              *color_p = DB::color_at(sel_color_id);
               return result;
             }
           }
