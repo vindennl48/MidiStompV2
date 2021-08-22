@@ -7,7 +7,7 @@ struct Menu {
    * different menus.  This also automates a lot of the mundane and
    * often overlooked tasks when switching between menus.  */
   union {
-    uint8_t d;
+    uint16_t d;
     struct {
       unsigned event:8;
       unsigned initialized:1;
@@ -19,7 +19,7 @@ struct Menu {
   ~Menu() {}
 
   bool not_initialized() {
-    bool result   = initialized;
+    bool result = initialized;
     initialized = true;
     return !result; 
   }

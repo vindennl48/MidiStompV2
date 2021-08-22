@@ -10,8 +10,8 @@ struct ListLoop {
   uint16_t max                 = 99;
   uint8_t  is_color            = 0;
 
-  ListLoop(uint16_t address, uint8_t size, String title, uint16_t max, uint8_t is_color=false) {
-    this->x        = 1;
+  ListLoop(uint16_t address, uint8_t size, String title, uint16_t max, uint8_t is_color=false, uint8_t start_point=0) {
+    this->x        = start_point+1;
     this->address  = address;
     this->size     = size;
     this->title    = title;
@@ -25,8 +25,6 @@ struct ListLoop {
       HW::screen.print_with_nline(0,0, "::" + title);
 
       if ( address == EEP_START_PEDALS ) {
-
-
         if ( pedal_p == nullptr ) pedal_p = new Pedal();
         *pedal_p = DB::pedal_at(x-1);
         memcpy(option, pedal_p->name, STR_LEN_MAX);
@@ -62,15 +60,15 @@ struct ListLoop {
         m.reinitialize();
       }
       else if ( HW::knob.is_pressed() || HW::knob.is_long_pressed() ) {
-        if ( HW::knob.is_long_pressed() ) {
-          x = max+1;
+        if ( HW::knob.is_long_pressed() ) { x = max+1; }
+        else {  // REGULAR PRESS
+          if      ( address == EEP_START_PEDALS ) sel_pedal_id = x-1;
+          else if ( address == EEP_START_COLORS ) sel_color_id = x-1;
         }
-        m.back();
         if ( is_color ) { HW::leds.set(0,0,0); }
-
+        m.back();
         CLRPTR(pedal_p);
         CLRPTR(color_p);
-
         return x;
       }
     }
@@ -79,7 +77,7 @@ struct ListLoop {
   }
 
   uint16_t get_result() {
-    return x == (max+1) ? x : (x-1);
+    return x == (max+1) ? max : (x-1);
   }
 } *list_loop_p = nullptr;
 

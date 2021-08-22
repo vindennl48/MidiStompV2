@@ -31,58 +31,44 @@ uint8_t submenu_preset_name(Menu *m) {
 }
 
 uint8_t submenu_preset_params(Menu *m) {
-  if ( m->not_initialized() ) {
-    pedal_param_loop_p = new PedalParamLoop(sel_preset_id, false, sel_param_id);
-  }
-  else {
-    if ( pedal_param_loop_p->loop() ) {
-      if ( pedal_param_loop_p->get_result() != (NUM_PARAMS_PER_FSW+1) ) {
-        //continue
-        m->back();
-      }
-      else {
-        //go back
-        m->jump_to(255);
-      }
-      CLRPTR(pedal_param_loop_p);
-      return true;
-    }
-  }
-
-  return false;
+  return submenu_helper_pedal_param_loop(m, sel_preset_id, false, sel_param_id);
 }
 
 uint8_t submenu_preset_param_pedal(Menu *m) {
-  if ( m->not_initialized() ) {
-    list_loop_p = new ListLoop(EEP_START_PEDALS, sizeof(Pedal), "PEDALS", EEP_NUM_PEDALS);
-  }
-  else {
-    if ( list_loop_p->loop() ) {
-      if ( list_loop_p->get_result() != EEP_NUM_PEDALS ) {
-        //continue
-        pedal_param_p->pedal = list_loop_p->get_result();
-        DB::preset_param_save(sel_preset_id, sel_param_id, pedal_param_p);
-        m->back();
-      }
-      else {
-        //go back
-        m->jump_to(255);
-      }
-      CLRPTR(list_loop_p);
-      return true;
-    }
+  uint16_t result = submenu_helper_list_loop(m, EEP_START_PEDALS, sizeof(Pedal), "PEDALS", EEP_NUM_PEDALS, false, sel_pedal_id);
+
+  if ( result ) {
+    if ( pedal_param_p == nullptr ) pedal_param_p = new PedalParam;
+    *pedal_param_p = DB::preset_param_at(sel_preset_id, sel_param_id);
+
+    pedal_param_p->pedal = result-1;
+
+    DB::preset_param_save(sel_preset_id, sel_param_id, pedal_param_p);
+
+    CLRPTR(pedal_param_p);
+    return true;
   }
 
   return false;
 }
 
 uint8_t submenu_preset_param_velocity(Menu *m) {
+  if ( !m->initialized ) {
+    if ( pedal_param_p == nullptr ) pedal_param_p = new PedalParam;
+    *pedal_param_p = DB::preset_param_at(sel_preset_id, sel_param_id);
+  }
+
   uint16_t result = submenu_helper_value(m, pedal_param_p->velocity, 0, 127, "VELOCITY"); 
+
   if ( result ) {
     pedal_param_p->velocity = result-1;
+
     DB::preset_param_save(sel_preset_id, sel_param_id, pedal_param_p);
+
+    CLRPTR(pedal_param_p);
     return true;
   }
+
   return false;
 }
 
@@ -92,7 +78,7 @@ uint8_t submenu_preset_param_reset(Menu *m) {
   if ( result ) {
     if ( result == LTRUE ) {
       //  SAVE
-      if ( pedal_param_p != nullptr )  pedal_param_p = new PedalParam;
+      if ( pedal_param_p == nullptr )  pedal_param_p = new PedalParam;
       else                            *pedal_param_p = PedalParam();
 
       DB::preset_param_save(sel_preset_id, sel_param_id, pedal_param_p);
@@ -115,40 +101,32 @@ uint8_t submenu_preset_copy  (Menu *m) {
 }
 
 uint8_t submenu_preset_reset (Menu *m) {
-  if ( m->not_initialized() ) {
-    confirm_p = new Confirm;
-  }
-  else {
-    uint8_t result = confirm_p->loop();
+  uint8_t result = submenu_helper_confirm(m);
 
-    if ( result != false ) {
-      if ( result == LTRUE ) {
-        //  SAVE
-        *preset_p      = Preset();
-        pedal_param_p  = new PedalParam;
+  if ( result ) {
+    if ( result == LTRUE ) {
+      //  SAVE
+      *preset_p      = Preset();
+      if ( pedal_param_p == nullptr )  pedal_param_p = new PedalParam;
+      else                            *pedal_param_p = PedalParam();
 
-        DB::preset_save(sel_preset_id, preset_p);
+      DB::preset_save(sel_preset_id, preset_p);
 
-        for (int i=0; i<NUM_PRESET_PARAMS; i++) DB::preset_param_save(sel_preset_id, i, pedal_param_p);
+      for (int i=0; i<NUM_PRESET_PARAMS; i++) DB::preset_param_save(sel_preset_id, i, pedal_param_p);
 
-        for (int i=0; i<NUM_FSW_PER_PRESET; i++) {
-          fsw_p[i] = Footswitch();
-          DB::fsw_save(sel_preset_id, i, &fsw_p[i]);
+      for (int i=0; i<NUM_FSW_PER_PRESET; i++) {
+        fsw_p[i] = Footswitch();
+        DB::fsw_save(sel_preset_id, i, &fsw_p[i]);
 
-          for (int j=0; j<NUM_PARAMS_PER_FSW; j++) {
-            DB::fsw_param_save(i + sel_preset_id*NUM_FSW*NUM_SUB_MENUS, j, pedal_param_p);
-          }
+        for (int j=0; j<NUM_PARAMS_PER_FSW; j++) {
+          DB::fsw_param_save(i + sel_preset_id*NUM_FSW*NUM_SUB_MENUS, j, pedal_param_p);
         }
-
-        CLRPTR(pedal_param_p);
-      }
-      else if ( result == LFALSE ) {
-        // CANCEL
       }
 
-      CLRPTR(confirm_p);
-      return m->back();
+      CLRPTR(pedal_param_p);
     }
+
+    return true;
   }
 
   return false;

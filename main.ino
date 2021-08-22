@@ -58,7 +58,7 @@ void loop() {
           else if ( HW::btns.at(i)->is_long_pressed() ) {}
         }
 
-        if ( HW::knob.is_long_pressed() ) m.jump_to(E_SETTINGS);
+        if ( HW::knob.is_long_pressed() ) { m.jump_to(E_SETTINGS); }
       }
       break;
 

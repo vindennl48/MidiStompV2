@@ -57,15 +57,10 @@ struct PedalParamLoop {
         x = CONTAIN(x+1, 1, NUM_PARAMS_PER_FSW);
         m.reinitialize();
       }
-      else if ( HW::knob.is_pressed() ) {
+      else if ( HW::knob.is_pressed() || HW::knob.is_long_pressed() ) {
+        if ( HW::knob.is_long_pressed() ) { x = (NUM_PARAMS_PER_FSW+1); }
         m.back();
-        return x;
-      }
-      else if ( HW::knob.is_long_pressed() ) {
-        m.back();
-        x = NUM_PARAMS_PER_FSW;
         CLRPTR(pedal_param_p);
-        x = (NUM_PARAMS_PER_FSW+1);
         return x;
       }
     }
