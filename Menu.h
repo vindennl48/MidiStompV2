@@ -9,26 +9,26 @@ struct Menu {
   union {
     uint8_t d;
     struct {
-      unsigned event:6;
+      unsigned event:8;
       unsigned initialized:1;
       unsigned active:1;
     };
-  } d;
+  };
 
-  Menu()  { d.d = 0; }
+  Menu()  { d = 0; }
   ~Menu() {}
 
   bool not_initialized() {
-    bool result   = d.initialized;
-    d.initialized = true;
+    bool result   = initialized;
+    initialized = true;
     return !result; 
   }
-  void    reinitialize()     { d.initialized = false; }
-  bool    is_active()        { return d.active; }
-  void    activate()         { d.initialized = false; d.active = true; }
-  void    jump_to(uint8_t e) { d.d = 0; d.event = e; }
-  bool    back()             { d.d = 0; return true; }
-  uint8_t e()                { return d.event; }
+  void    reinitialize()     { initialized = false; }
+  bool    is_active()        { return active; }
+  void    activate()         { initialized = false; active = true; }
+  void    jump_to(uint8_t e) { d = 0; event = e; }
+  bool    back()             { d = 0; return true; }
+  uint8_t e()                { return event; }
 };
 
 

@@ -144,8 +144,7 @@ void setup() {
   HW::setup();  // NEEDED
   HW::screen.clear();
 
-  pedal_p = new Pedal();
-  *pedal_p = DB::pedal_at(0);
+  pedal_param_p  = new PedalParam();
   /*memcpy(pedal_p->name, "ADAM        ", STR_LEN_MAX);*/
   /*pedal_p->channel = 10;*/
   /*DB::pedal_save(0, pedal_p);*/
@@ -155,8 +154,16 @@ void loop() {
   HW::loop();  // NEEDED
 
   if ( m.not_initialized() ) {
-    HW::screen.print(0,0, pedal_p->name);
-    HW::screen.print(0,1, pedal_p->channel);
+    for (int i=0; i<10; i++) {
+      *pedal_param_p = DB::preset_param_at(preset_id, i);
+      HW::screen.print(0,0, "pedal");
+      HW::screen.print(0,1, "param");
+
+      HW::screen.print(15,0, pedal_param_p->pedal);
+      HW::screen.print(15,1, pedal_param_p->param);
+
+      delay(1000);
+    }
   }
 }
 
@@ -174,6 +181,7 @@ void setup() {
   reset_eeprom();
   HW::screen.clear();
   HW::screen.print(0,0, "DONE!");
+  HW::screen.print(0,1, String("LAST SECT:") + String(EEP_START_OPTS));
 
 #ifndef EEP_RESET
   HW::screen.clear();

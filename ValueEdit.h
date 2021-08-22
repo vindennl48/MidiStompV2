@@ -7,10 +7,10 @@
 struct ValueEdit {
   Menu   m;
   String title;
-  uint8_t value_old;
-  uint8_t value, min, max, cursor;
+  uint16_t value_old;
+  uint16_t value, min, max, cursor;
 
-  ValueEdit(uint8_t value_old, uint8_t min=0, uint8_t max=255, String title="VALUE") {
+  ValueEdit(uint16_t value_old, uint16_t min=0, uint16_t max=255, String title="VALUE") {
     this->title     = title;
     this->value_old = value_old;
     this->value     = value_old;
@@ -91,7 +91,7 @@ struct ValueEdit {
     return false;
   }
 
-  uint8_t get_result() { return value; }
+  uint16_t get_result() { return value; }
 
 } *value_edit_p = nullptr;
 

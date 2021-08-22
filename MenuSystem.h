@@ -4,39 +4,43 @@
 #define E_SUBMENU   0
 #define E_OPTION    1
 
-#define F_SUBMENU_PRESET_SAVE        1
-#define F_SUBMENU_PRESET_NAME        2
-#define F_SUBMENU_PRESET_PARAMS      3
-#define F_SUBMENU_PRESET_PARAM_PEDAL 4
-#define F_SUBMENU_PRESET_COPY        5
-#define F_SUBMENU_PRESET_RESET       6
-#define F_SUBMENU_PEDALS             7
-#define F_SUBMENU_PEDAL_NAME         8
-#define F_SUBMENU_PEDAL_PARAMS       9
-#define F_SUBMENU_PEDAL_PARAM_NAME   10
-#define F_SUBMENU_PEDAL_CHAN         11
-#define F_SUBMENU_COLORS             12
-#define F_SUBMENU_COLOR_NAME         13
-#define F_SUBMENU_COLOR_EDIT         14
+#define F_SUBMENU_PRESET_SAVE           1
+#define F_SUBMENU_PRESET_NAME           2
+#define F_SUBMENU_PRESET_PARAMS         3
+#define F_SUBMENU_PRESET_PARAM_PEDAL    4
+#define F_SUBMENU_PRESET_PARAM_VELOCITY 5
+#define F_SUBMENU_PRESET_PARAM_RESET    6
+#define F_SUBMENU_PRESET_COPY           7
+#define F_SUBMENU_PRESET_RESET          8
+#define F_SUBMENU_PEDALS                9
+#define F_SUBMENU_PEDAL_NAME            10
+#define F_SUBMENU_PEDAL_PARAMS          11
+#define F_SUBMENU_PEDAL_PARAM_NAME      12
+#define F_SUBMENU_PEDAL_CHAN            13
+#define F_SUBMENU_COLORS                14
+#define F_SUBMENU_COLOR_NAME            15
+#define F_SUBMENU_COLOR_EDIT            16
 
 typedef uint8_t (*SelectedFunction)(Menu*);
 
 SelectedFunction get_selected_function(uint8_t id) {
   switch(id) {
-    case F_SUBMENU_PRESET_SAVE:        return &submenu_preset_save;
-    case F_SUBMENU_PRESET_NAME:        return &submenu_preset_name;
-    case F_SUBMENU_PRESET_PARAMS:      return &submenu_preset_params;
-    case F_SUBMENU_PRESET_PARAM_PEDAL: return &submenu_preset_param_pedal;
-    case F_SUBMENU_PRESET_COPY:        return &submenu_preset_copy;
-    case F_SUBMENU_PRESET_RESET:       return &submenu_preset_reset;
-    case F_SUBMENU_PEDALS:             return &submenu_pedals;
-    case F_SUBMENU_PEDAL_NAME:         return &submenu_pedal_name;
-    case F_SUBMENU_PEDAL_PARAMS:       return &submenu_pedal_params;
-    case F_SUBMENU_PEDAL_PARAM_NAME:   return &submenu_pedal_param_name;
-    case F_SUBMENU_PEDAL_CHAN:         return &submenu_pedal_channel;
-    case F_SUBMENU_COLORS:             return &submenu_colors;
-    case F_SUBMENU_COLOR_NAME:         return &submenu_color_name;
-    case F_SUBMENU_COLOR_EDIT:         return &submenu_color_edit;
+    case F_SUBMENU_PRESET_SAVE:           return &submenu_preset_save;
+    case F_SUBMENU_PRESET_NAME:           return &submenu_preset_name;
+    case F_SUBMENU_PRESET_PARAMS:         return &submenu_preset_params;
+    case F_SUBMENU_PRESET_PARAM_PEDAL:    return &submenu_preset_param_pedal;
+    case F_SUBMENU_PRESET_PARAM_VELOCITY: return &submenu_preset_param_velocity;
+    case F_SUBMENU_PRESET_PARAM_RESET:    return &submenu_preset_param_reset;
+    case F_SUBMENU_PRESET_COPY:           return &submenu_preset_copy;
+    case F_SUBMENU_PRESET_RESET:          return &submenu_preset_reset;
+    case F_SUBMENU_PEDALS:                return &submenu_pedals;
+    case F_SUBMENU_PEDAL_NAME:            return &submenu_pedal_name;
+    case F_SUBMENU_PEDAL_PARAMS:          return &submenu_pedal_params;
+    case F_SUBMENU_PEDAL_PARAM_NAME:      return &submenu_pedal_param_name;
+    case F_SUBMENU_PEDAL_CHAN:            return &submenu_pedal_channel;
+    case F_SUBMENU_COLORS:                return &submenu_colors;
+    case F_SUBMENU_COLOR_NAME:            return &submenu_color_name;
+    case F_SUBMENU_COLOR_EDIT:            return &submenu_color_edit;
   };
 
   return nullptr;
@@ -130,7 +134,7 @@ struct MenuHost {
           else if ( menu_option_2.type == MENU_TYPE_FUNC_AND_SUB ) {
             if ( !func_or_sub ) {
               if ( selected_function(&m_sub) ) {
-                if ( ( menu_option_2.value == F_SUBMENU_COLORS && m_sub.d.event == 255 ) || m_sub.d.event == 63 ) {
+                if ( m_sub.event == 255 ) {
                   m.jump_to(E_SUBMENU);
                   CLRPTR(sub_menu_host);
                 }

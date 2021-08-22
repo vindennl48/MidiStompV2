@@ -15,18 +15,18 @@
 
 // Definitions
 // Settings
-#define NUM_PEDAL_PARAMS   32          // Number of params per pedal
-#define NUM_PRESET_PARAMS  5           // Number of params per preset load
-#define NUM_PARAMS_PER_FSW 10          // Number of params that activate on fsw stomp
-#define NUM_FSW            4           // Number of hardware fsw
-#define NUM_SUB_MENUS      4           // Number of total sub-menus per preset
+#define NUM_PEDAL_PARAMS   32                      // Number of params per pedal
+#define NUM_PARAMS_PER_FSW 10                      // Number of params that activate on fsw stomp
+#define NUM_PRESET_PARAMS  NUM_PARAMS_PER_FSW      // Number of params per preset load
+#define NUM_FSW            4                       // Number of hardware fsw
+#define NUM_SUB_MENUS      4                       // Number of total sub-menus per preset
 #define NUM_FSW_PER_PRESET (NUM_FSW*NUM_SUB_MENUS) // Number of total FSW per preset
-#define NUM_STATES         3           // Number of states to cycle per fsw
+#define NUM_STATES         3                       // Number of states to cycle per fsw
 
-#define NUM_MENU_ITEMS     10          // Number of total menu items allowed per settings menu
+#define NUM_MENU_ITEMS     10                      // Number of total menu items allowed per settings menu
 
-#define STR_LEN            12          // Max number of characters per string
-#define STR_LEN_MAX        (STR_LEN+1) // Max chars plus null terminated char
+#define STR_LEN            12                      // Max number of characters per string
+#define STR_LEN_MAX        (STR_LEN+1)             // Max chars plus null terminated char
 
 // -- EEPROM MAP --
 #define EEP_NUM_COLORS          100
@@ -130,6 +130,8 @@ uint8_t pedal_param_selected  = 0;
 uint8_t color_selected        = 0;
 uint8_t fsw_selected          = 0;
 uint8_t fsw_selected_state    = 0;
+
+uint16_t value_edit = 0;  // Used for ValueEdit and other functions
 // -- END VARS --
 
 // Headers
@@ -137,8 +139,6 @@ uint8_t fsw_selected_state    = 0;
 #include "Menu.h"
 #include "I2C_EEPROM.h"
 #include "Database.h"
-//Preset     preset;
-//Footswitch fsw[NUM_SUB_MENUS][NUM_FSW];
 #include "Button.h"
 #include "Encoder.h"
 #include "Buttons.h"
@@ -154,7 +154,7 @@ uint8_t fsw_selected_state    = 0;
 #include "TextEdit.h"
 #include "ColorEdit.h"
 #include "ValueEdit.h"
-//#include "Settings.h"
+#include "submenu_helpers.h"
 #include "submenu_preset.h"
 #include "submenu_pedal.h"
 #include "submenu_color.h"

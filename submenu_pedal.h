@@ -14,7 +14,7 @@ uint8_t submenu_pedals(Menu *m) {
       }
       else {
         //go back
-        m->jump_to(63);
+        m->jump_to(255);
       }
       CLRPTR(list_loop_p);
       return true;
@@ -56,7 +56,7 @@ uint8_t submenu_pedal_params(Menu *m) {
       }
       else {
         //go back
-        m->jump_to(63);
+        m->jump_to(255);
       }
       CLRPTR(list_loop_p);
       return true;

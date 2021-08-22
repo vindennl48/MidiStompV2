@@ -10,11 +10,19 @@ uint8_t submenu_preset_save(Menu *m) {
 
     if ( result != false ) {
       if ( result == LTRUE ) {
-        /*  SAVE
-         *  - Preset
-         *  - ALL FSW
-         *  - Pedal Params for FSW and Preset
-         *  */
+        //  SAVE
+        DB::preset_save(preset_id, preset_p);
+
+        for (int i=0; i<NUM_FSW_PER_PRESET; i++) {
+          DB::fsw_save(preset_id, i, &fsw_p[i]);
+        }
+
+        /*
+         * Eventually, would like to store currently running
+         * preset on a reserved section of EEPROM so we can 
+         * also store temporary fsw pedal params and preset
+         * pedal params.  Currently, we don't have enough
+         * room in ram to do this. */
       }
       else if ( result == LFALSE ) {
         // CANCEL
@@ -43,7 +51,7 @@ uint8_t submenu_preset_name(Menu *m) {
 
 uint8_t submenu_preset_params(Menu *m) {
   if ( m->not_initialized() ) {
-    pedal_param_loop_p = new PedalParamLoop(preset_id, false);
+    pedal_param_loop_p = new PedalParamLoop(preset_id, false, preset_selected_param);
   }
   else {
     if ( pedal_param_loop_p->loop() ) {
@@ -53,7 +61,7 @@ uint8_t submenu_preset_params(Menu *m) {
       }
       else {
         //go back
-        m->jump_to(63);
+        m->jump_to(255);
       }
       CLRPTR(pedal_param_loop_p);
       return true;
@@ -77,7 +85,7 @@ uint8_t submenu_preset_param_pedal(Menu *m) {
       }
       else {
         //go back
-        m->jump_to(63);
+        m->jump_to(255);
       }
       CLRPTR(list_loop_p);
       return true;
@@ -87,7 +95,89 @@ uint8_t submenu_preset_param_pedal(Menu *m) {
   return false;
 }
 
-uint8_t submenu_preset_copy  (Menu *m) { }
-uint8_t submenu_preset_reset (Menu *m) { }
+uint8_t submenu_preset_param_velocity(Menu *m) {
+  uint16_t result = submenu_helper_value(m, pedal_param_p->velocity, 0, 127, "VELOCITY"); 
+  if ( result ) {
+    pedal_param_p->velocity = result-1;
+    DB::preset_param_save(preset_id, preset_selected_param, pedal_param_p);
+    return true;
+  }
+  return false;
+}
+
+uint8_t submenu_preset_param_reset(Menu *m) {
+  if ( m->not_initialized() ) {
+    confirm_p = new Confirm;
+  }
+  else {
+    uint8_t result = confirm_p->loop();
+
+    if ( result != false ) {
+      if ( result == LTRUE ) {
+        //  SAVE
+        pedal_param_p = new PedalParam;
+        DB::preset_param_save(preset_id, preset_selected_param, pedal_param_p);
+        CLRPTR(pedal_param_p);
+      }
+      else if ( result == LFALSE ) {
+        // CANCEL
+      }
+
+      CLRPTR(confirm_p);
+      return m->back();
+    }
+  }
+
+  return false;
+}
+
+uint8_t submenu_preset_copy  (Menu *m) {
+  if ( m->not_initialized() ) {
+  }
+  else {
+  }
+
+  return false;
+}
+
+uint8_t submenu_preset_reset (Menu *m) {
+  if ( m->not_initialized() ) {
+    confirm_p = new Confirm;
+  }
+  else {
+    uint8_t result = confirm_p->loop();
+
+    if ( result != false ) {
+      if ( result == LTRUE ) {
+        //  SAVE
+        *preset_p      = Preset();
+        pedal_param_p  = new PedalParam;
+
+        DB::preset_save(preset_id, preset_p);
+
+        for (int i=0; i<NUM_PRESET_PARAMS; i++) DB::preset_param_save(preset_id, i, pedal_param_p);
+
+        for (int i=0; i<NUM_FSW_PER_PRESET; i++) {
+          fsw_p[i] = Footswitch();
+          DB::fsw_save(preset_id, i, &fsw_p[i]);
+
+          for (int j=0; j<NUM_PARAMS_PER_FSW; j++) {
+            DB::fsw_param_save(i + preset_id*NUM_FSW*NUM_SUB_MENUS, j, pedal_param_p);
+          }
+        }
+
+        CLRPTR(pedal_param_p);
+      }
+      else if ( result == LFALSE ) {
+        // CANCEL
+      }
+
+      CLRPTR(confirm_p);
+      return m->back();
+    }
+  }
+
+  return false;
+}
 
 #endif

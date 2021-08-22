@@ -47,12 +47,20 @@ struct Pedal {
 } *pedal_p = nullptr;
 
 // Pedal Param = PP
-union PedalParam {
-  struct {
-    unsigned pedal:4; // EEP_NUM_PEDALS is Empty
-    unsigned param:5;
-    unsigned velocity:7;
+struct PedalParam {
+  union {
+    struct {
+      unsigned pedal:4; // EEP_NUM_PEDALS is Empty
+      unsigned param:5;
+      unsigned velocity:7;
+    };
   };
+
+  PedalParam() {
+    this->pedal    = EEP_NUM_PEDALS;
+    this->param    = 0;
+    this->velocity = 0;
+  }
 } *pedal_param_p = nullptr;
 
 /*  :: FOOTSWITCH :: */
@@ -183,7 +191,9 @@ struct DB {
   EEP_FUNC(preset, Preset,  EEP_START_PRESETS);
   EEP_FUNC_EXTEND(preset_param, PedalParam, EEP_START_PRESET_PARAMS, NUM_PRESET_PARAMS);
 
+  // Parent: preset_id, ID: FSW 1-16 (NUM_FSW_PER_PRESET)
   EEP_FUNC_EXTEND(fsw,   Footswitch, EEP_START_FSW,    (NUM_FSW*NUM_SUB_MENUS));
+  // Parent: i + preset_id*NUM_FSW*NUM_SUB_MENUS, ID: PedalParam 1-10 (NUM_PARAMS_PER_FSW)
   EEP_FUNC_EXTEND(fsw_param,   PedalParam, EEP_START_FSW_PARAMS, (NUM_PARAMS_PER_FSW*(NUM_STATES+1)));
 
   EEP_FUNC(sub_menu, SubMenu, EEP_START_MENUS);
