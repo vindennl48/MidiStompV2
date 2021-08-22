@@ -1,6 +1,7 @@
 #ifndef SUBMENU_PEDAL_H
 #define SUBMENU_PEDAL_H
 
+// Select the pedal to edit
 uint8_t submenu_pedals(Menu *m) {
   uint16_t result = submenu_helper_list_loop(m, EEP_START_PEDALS, sizeof(Pedal), "PEDALS", EEP_NUM_PEDALS, false, sel_pedal_id);
 
@@ -12,6 +13,7 @@ uint8_t submenu_pedals(Menu *m) {
   return false;
 }
 
+// Change pedal name
 uint8_t submenu_pedal_name(Menu *m) {
   if ( !m->initialized ) {
     if ( pedal_p == nullptr ) pedal_p = new Pedal;
@@ -29,6 +31,7 @@ uint8_t submenu_pedal_name(Menu *m) {
   return false;
 }
 
+// Select pedal param to edit
 uint8_t submenu_pedal_params(Menu *m) {
   uint16_t result = submenu_helper_list_loop(m, EEP_START_PARAMS, sizeof(Param), "PARAMS", NUM_PEDAL_PARAMS, false, sel_param_id);
 
@@ -40,6 +43,7 @@ uint8_t submenu_pedal_params(Menu *m) {
   return false;
 }
 
+// Change pedal channel
 uint8_t submenu_pedal_channel(Menu *m) {
   if ( !m->initialized ) {
     if ( pedal_p == nullptr ) pedal_p = new Pedal;
@@ -60,6 +64,7 @@ uint8_t submenu_pedal_channel(Menu *m) {
   return false;
 }
 
+// Change pedal param name
 uint8_t submenu_pedal_param_name(Menu *m) {
   if ( !m->initialized ) {
     if ( param_p == nullptr ) param_p = new Param;
@@ -77,6 +82,7 @@ uint8_t submenu_pedal_param_name(Menu *m) {
   return false;
 }
 
+// Reset Pedal
 uint8_t submenu_pedal_reset(Menu *m) {
   uint8_t result = submenu_helper_confirm(m);
 

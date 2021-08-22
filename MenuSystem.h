@@ -22,6 +22,7 @@
 #define F_SUBMENU_COLORS                   16
 #define F_SUBMENU_COLOR_NAME               17
 #define F_SUBMENU_COLOR_EDIT               18
+#define F_SUBMENU_COLOR_RESET              19
 
 typedef uint8_t (*SelectedFunction)(Menu*);
 
@@ -45,6 +46,7 @@ SelectedFunction get_selected_function(uint8_t id) {
     case F_SUBMENU_COLORS:                   return &submenu_colors;
     case F_SUBMENU_COLOR_NAME:               return &submenu_color_name;
     case F_SUBMENU_COLOR_EDIT:               return &submenu_color_edit;
+    case F_SUBMENU_COLOR_RESET:              return &submenu_color_reset;
   };
 
   return nullptr;

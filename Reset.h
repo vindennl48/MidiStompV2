@@ -190,7 +190,7 @@ void reset_eeprom() {
     menu_option[0] = MenuOption("",      MENU_TYPE_DUMMY);
     menu_option[1] = MenuOption("NAME",  MENU_TYPE_FUNCTION, F_SUBMENU_COLOR_NAME);
     menu_option[2] = MenuOption("VALUE", MENU_TYPE_FUNCTION, F_SUBMENU_COLOR_EDIT);
-    menu_option[3] = MenuOption("RESET", MENU_TYPE_DUMMY);
+    menu_option[3] = MenuOption("RESET", MENU_TYPE_FUNCTION, F_SUBMENU_COLOR_RESET);
     DB::sub_menu_save(menu_id, &sub_menu);
     for (int i=0; i<num_options; i++) DB::menu_option_save(menu_id, i, &menu_option[i]);
 
