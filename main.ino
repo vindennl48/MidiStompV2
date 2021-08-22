@@ -65,7 +65,7 @@ void loop() {
     case E_SETTINGS:
       if ( m.not_initialized() ) {
         mh_p = new MenuHost;
-        mh_p->setup(EEP_PRESET_MENU);
+        mh_p->setup(EEP_SUBMENU_PRESET);
         HW::leds.set(0,0,0);
       }
       else {
@@ -92,7 +92,7 @@ void loop() {
     case E_FSW_SETTINGS:
       if ( m.not_initialized() ) {
         *mh_p = MenuHost();
-        mh_p->setup(EEP_FSW_MENU);
+        mh_p->setup(EEP_SUBMENU_FSW);
         mh_p->change_title( String( "FSW" + String(fsw_selected+1) + " S" + String(fsw_selected_state+1) + " M" + String(preset_submenu+1) ).c_str() );
 
         HW::leds.set(0,0,0);
@@ -142,13 +142,22 @@ Menu m;  // NEEDED
 
 void setup() {
   HW::setup();  // NEEDED
-
   HW::screen.clear();
-  HW::screen.print(0,0, String(EEP_RAM_FSW_PARAMS));
+
+  pedal_p = new Pedal();
+  *pedal_p = DB::pedal_at(0);
+  /*memcpy(pedal_p->name, "ADAM        ", STR_LEN_MAX);*/
+  /*pedal_p->channel = 10;*/
+  /*DB::pedal_save(0, pedal_p);*/
 }
 
 void loop() {
   HW::loop();  // NEEDED
+
+  if ( m.not_initialized() ) {
+    HW::screen.print(0,0, pedal_p->name);
+    HW::screen.print(0,1, pedal_p->channel);
+  }
 }
 
 #endif

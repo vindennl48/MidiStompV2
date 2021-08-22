@@ -58,10 +58,12 @@
 #define EEP_RAM_FSW_PARAMS      (EEP_RAM_FSW+(sizeof(Footswitch)*NUM_FSW*NUM_SUB_MENUS)+1)
 
 // EEPROM MENUS
-#define EEP_PRESET_MENU       0
-#define EEP_GLOBAL_MENU       1
-#define EEP_PRESET_PARAM_MENU 2
-#define EEP_FSW_MENU          3
+#define EEP_SUBMENU_PRESET 0
+#define EEP_SUBMENU_GLOBAL 1
+#define EEP_SUBMENU_PARAM  2
+#define EEP_SUBMENU_PEDAL  3
+#define EEP_SUBMENU_FSW    4
+#define EEP_SUBMENU_COLOR  5
 // -- END EEPROM MAP --
 
 // Footswitch
@@ -105,7 +107,6 @@
 //#define EEP_RESET
 //#define EEP_RESET_COLORS
 //#define EEP_RESET_PEDALS
-//#define EEP_RESET_PARAMS
 //#define EEP_RESET_PEDAL_PARAMS
 //#define EEP_RESET_FSW
 //#define EEP_RESET_FSW_PARAMS
@@ -120,10 +121,13 @@
 // -- END FLAGS --
 
 // -- VARS --
-uint8_t preset_id          = 0;
-uint8_t preset_submenu     = 0;
-uint8_t fsw_selected       = 0;
-uint8_t fsw_selected_state = 0;
+uint8_t preset_id             = 0;
+uint8_t preset_submenu        = 0;
+uint8_t preset_selected_param = 0;
+uint8_t pedal_selected        = 0;
+uint8_t color_selected        = 0;
+uint8_t fsw_selected          = 0;
+uint8_t fsw_selected_state    = 0;
 // -- END VARS --
 
 // Headers
@@ -142,14 +146,17 @@ uint8_t fsw_selected_state = 0;
 #include "LEDs.h"
 #include "Screen.h"
 #include "Hardware.h"
-#include "Reset.h"
 #include "ListLoop.h"
+#include "PedalParamLoop.h"
 #include "Confirm.h"
 #include "TextEdit.h"
 #include "ColorEdit.h"
 //#include "ValueEdit.h"
 //#include "Settings.h"
 #include "submenu_preset.h"
+#include "submenu_pedal.h"
+#include "submenu_color.h"
 #include "MenuSystem.h"
+#include "Reset.h"
 
 #endif

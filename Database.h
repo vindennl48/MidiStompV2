@@ -49,7 +49,7 @@ struct Pedal {
 // Pedal Param = PP
 union PedalParam {
   struct {
-    unsigned pedal:4; // 0 is Empty
+    unsigned pedal:4; // EEP_NUM_PEDALS is Empty
     unsigned param:5;
     unsigned velocity:7;
   };

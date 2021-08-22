@@ -4,15 +4,31 @@
 #define E_SUBMENU   0
 #define E_OPTION    1
 
+#define F_SUBMENU_PRESET_SAVE        1
+#define F_SUBMENU_PRESET_NAME        2
+#define F_SUBMENU_PRESET_PARAMS      3
+#define F_SUBMENU_PRESET_PARAM_PEDAL 4
+#define F_SUBMENU_PRESET_COPY        5
+#define F_SUBMENU_PRESET_RESET       6
+#define F_SUBMENU_PEDALS             7
+#define F_SUBMENU_PEDAL_NAME         8
+#define F_SUBMENU_COLORS             9
+#define F_SUBMENU_COLOR_NAME         10
+
 typedef uint8_t (*SelectedFunction)(Menu*);
 
 SelectedFunction get_selected_function(uint8_t id) {
   switch(id) {
-    case 1: return &submenu_preset_save;
-    case 2: return &submenu_preset_name;
-    case 3: return &submenu_preset_params;
-    case 4: return &submenu_preset_copy;
-    case 5: return &submenu_preset_reset;
+    case F_SUBMENU_PRESET_SAVE:        return &submenu_preset_save;
+    case F_SUBMENU_PRESET_NAME:        return &submenu_preset_name;
+    case F_SUBMENU_PRESET_PARAMS:      return &submenu_preset_params;
+    case F_SUBMENU_PRESET_PARAM_PEDAL: return &submenu_preset_param_pedal;
+    case F_SUBMENU_PRESET_COPY:        return &submenu_preset_copy;
+    case F_SUBMENU_PRESET_RESET:       return &submenu_preset_reset;
+    case F_SUBMENU_PEDALS:             return &submenu_pedals;
+    case F_SUBMENU_PEDAL_NAME:         return &submenu_pedal_name;
+    case F_SUBMENU_COLORS:             return &submenu_colors;
+    case F_SUBMENU_COLOR_NAME:         return &submenu_color_name;
   };
 
   return nullptr;
@@ -22,12 +38,13 @@ struct MenuHost {
   /* Function to run the entire menu system */
 
   Menu             m, m_sub;
-  MenuHost         *sub_menu_host;
+  MenuHost         *sub_menu_host = nullptr;
   SubMenu          sub_menu;
   MenuOption       menu_option_1, menu_option_2;
   SelectedFunction selected_function;
   uint8_t          sub_menu_id    = 0;
   uint8_t          x              = 1;
+  uint8_t          func_or_sub    = 0;
 
   void setup(uint8_t sub_menu_id) {
     this->sub_menu_id = sub_menu_id;
@@ -70,7 +87,7 @@ struct MenuHost {
             m.reinitialize();
           }
           else if ( HW::knob.is_pressed() ) {
-            m.jump_to(E_OPTION);
+            if ( menu_option_2.type != MENU_TYPE_DUMMY ) m.jump_to(E_OPTION);
           }
           else if ( HW::knob.is_long_pressed() ) {
             m.back();
@@ -81,19 +98,21 @@ struct MenuHost {
 
       case E_OPTION:
         if ( m.not_initialized() ) {
-          if ( menu_option_2.type == MENU_TYPE_SUB_MENU ) {
+          if ( menu_option_2.type == MENU_TYPE_SUB_MENU || menu_option_2.type == MENU_TYPE_FUNC_AND_SUB ) {
             sub_menu_host = new MenuHost;
-            sub_menu_host->setup(menu_option_2.value);
+            if ( menu_option_2.type == MENU_TYPE_FUNC_AND_SUB )
+              sub_menu_host->setup(menu_option_2.value2);
+            else
+              sub_menu_host->setup(menu_option_2.value);
           }
-          else if ( menu_option_2.type == MENU_TYPE_FUNCTION ) {
+          if ( menu_option_2.type == MENU_TYPE_FUNCTION || menu_option_2.type == MENU_TYPE_FUNC_AND_SUB ) {
             selected_function = get_selected_function(menu_option_2.value);
           }
-          else if ( menu_option_2.type == MENU_TYPE_FUNC_AND_SUB) { }
         }
         else {
           if ( menu_option_2.type == MENU_TYPE_SUB_MENU ) {
             if ( sub_menu_host->loop() ) {
-              delete sub_menu_host;
+              CLRPTR(sub_menu_host);
               m.jump_to(E_SUBMENU);
             }
           }
@@ -101,7 +120,25 @@ struct MenuHost {
             if ( selected_function(&m_sub) ) m.jump_to(E_SUBMENU);
           }
           else if ( menu_option_2.type == MENU_TYPE_FUNC_AND_SUB ) {
-            m.jump_to(E_SUBMENU);
+            if ( !func_or_sub ) {
+              if ( selected_function(&m_sub) ) {
+                if ( ( menu_option_2.value == F_SUBMENU_COLORS && m_sub.d.event == 255 ) || m_sub.d.event == 63 ) {
+                  m.jump_to(E_SUBMENU);
+                  CLRPTR(sub_menu_host);
+                }
+                else {
+                  func_or_sub = true; 
+                }
+                m_sub.back();
+              }
+            }
+            else {
+              if ( sub_menu_host->loop() ) {
+                func_or_sub = false;
+                CLRPTR(sub_menu_host);
+                m.reinitialize();
+              }
+            }
           }
         }
         break;
