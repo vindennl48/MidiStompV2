@@ -52,6 +52,24 @@ uint8_t submenu_preset_param_pedal(Menu *m) {
   return false;
 }
 
+uint8_t submenu_preset_param_pedal_param(Menu *m) {
+  uint16_t result = submenu_helper_list_loop(m, EEP_START_PARAMS, sizeof(Param), "PARAMS", EEP_NUM_PARAMS, false, sel_param_id);
+
+  if ( result ) {
+    if ( pedal_param_p == nullptr ) pedal_param_p = new PedalParam;
+    *pedal_param_p = DB::preset_param_at(sel_preset_id, sel_param_id);
+
+    pedal_param_p->param = result-1;
+
+    DB::preset_param_save(sel_preset_id, sel_param_id, pedal_param_p);
+
+    CLRPTR(pedal_param_p);
+    return true;
+  }
+
+  return false;
+}
+
 uint8_t submenu_preset_param_velocity(Menu *m) {
   if ( !m->initialized ) {
     if ( pedal_param_p == nullptr ) pedal_param_p = new PedalParam;

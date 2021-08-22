@@ -144,7 +144,7 @@ void reset_eeprom() {
     sub_menu    = SubMenu("PARAM", num_options);
     menu_option[0] = MenuOption("",            MENU_TYPE_DUMMY);
     menu_option[1] = MenuOption("PEDAL",       MENU_TYPE_FUNCTION, F_SUBMENU_PRESET_PARAM_PEDAL);
-    menu_option[2] = MenuOption("PEDAL PARAM", MENU_TYPE_DUMMY);
+    menu_option[2] = MenuOption("PEDAL PARAM", MENU_TYPE_FUNCTION, F_SUBMENU_PRESET_PARAM_PEDAL_PARAM);
     menu_option[3] = MenuOption("VELOCITY",    MENU_TYPE_FUNCTION, F_SUBMENU_PRESET_PARAM_VELOCITY);
     menu_option[4] = MenuOption("RESET",       MENU_TYPE_FUNCTION, F_SUBMENU_PRESET_PARAM_RESET);
     DB::sub_menu_save(menu_id, &sub_menu);
