@@ -123,7 +123,7 @@ void reset_eeprom() {
     menu_option[1] = MenuOption("SAVE",   MENU_TYPE_FUNCTION,     F_SUBMENU_PRESET_SAVE);
     menu_option[2] = MenuOption("NAME",   MENU_TYPE_FUNCTION,     F_SUBMENU_PRESET_NAME);
     menu_option[3] = MenuOption("PARAMS", MENU_TYPE_FUNC_AND_SUB, F_SUBMENU_PRESET_PARAMS, EEP_SUBMENU_PARAM);
-    menu_option[4] = MenuOption("COPY",   MENU_TYPE_DUMMY);
+    menu_option[4] = MenuOption("COPY",   MENU_TYPE_FUNCTION,     F_SUBMENU_PRESET_COPY);
     menu_option[5] = MenuOption("RESET",  MENU_TYPE_FUNCTION,     F_SUBMENU_PRESET_RESET);
     menu_option[6] = MenuOption("GLOBAL", MENU_TYPE_SUB_MENU, EEP_SUBMENU_GLOBAL);
     DB::sub_menu_save(menu_id, &sub_menu);

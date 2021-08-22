@@ -21,10 +21,6 @@ void setup() {
 
   preset_p  = new Preset;
   fsw_p     = new Footswitch[NUM_FSW_PER_PRESET];
-
-  *preset_p = DB::preset_at(sel_preset_id);
-  for (int i=0; i<NUM_FSW_PER_PRESET; i++)
-    fsw_p[i] = DB::fsw_at(sel_preset_id, i);
 }
 
 void loop() {
@@ -33,17 +29,27 @@ void loop() {
   switch( m.e() ) {
     case E_MAIN:
       if ( m.not_initialized() ) {
-        // Setup screen
-        HW::screen.clear();
-        HW::screen.print(0,0, preset_p->name);
-        HW::screen.print(10,1, String("MENU ") + String(sel_preset_submenu_id+1));
+        if ( !m.is_active() ) {
+          // Get Preset and FSW
+          *preset_p = DB::preset_at(sel_preset_id);
+          for (int i=0; i<NUM_FSW_PER_PRESET; i++)
+            fsw_p[i] = DB::fsw_at(sel_preset_id, i);
+          m.activate();
+        }
+        else {
+          // Setup screen
+          HW::screen.clear();
+          HW::screen.print(0,0, preset_p->name);
+          HW::screen.print(0,1, String("P.")+String(sel_preset_id+1));
+          HW::screen.print(10,1, String("MENU ") + String(sel_preset_submenu_id+1));
 
-        // Setup footswitches
-        for (int i=0; i<NUM_FSW; i++) {
-          int j = (NUM_FSW * sel_preset_submenu_id) + i;
+          // Setup footswitches
+          for (int i=0; i<NUM_FSW; i++) {
+            int j = (NUM_FSW * sel_preset_submenu_id) + i;
 
-          HW::btns.at(i)->set_press_type(fsw_p[j].press_type);
-          HW::leds.at(i)->set( DB::color_at( fsw_p[j].colors[fsw_p[j].state] ) );
+            HW::btns.at(i)->set_press_type(fsw_p[j].press_type);
+            HW::leds.at(i)->set( DB::color_at( fsw_p[j].colors[fsw_p[j].state] ) );
+          }
         }
       }
 
@@ -58,7 +64,12 @@ void loop() {
           else if ( HW::btns.at(i)->is_long_pressed() ) {}
         }
 
-        if ( HW::knob.is_long_pressed() ) { m.jump_to(E_SETTINGS); }
+        if      ( HW::knob.is_long_pressed() ) { m.jump_to(E_SETTINGS); }
+        else if ( HW::knob.is_left() || HW::knob.is_right() ) {
+          if      ( HW::knob.is_left() )  sel_preset_id = CONTAIN(sel_preset_id-1, 0, EEP_NUM_PRESETS-1);
+          else if ( HW::knob.is_right() ) sel_preset_id = CONTAIN(sel_preset_id+1, 0, EEP_NUM_PRESETS-1);
+          m.jump_to(E_MAIN); //RELOAD NEW PRESET
+        }
       }
       break;
 

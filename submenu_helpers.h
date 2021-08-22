@@ -1,7 +1,7 @@
 #ifndef SUBMENU_HELPERS_H
 #define SUBMENU_HELPERS_H
 
-uint8_t submenu_helper_list_loop(Menu *m, uint16_t start, uint8_t size, String title, uint16_t max, uint8_t is_color=false, uint8_t start_point=0) {
+uint16_t submenu_helper_list_loop(Menu *m, uint16_t start, uint8_t size, String title, uint16_t max, uint8_t is_color=false, uint8_t start_point=0) {
   if ( m->not_initialized() ) {
     if ( list_loop_p == nullptr )  list_loop_p = new ListLoop(start, size, title, max, is_color, start_point);
     else                          *list_loop_p = ListLoop(start, size, title, max, is_color, start_point);
