@@ -161,10 +161,21 @@ void reset_eeprom() {
     num_options = 5;
     sub_menu    = SubMenu("PEDAL", num_options);
     menu_option[0] = MenuOption("",        MENU_TYPE_DUMMY);
-    menu_option[1] = MenuOption("NAME",    MENU_TYPE_FUNCTION, F_SUBMENU_PEDAL_NAME);
-    menu_option[2] = MenuOption("PARAMS",  MENU_TYPE_DUMMY);
-    menu_option[3] = MenuOption("CHANNEL", MENU_TYPE_DUMMY);
+    menu_option[1] = MenuOption("NAME",    MENU_TYPE_FUNCTION,     F_SUBMENU_PEDAL_NAME);
+    menu_option[2] = MenuOption("PARAMS",  MENU_TYPE_FUNC_AND_SUB, F_SUBMENU_PEDAL_PARAMS, EEP_SUBMENU_PEDAL_PARAM);
+    menu_option[3] = MenuOption("CHANNEL", MENU_TYPE_FUNCTION,     F_SUBMENU_PEDAL_CHAN);
     menu_option[4] = MenuOption("RESET",   MENU_TYPE_DUMMY);
+    DB::sub_menu_save(menu_id, &sub_menu);
+    for (int i=0; i<num_options; i++) DB::menu_option_save(menu_id, i, &menu_option[i]);
+
+    menu_id     = EEP_SUBMENU_PEDAL_PARAM;
+    num_options = 5;
+    sub_menu    = SubMenu("PEDAL PARAM", num_options);
+    menu_option[0] = MenuOption("",      MENU_TYPE_DUMMY);
+    menu_option[1] = MenuOption("NAME",  MENU_TYPE_FUNCTION, F_SUBMENU_PEDAL_PARAM_NAME);
+    menu_option[2] = MenuOption("TYPE",  MENU_TYPE_DUMMY);
+    menu_option[3] = MenuOption("PITCH", MENU_TYPE_DUMMY);
+    menu_option[4] = MenuOption("RESET", MENU_TYPE_DUMMY);
     DB::sub_menu_save(menu_id, &sub_menu);
     for (int i=0; i<num_options; i++) DB::menu_option_save(menu_id, i, &menu_option[i]);
 
@@ -185,7 +196,7 @@ void reset_eeprom() {
     sub_menu    = SubMenu("COLOR", num_options);
     menu_option[0] = MenuOption("",      MENU_TYPE_DUMMY);
     menu_option[1] = MenuOption("NAME",  MENU_TYPE_FUNCTION, F_SUBMENU_COLOR_NAME);
-    menu_option[2] = MenuOption("VALUE", MENU_TYPE_DUMMY);
+    menu_option[2] = MenuOption("VALUE", MENU_TYPE_FUNCTION, F_SUBMENU_COLOR_EDIT);
     menu_option[3] = MenuOption("RESET", MENU_TYPE_DUMMY);
     DB::sub_menu_save(menu_id, &sub_menu);
     for (int i=0; i<num_options; i++) DB::menu_option_save(menu_id, i, &menu_option[i]);

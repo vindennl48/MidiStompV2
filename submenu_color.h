@@ -43,4 +43,22 @@ uint8_t submenu_color_name(Menu *m) {
   return false;
 }
 
+uint8_t submenu_color_edit(Menu *m) {
+  if ( m->not_initialized() ) {
+    if ( color_p == nullptr ) color_p = new Color;
+    *color_p = DB::color_at(color_selected);
+
+    color_edit_p = new ColorEdit();
+  }
+  else {
+    if ( color_edit_p->loop() ) {
+      CLRPTR(color_edit_p);
+      CLRPTR(color_p)
+      return m->back();
+    }
+  }
+
+  return false;
+}
+
 #endif

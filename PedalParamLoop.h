@@ -4,7 +4,7 @@
 struct PedalParamLoop {
   Menu     m;
   uint8_t  parent_id, size, x, is_fsw;
-  String   title                   = "PEDAL PARAMS";
+  String   title                   = "PARAMS";
   char     pedal_name[STR_LEN_MAX] = {" "};
   char     param_name[STR_LEN_MAX] = {" "};
 

@@ -7,13 +7,13 @@
 struct ValueEdit {
   Menu   m;
   String title;
-  uint8_t *value_old;
+  uint8_t value_old;
   uint8_t value, min, max, cursor;
 
-  ValueEdit(uint8_t *value_old, uint8_t min=0, uint8_t max=255, String title="VALUE") {
+  ValueEdit(uint8_t value_old, uint8_t min=0, uint8_t max=255, String title="VALUE") {
     this->title     = title;
     this->value_old = value_old;
-    this->value     = *value_old;
+    this->value     = value_old;
     this->min       = min;
     this->max       = max;
     this->cursor    = 0;
@@ -51,13 +51,15 @@ struct ValueEdit {
             else if ( cursor == 1 ) { // SAVE
               HW::screen.highlight(false);
               HW::screen.blink(false);
-              *value_old = value;
-              return m.back();
+              m.back();
+              return value;
             }
             else { // CANCEL
               HW::screen.highlight(false);
               HW::screen.blink(false);
-              return m.back();
+              value = value_old;
+              m.back();
+              return value;
             }
           }
         }
@@ -79,7 +81,7 @@ struct ValueEdit {
             m.jump_to(E_MAIN);
           }
           else if ( HW::knob.is_long_pressed() ){
-            value = *value_old;
+            value = value_old;
             m.jump_to(E_MAIN);
           }
         }
@@ -88,6 +90,8 @@ struct ValueEdit {
 
     return false;
   }
+
+  uint8_t get_result() { return value; }
 
 } *value_edit_p = nullptr;
 

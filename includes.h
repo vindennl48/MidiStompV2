@@ -58,12 +58,13 @@
 #define EEP_RAM_FSW_PARAMS      (EEP_RAM_FSW+(sizeof(Footswitch)*NUM_FSW*NUM_SUB_MENUS)+1)
 
 // EEPROM MENUS
-#define EEP_SUBMENU_PRESET 0
-#define EEP_SUBMENU_GLOBAL 1
-#define EEP_SUBMENU_PARAM  2
-#define EEP_SUBMENU_PEDAL  3
-#define EEP_SUBMENU_FSW    4
-#define EEP_SUBMENU_COLOR  5
+#define EEP_SUBMENU_PRESET      0
+#define EEP_SUBMENU_GLOBAL      1
+#define EEP_SUBMENU_PARAM       2
+#define EEP_SUBMENU_PEDAL       3
+#define EEP_SUBMENU_PEDAL_PARAM 4
+#define EEP_SUBMENU_FSW         5
+#define EEP_SUBMENU_COLOR       6
 // -- END EEPROM MAP --
 
 // Footswitch
@@ -125,6 +126,7 @@ uint8_t preset_id             = 0;
 uint8_t preset_submenu        = 0;
 uint8_t preset_selected_param = 0;
 uint8_t pedal_selected        = 0;
+uint8_t pedal_param_selected  = 0;
 uint8_t color_selected        = 0;
 uint8_t fsw_selected          = 0;
 uint8_t fsw_selected_state    = 0;
@@ -151,7 +153,7 @@ uint8_t fsw_selected_state    = 0;
 #include "Confirm.h"
 #include "TextEdit.h"
 #include "ColorEdit.h"
-//#include "ValueEdit.h"
+#include "ValueEdit.h"
 //#include "Settings.h"
 #include "submenu_preset.h"
 #include "submenu_pedal.h"
