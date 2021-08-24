@@ -98,20 +98,27 @@ struct Footswitch {
   // States of footswitch
   union {
     struct {
-      unsigned press_type:1; // 0 PRESS_TYPE_DOWN, 1 PRESS_TYPE_UP
+      unsigned press_type:1; // 0 PRESS_TYPE_UP, 1 PRESS_TYPE_DOWN
       unsigned mode:3;       // 0 OFF, 1 Toggle, 2 Cycle, 3 OneShot
                              //   SPECIALTY: 
                              //     4 Switch Submenu,
                              //     5 Jump to preset x,
                              //     6 Switch Preset by n number of presets,
                              //     7 Loop Quantize
+      unsigned lp_mode:3;    // 0 OFF, 3 OneShot
+                             //   SPECIALTY:
+                             //     4 Switch Submenu
+                             //     5 Jump to Preset x
+                             //     6 Switch Preset by n number of presets,
       unsigned state:2;      // 0 OFF, 1 ON1, 2 ON2
     };
   };
 
   Footswitch() {
-    this->mode  = FSW_MODE_TOGGLE;
-    this->state = 0;
+    this->press_type = PRESS_TYPE_UP;
+    this->mode       = FSW_MODE_TOGGLE;
+    this->lp_mode    = FSW_MODE_OFF;
+    this->state      = 0;
   }
 
   void increase_state() {

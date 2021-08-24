@@ -50,22 +50,29 @@
 #define EEP_START_PRESET_PARAMS (EEP_START_PRESETS+(sizeof(Preset)*EEP_NUM_PRESETS)+1)
 #define EEP_START_MENUS         (EEP_START_PRESET_PARAMS+(sizeof(PedalParam)*EEP_NUM_PRESET_PARAMS)+1)
 #define EEP_START_OPTS          (EEP_START_MENUS+(sizeof(SubMenu)*EEP_NUM_MENUS)+1)
+#define EEP_END_EEPROM          (EEP_START_OPTS+(sizeof(MenuOption)*EEP_NUM_OPTS)+1)
 #define EEP_START_LETTERS       65490 // At very end of EEPROM
 
+// Not used yet..
 #define EEP_RAM_PRESET          (EEP_START_OPTS+(sizeof(MenuOption)*EEP_NUM_OPTS)+1)
 #define EEP_RAM_PRESET_PARAMS   (EEP_RAM_PRESET+(sizeof(Preset))+1)
 #define EEP_RAM_FSW             (EEP_RAM_PRESET_PARAMS+(sizeof(PedalParam)*NUM_PRESET_PARAMS)+1)
 #define EEP_RAM_FSW_PARAMS      (EEP_RAM_FSW+(sizeof(Footswitch)*NUM_FSW*NUM_SUB_MENUS)+1)
+// --
 
 // EEPROM MENUS
-#define EEP_SUBMENU_PRESET      0
-#define EEP_SUBMENU_GLOBAL      1
-#define EEP_SUBMENU_PARAM       2
-#define EEP_SUBMENU_PEDAL       3
-#define EEP_SUBMENU_PEDAL_PARAM 4
-#define EEP_SUBMENU_COLOR       5
-#define EEP_SUBMENU_FSW         6
-#define EEP_SUBMENU_FSW_MODE    7
+#define EEP_SUBMENU_PRESET         0
+#define EEP_SUBMENU_GLOBAL         1
+#define EEP_SUBMENU_PRESET_PARAM   2
+#define EEP_SUBMENU_PEDAL          3
+#define EEP_SUBMENU_PEDAL_PARAM    4
+#define EEP_SUBMENU_COLOR          5
+#define EEP_SUBMENU_FSW            6
+#define EEP_SUBMENU_FSW_MODE       7
+#define EEP_SUBMENU_FSW_PARAM      8
+#define EEP_SUBMENU_FSW_PRESS_TYPE 9
+#define EEP_SUBMENU_FSW_LP         10
+#define EEP_SUBMENU_FSW_LP_MODE    11
 // -- END EEPROM MAP --
 
 // Footswitch

@@ -30,6 +30,15 @@
 #define F_SUBMENU_FSW_MODE_ONESHOT         24
 #define F_SUBMENU_FSW_MODE_SUBMENU         25
 #define F_SUBMENU_FSW_MODE_PRESET          26
+#define F_SUBMENU_FSW_PARAMS               27
+#define F_SUBMENU_FSW_PARAM_PEDAL          28
+#define F_SUBMENU_FSW_PARAM_PEDAL_PARAM    29
+#define F_SUBMENU_FSW_PARAM_VELOCITY       30
+#define F_SUBMENU_FSW_PARAM_RESET          31
+#define F_SUBMENU_FSW_LP_MODE_OFF          32
+#define F_SUBMENU_FSW_LP_MODE_ONESHOT      33
+#define F_SUBMENU_FSW_LP_MODE_SUBMENU      34
+#define F_SUBMENU_FSW_LP_MODE_PRESET       35
 
 typedef uint8_t (*SelectedFunction)(Menu*);
 
@@ -61,6 +70,15 @@ SelectedFunction get_selected_function(uint8_t id) {
     case F_SUBMENU_FSW_MODE_ONESHOT:         return &submenu_fsw_mode_oneshot;
     case F_SUBMENU_FSW_MODE_SUBMENU:         return &submenu_fsw_mode_submenu;
     case F_SUBMENU_FSW_MODE_PRESET:          return &submenu_fsw_mode_preset;
+    case F_SUBMENU_FSW_PARAMS:               return &submenu_fsw_params;
+    case F_SUBMENU_FSW_PARAM_PEDAL:          return &submenu_fsw_param_pedal;
+    case F_SUBMENU_FSW_PARAM_PEDAL_PARAM:    return &submenu_fsw_param_pedal_param;
+    case F_SUBMENU_FSW_PARAM_VELOCITY:       return &submenu_fsw_param_velocity;
+    case F_SUBMENU_FSW_PARAM_RESET:          return &submenu_fsw_param_reset;
+    case F_SUBMENU_FSW_LP_MODE_OFF:          return &submenu_fsw_lp_mode_off;
+    case F_SUBMENU_FSW_LP_MODE_ONESHOT:      return &submenu_fsw_lp_mode_oneshot;
+    case F_SUBMENU_FSW_LP_MODE_SUBMENU:      return &submenu_fsw_lp_mode_submenu;
+    case F_SUBMENU_FSW_LP_MODE_PRESET:       return &submenu_fsw_lp_mode_preset;
   };
 
   return nullptr;

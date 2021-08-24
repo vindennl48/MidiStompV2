@@ -4,6 +4,7 @@
 struct Screen {
 
   LiquidCrystal_I2C *lcd;
+  unsigned long timer = 0;
 
   void setup(uint8_t address, uint8_t width, uint8_t height) {
     lcd = new LiquidCrystal_I2C(address, width, height);
@@ -13,7 +14,15 @@ struct Screen {
     lcd->backlight();
   }
 
-  void loop() {}
+  void loop() {
+    // Flash the screen
+    if ( timer ) {
+      if ( millis()-timer >= 100 ) {
+        timer = 0;
+        lcd->backlight();
+      }
+    }
+  }
 
   // Print exact text at exact location
   void print(uint8_t x, uint8_t y, String text) {
@@ -62,6 +71,12 @@ struct Screen {
   void blink(bool ans) {
     if ( ans ) { lcd->blink();   }
     else       { lcd->noBlink(); }
+  }
+
+  void flash() {
+    timer = millis();
+    if ( !timer ) timer = 1;
+    lcd->noBacklight();
   }
 };
 

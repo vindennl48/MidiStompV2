@@ -126,7 +126,7 @@ uint8_t submenu_preset_copy(Menu *m) {
     for (int i=0; i<NUM_FSW_PER_PRESET; i++) {
       DB::fsw_save(result-1, i, &fsw_p[i]);
 
-      for (int j=0; j<NUM_PARAMS_PER_FSW; j++) {
+      for (int j=0; j<NUM_PARAMS_PER_FSW*(NUM_STATES+1); j++) {
         *pedal_param_p = DB::fsw_param_at(i + sel_preset_id*NUM_FSW*NUM_SUB_MENUS, j);
         DB::fsw_param_save(i + (result-1)*NUM_FSW*NUM_SUB_MENUS, j, pedal_param_p);
       }
@@ -161,7 +161,7 @@ uint8_t submenu_preset_reset(Menu *m) {
         fsw_p[i] = Footswitch();
         DB::fsw_save(sel_preset_id, i, &fsw_p[i]);
 
-        for (int j=0; j<NUM_PARAMS_PER_FSW; j++) {
+        for (int j=0; j<NUM_PARAMS_PER_FSW*(NUM_STATES+1); j++) {
           DB::fsw_param_save(i + sel_preset_id*NUM_FSW*NUM_SUB_MENUS, j, pedal_param_p);
         }
       }

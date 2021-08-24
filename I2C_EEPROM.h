@@ -66,10 +66,10 @@ void set_data(T *data, uint16_t start) {
   }
 
 #define EEP_FUNC_EXTEND(name, obj_class, start, num_obj) \
-  static obj_class name##_at_single(uint8_t id) { \
+  static obj_class name##_at_single(uint16_t id) { \
     return get_data<obj_class>(start + sizeof(obj_class) * id); \
   } \
-  static void name##_save_single(uint8_t id, obj_class *new_obj) { \
+  static void name##_save_single(uint16_t id, obj_class *new_obj) { \
     set_data<obj_class>(new_obj, start + sizeof(obj_class) * id); \
   } \
   static obj_class name##_at(uint8_t parent_id, uint8_t id) { \

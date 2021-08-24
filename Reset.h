@@ -67,6 +67,7 @@ void reset_eeprom() {
     for (int i=0; i<EEP_NUM_FSW; i++) {
       DB::fsw_save_single(i, fsw_p);
       HW::screen.print_with_nline(6,1, String(i));
+      if ( i % 10 == 0 ) HW::screen.print_with_nline(6,1, String(i));
     }
     CLRPTR(fsw_p);
   }
@@ -78,7 +79,7 @@ void reset_eeprom() {
     pedal_param_p = new PedalParam;
     for (int i=0; i<EEP_NUM_FSW_PARAMS; i++) {
       DB::fsw_param_save_single(i, pedal_param_p);
-      HW::screen.print_with_nline(9,1, String(i));
+      if ( i % 500 == 0 ) HW::screen.print_with_nline(9,1, String(i));
     }
     CLRPTR(pedal_param_p);
   }
@@ -102,7 +103,7 @@ void reset_eeprom() {
     pedal_param_p = new PedalParam;
     for (int i=0; i<EEP_NUM_PRESET_PARAMS; i++) {
       DB::preset_param_save_single(i, pedal_param_p);
-      HW::screen.print_with_nline(11,1, String(i));
+      if ( i % 10 == 0 ) HW::screen.print_with_nline(11,1, String(i));
     }
     CLRPTR(pedal_param_p);
   }
@@ -122,7 +123,7 @@ void reset_eeprom() {
     menu_option[0] = MenuOption("",       MENU_TYPE_DUMMY);
     menu_option[1] = MenuOption("SAVE",   MENU_TYPE_FUNCTION,     F_SUBMENU_PRESET_SAVE);
     menu_option[2] = MenuOption("NAME",   MENU_TYPE_FUNCTION,     F_SUBMENU_PRESET_NAME);
-    menu_option[3] = MenuOption("PARAMS", MENU_TYPE_FUNC_AND_SUB, F_SUBMENU_PRESET_PARAMS, EEP_SUBMENU_PARAM);
+    menu_option[3] = MenuOption("PARAMS", MENU_TYPE_FUNC_AND_SUB, F_SUBMENU_PRESET_PARAMS, EEP_SUBMENU_PRESET_PARAM);
     menu_option[4] = MenuOption("COPY",   MENU_TYPE_FUNCTION,     F_SUBMENU_PRESET_COPY);
     menu_option[5] = MenuOption("RESET",  MENU_TYPE_FUNCTION,     F_SUBMENU_PRESET_RESET);
     menu_option[6] = MenuOption("GLOBAL", MENU_TYPE_SUB_MENU, EEP_SUBMENU_GLOBAL);
@@ -139,9 +140,9 @@ void reset_eeprom() {
     DB::sub_menu_save(menu_id, &sub_menu);
     for (int i=0; i<num_options; i++) DB::menu_option_save(menu_id, i, &menu_option[i]);
 
-    menu_id     = EEP_SUBMENU_PARAM;
+    menu_id     = EEP_SUBMENU_PRESET_PARAM;
     num_options = 5;
-    sub_menu    = SubMenu("PARAM", num_options);
+    sub_menu    = SubMenu("PRESET PARAM", num_options);
     menu_option[0] = MenuOption("",            MENU_TYPE_DUMMY);
     menu_option[1] = MenuOption("PEDAL",       MENU_TYPE_FUNCTION, F_SUBMENU_PRESET_PARAM_PEDAL);
     menu_option[2] = MenuOption("PEDAL PARAM", MENU_TYPE_FUNCTION, F_SUBMENU_PRESET_PARAM_PEDAL_PARAM);
@@ -186,10 +187,10 @@ void reset_eeprom() {
     num_options = 7;
     sub_menu    = SubMenu("FSW", num_options);
     menu_option[0] = MenuOption("",           MENU_TYPE_DUMMY);
-    menu_option[1] = MenuOption("MODE",       MENU_TYPE_SUB_MENU, EEP_SUBMENU_FSW_MODE);
-    menu_option[2] = MenuOption("COLOR",      MENU_TYPE_FUNCTION, F_SUBMENU_FSW_COLOR);
-    menu_option[3] = MenuOption("SHORTPRESS", MENU_TYPE_DUMMY);
-    menu_option[4] = MenuOption("LONGPRESS",  MENU_TYPE_DUMMY);
+    menu_option[1] = MenuOption("MODE",       MENU_TYPE_SUB_MENU,     EEP_SUBMENU_FSW_MODE);
+    menu_option[2] = MenuOption("COLOR",      MENU_TYPE_FUNCTION,     F_SUBMENU_FSW_COLOR);
+    menu_option[3] = MenuOption("PARAMS",     MENU_TYPE_FUNC_AND_SUB, F_SUBMENU_FSW_PARAMS, EEP_SUBMENU_FSW_PARAM);
+    menu_option[4] = MenuOption("LONGPRESS",  MENU_TYPE_SUB_MENU,     EEP_SUBMENU_FSW_LP);
     menu_option[5] = MenuOption("PRESS TYPE", MENU_TYPE_DUMMY);
     menu_option[6] = MenuOption("RESET",      MENU_TYPE_DUMMY);
     DB::sub_menu_save(menu_id, &sub_menu);
@@ -205,6 +206,47 @@ void reset_eeprom() {
     menu_option[4] = MenuOption("ONESHOT", MENU_TYPE_FUNCTION, F_SUBMENU_FSW_MODE_ONESHOT);
     menu_option[5] = MenuOption("SUBMENU", MENU_TYPE_DUMMY);
     menu_option[6] = MenuOption("PRESET",  MENU_TYPE_DUMMY);
+    DB::sub_menu_save(menu_id, &sub_menu);
+    for (int i=0; i<num_options; i++) DB::menu_option_save(menu_id, i, &menu_option[i]);
+
+    menu_id     = EEP_SUBMENU_FSW_PARAM;
+    num_options = 5;
+    sub_menu    = SubMenu("FSW PARAM", num_options);
+    menu_option[0] = MenuOption("",            MENU_TYPE_DUMMY);
+    menu_option[1] = MenuOption("PEDAL",       MENU_TYPE_FUNCTION, F_SUBMENU_FSW_PARAM_PEDAL);
+    menu_option[2] = MenuOption("PEDAL PARAM", MENU_TYPE_FUNCTION, F_SUBMENU_FSW_PARAM_PEDAL_PARAM);
+    menu_option[3] = MenuOption("VELOCITY",    MENU_TYPE_FUNCTION, F_SUBMENU_FSW_PARAM_VELOCITY);
+    menu_option[4] = MenuOption("RESET",       MENU_TYPE_FUNCTION, F_SUBMENU_FSW_PARAM_RESET);
+    DB::sub_menu_save(menu_id, &sub_menu);
+    for (int i=0; i<num_options; i++) DB::menu_option_save(menu_id, i, &menu_option[i]);
+
+    menu_id     = EEP_SUBMENU_FSW_PRESS_TYPE;
+    num_options = 3;
+    sub_menu    = SubMenu("FSW PRESS TYPE", num_options);
+    menu_option[0] = MenuOption("",                MENU_TYPE_DUMMY);
+    menu_option[1] = MenuOption("PRESS_TYPE_UP",   MENU_TYPE_DUMMY);
+    menu_option[2] = MenuOption("PRESS_TYPE_DOWN", MENU_TYPE_DUMMY);
+    DB::sub_menu_save(menu_id, &sub_menu);
+    for (int i=0; i<num_options; i++) DB::menu_option_save(menu_id, i, &menu_option[i]);
+
+    menu_id     = EEP_SUBMENU_FSW_LP;
+    num_options = 4;
+    sub_menu    = SubMenu("FSW LONGPRESS", num_options);
+    menu_option[0] = MenuOption("",       MENU_TYPE_DUMMY);
+    menu_option[1] = MenuOption("MODE",   MENU_TYPE_SUB_MENU, EEP_SUBMENU_FSW_LP_MODE);
+    menu_option[2] = MenuOption("PARAMS", MENU_TYPE_DUMMY);
+    menu_option[3] = MenuOption("RESET",  MENU_TYPE_DUMMY);
+    DB::sub_menu_save(menu_id, &sub_menu);
+    for (int i=0; i<num_options; i++) DB::menu_option_save(menu_id, i, &menu_option[i]);
+
+    menu_id     = EEP_SUBMENU_FSW_LP_MODE;
+    num_options = 5;
+    sub_menu    = SubMenu("FSW LP MODE", num_options);
+    menu_option[0] = MenuOption("",        MENU_TYPE_DUMMY);
+    menu_option[1] = MenuOption("OFF",     MENU_TYPE_FUNCTION, F_SUBMENU_FSW_LP_MODE_OFF);
+    menu_option[2] = MenuOption("ONESHOT", MENU_TYPE_FUNCTION, F_SUBMENU_FSW_LP_MODE_ONESHOT);
+    menu_option[3] = MenuOption("SUBMENU", MENU_TYPE_FUNCTION, F_SUBMENU_FSW_LP_MODE_SUBMENU);
+    menu_option[4] = MenuOption("PRESET",  MENU_TYPE_FUNCTION, F_SUBMENU_FSW_LP_MODE_PRESET);
     DB::sub_menu_save(menu_id, &sub_menu);
     for (int i=0; i<num_options; i++) DB::menu_option_save(menu_id, i, &menu_option[i]);
   }

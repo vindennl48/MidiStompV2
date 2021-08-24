@@ -55,7 +55,11 @@ void loop() {
             fsw_p[j].increase_state();
             HW::leds.at(i)->set( DB::color_at( fsw_p[j].colors[fsw_p[j].state] ) );
           }
-          else if ( HW::btns.at(i)->is_long_pressed() ) {}
+          else if ( HW::btns.at(i)->is_long_pressed() ) {
+            if ( fsw_p[j].lp_mode == FSW_MODE_ONESHOT ) {
+              HW::screen.flash();
+            }
+          }
         }
 
         if      ( HW::knob.is_long_pressed() ) { m.jump_to(E_SETTINGS); }
@@ -191,7 +195,7 @@ void setup() {
   reset_eeprom();
   HW::screen.clear();
   HW::screen.print(0,0, "DONE!");
-  HW::screen.print(0,1, String("LAST SECT:") + String(EEP_START_OPTS));
+  HW::screen.print(0,1, String("LAST SECT:") + String(EEP_END_EEPROM));
 
 #ifndef EEP_RESET
   HW::screen.clear();
