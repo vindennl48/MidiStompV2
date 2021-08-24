@@ -63,8 +63,9 @@
 #define EEP_SUBMENU_PARAM       2
 #define EEP_SUBMENU_PEDAL       3
 #define EEP_SUBMENU_PEDAL_PARAM 4
-#define EEP_SUBMENU_FSW         5
-#define EEP_SUBMENU_COLOR       6
+#define EEP_SUBMENU_COLOR       5
+#define EEP_SUBMENU_FSW         6
+#define EEP_SUBMENU_FSW_MODE    7
 // -- END EEPROM MAP --
 
 // Footswitch
@@ -75,10 +76,10 @@
 #define FSW_MODE_TOGGLE   1  // Press once for on, 2x for off
 #define FSW_MODE_CYCLE    2  // Press once for on, 2x for on2, 3x for off
 #define FSW_MODE_ONESHOT  3  // Every press only sends one set of params, no cycling or toggle
-#define FSW_MODE_SUBMENU  4  // Every press only sends one set of params, no cycling or toggle
-#define FSW_MODE_PRESET_X 5  // Every press only sends one set of params, no cycling or toggle
-#define FSW_MODE_PRESET_N 6  // Every press only sends one set of params, no cycling or toggle
-#define FSW_MODE_QUANTIZE 7  // Every press only sends one set of params, no cycling or toggle
+#define FSW_MODE_SUBMENU  4  // Change to a different submenu
+#define FSW_MODE_PRESET   5  // Change to a different preset
+//#define FSW_MODE_PRESET_N 6  // Change preset up or down by N
+//#define FSW_MODE_QUANTIZE 7  // Send out midi notes on downbeat of midi-clock data
 
 // Screen
 #define LCD_ADDR   0x27
@@ -155,6 +156,7 @@ uint8_t sel_fsw_state_id      = 0;
 #include "submenu_preset.h"
 #include "submenu_pedal.h"
 #include "submenu_color.h"
+#include "submenu_fsw.h"
 #include "MenuSystem.h"
 #include "Reset.h"
 

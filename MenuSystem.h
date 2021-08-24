@@ -23,6 +23,12 @@
 #define F_SUBMENU_COLOR_NAME               17
 #define F_SUBMENU_COLOR_EDIT               18
 #define F_SUBMENU_COLOR_RESET              19
+#define F_SUBMENU_FSW_MODE_OFF             20
+#define F_SUBMENU_FSW_MODE_TOGGLE          21
+#define F_SUBMENU_FSW_MODE_CYCLE           22
+#define F_SUBMENU_FSW_MODE_ONESHOT         23
+#define F_SUBMENU_FSW_MODE_SUBMENU         24
+#define F_SUBMENU_FSW_MODE_PRESET          25
 
 typedef uint8_t (*SelectedFunction)(Menu*);
 
@@ -47,6 +53,12 @@ SelectedFunction get_selected_function(uint8_t id) {
     case F_SUBMENU_COLOR_NAME:               return &submenu_color_name;
     case F_SUBMENU_COLOR_EDIT:               return &submenu_color_edit;
     case F_SUBMENU_COLOR_RESET:              return &submenu_color_reset;
+    case F_SUBMENU_FSW_MODE_OFF:             return &submenu_fsw_mode_off;
+    case F_SUBMENU_FSW_MODE_TOGGLE:          return &submenu_fsw_mode_toggle;
+    case F_SUBMENU_FSW_MODE_CYCLE:           return &submenu_fsw_mode_cycle;
+    case F_SUBMENU_FSW_MODE_ONESHOT:         return &submenu_fsw_mode_oneshot;
+    case F_SUBMENU_FSW_MODE_SUBMENU:         return &submenu_fsw_mode_submenu;
+    case F_SUBMENU_FSW_MODE_PRESET:          return &submenu_fsw_mode_preset;
   };
 
   return nullptr;
@@ -108,8 +120,7 @@ struct MenuHost {
             if ( menu_option_2.type != MENU_TYPE_DUMMY ) m.jump_to(E_OPTION);
           }
           else if ( HW::knob.is_long_pressed() ) {
-            m.back();
-            return true;
+            return m.back();
           }
         }
         break;
@@ -135,7 +146,16 @@ struct MenuHost {
             }
           }
           else if ( menu_option_2.type == MENU_TYPE_FUNCTION ) {
-            if ( selected_function(&m_sub) ) m.jump_to(E_SUBMENU);
+            if ( selected_function(&m_sub) ) {
+              if ( m_sub.event == 255 ) {
+                m_sub.back();
+                return m.back();
+              }
+              else {
+                m_sub.back();
+                m.jump_to(E_SUBMENU);
+              }
+            }
           }
           else if ( menu_option_2.type == MENU_TYPE_FUNC_AND_SUB ) {
             if ( !func_or_sub ) {

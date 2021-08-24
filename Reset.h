@@ -130,12 +130,12 @@ void reset_eeprom() {
     for (int i=0; i<num_options; i++) DB::menu_option_save(menu_id, i, &menu_option[i]);
 
     menu_id     = EEP_SUBMENU_GLOBAL;
-    num_options = 4;
+    num_options = 3;
     sub_menu = SubMenu("GLOBAL", num_options);
     menu_option[0] = MenuOption("",       MENU_TYPE_DUMMY);
     menu_option[1] = MenuOption("PEDALS", MENU_TYPE_FUNC_AND_SUB, F_SUBMENU_PEDALS, EEP_SUBMENU_PEDAL);
     menu_option[2] = MenuOption("COLORS", MENU_TYPE_FUNC_AND_SUB, F_SUBMENU_COLORS, EEP_SUBMENU_COLOR);
-    menu_option[3] = MenuOption("RESET",  MENU_TYPE_DUMMY);
+    //menu_option[3] = MenuOption("RESET",  MENU_TYPE_DUMMY);
     DB::sub_menu_save(menu_id, &sub_menu);
     for (int i=0; i<num_options; i++) DB::menu_option_save(menu_id, i, &menu_option[i]);
 
@@ -172,18 +172,6 @@ void reset_eeprom() {
     DB::sub_menu_save(menu_id, &sub_menu);
     for (int i=0; i<num_options; i++) DB::menu_option_save(menu_id, i, &menu_option[i]);
 
-    menu_id     = EEP_SUBMENU_FSW;
-    num_options = 6;
-    sub_menu    = SubMenu("FSW", num_options);
-    menu_option[0] = MenuOption("",           MENU_TYPE_DUMMY);
-    menu_option[1] = MenuOption("TYPE",       MENU_TYPE_DUMMY);
-    menu_option[2] = MenuOption("COLOR",      MENU_TYPE_DUMMY);
-    menu_option[3] = MenuOption("SHORTPRESS", MENU_TYPE_DUMMY);
-    menu_option[4] = MenuOption("LONGPRESS",  MENU_TYPE_DUMMY);
-    menu_option[5] = MenuOption("RESET",      MENU_TYPE_DUMMY);
-    DB::sub_menu_save(menu_id, &sub_menu);
-    for (int i=0; i<num_options; i++) DB::menu_option_save(menu_id, i, &menu_option[i]);
-
     menu_id     = EEP_SUBMENU_COLOR;
     num_options = 4;
     sub_menu    = SubMenu("COLOR", num_options);
@@ -194,6 +182,31 @@ void reset_eeprom() {
     DB::sub_menu_save(menu_id, &sub_menu);
     for (int i=0; i<num_options; i++) DB::menu_option_save(menu_id, i, &menu_option[i]);
 
+    menu_id     = EEP_SUBMENU_FSW;
+    num_options = 7;
+    sub_menu    = SubMenu("FSW", num_options);
+    menu_option[0] = MenuOption("",           MENU_TYPE_DUMMY);
+    menu_option[1] = MenuOption("MODE",       MENU_TYPE_SUB_MENU, EEP_SUBMENU_FSW_MODE);
+    menu_option[2] = MenuOption("COLOR",      MENU_TYPE_DUMMY);
+    menu_option[3] = MenuOption("SHORTPRESS", MENU_TYPE_DUMMY);
+    menu_option[4] = MenuOption("LONGPRESS",  MENU_TYPE_DUMMY);
+    menu_option[5] = MenuOption("PRESS TYPE", MENU_TYPE_DUMMY);
+    menu_option[6] = MenuOption("RESET",      MENU_TYPE_DUMMY);
+    DB::sub_menu_save(menu_id, &sub_menu);
+    for (int i=0; i<num_options; i++) DB::menu_option_save(menu_id, i, &menu_option[i]);
+
+    menu_id     = EEP_SUBMENU_FSW_MODE;
+    num_options = 7;
+    sub_menu    = SubMenu("FSW MODE", num_options);
+    menu_option[0] = MenuOption("",        MENU_TYPE_DUMMY);
+    menu_option[1] = MenuOption("OFF",     MENU_TYPE_FUNCTION, F_SUBMENU_FSW_MODE_OFF);
+    menu_option[2] = MenuOption("TOGGLE",  MENU_TYPE_FUNCTION, F_SUBMENU_FSW_MODE_TOGGLE);
+    menu_option[3] = MenuOption("CYCLE",   MENU_TYPE_FUNCTION, F_SUBMENU_FSW_MODE_CYCLE);
+    menu_option[4] = MenuOption("ONESHOT", MENU_TYPE_FUNCTION, F_SUBMENU_FSW_MODE_ONESHOT);
+    menu_option[5] = MenuOption("SUBMENU", MENU_TYPE_DUMMY);
+    menu_option[6] = MenuOption("PRESET",  MENU_TYPE_DUMMY);
+    DB::sub_menu_save(menu_id, &sub_menu);
+    for (int i=0; i<num_options; i++) DB::menu_option_save(menu_id, i, &menu_option[i]);
   }
   #endif
 
