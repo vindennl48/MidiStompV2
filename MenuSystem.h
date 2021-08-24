@@ -23,12 +23,13 @@
 #define F_SUBMENU_COLOR_NAME               17
 #define F_SUBMENU_COLOR_EDIT               18
 #define F_SUBMENU_COLOR_RESET              19
-#define F_SUBMENU_FSW_MODE_OFF             20
-#define F_SUBMENU_FSW_MODE_TOGGLE          21
-#define F_SUBMENU_FSW_MODE_CYCLE           22
-#define F_SUBMENU_FSW_MODE_ONESHOT         23
-#define F_SUBMENU_FSW_MODE_SUBMENU         24
-#define F_SUBMENU_FSW_MODE_PRESET          25
+#define F_SUBMENU_FSW_COLOR                20
+#define F_SUBMENU_FSW_MODE_OFF             21
+#define F_SUBMENU_FSW_MODE_TOGGLE          22
+#define F_SUBMENU_FSW_MODE_CYCLE           23
+#define F_SUBMENU_FSW_MODE_ONESHOT         24
+#define F_SUBMENU_FSW_MODE_SUBMENU         25
+#define F_SUBMENU_FSW_MODE_PRESET          26
 
 typedef uint8_t (*SelectedFunction)(Menu*);
 
@@ -53,6 +54,7 @@ SelectedFunction get_selected_function(uint8_t id) {
     case F_SUBMENU_COLOR_NAME:               return &submenu_color_name;
     case F_SUBMENU_COLOR_EDIT:               return &submenu_color_edit;
     case F_SUBMENU_COLOR_RESET:              return &submenu_color_reset;
+    case F_SUBMENU_FSW_COLOR:                return &submenu_fsw_color;
     case F_SUBMENU_FSW_MODE_OFF:             return &submenu_fsw_mode_off;
     case F_SUBMENU_FSW_MODE_TOGGLE:          return &submenu_fsw_mode_toggle;
     case F_SUBMENU_FSW_MODE_CYCLE:           return &submenu_fsw_mode_cycle;

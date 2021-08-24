@@ -119,7 +119,10 @@ struct Footswitch {
     if ( mode == FSW_MODE_CYCLE ) {
       if ( state >= 3 ) state = 0;
     }
-    else if ( state >= 2 ) state = 0;
+    else if ( mode == FSW_MODE_ONESHOT ) {
+      state = 0;
+    }
+    else if ( FSW_MODE_TOGGLE && state >= 2 ) state = 0;
   }
 } *fsw_p = nullptr;
 

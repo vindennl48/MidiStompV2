@@ -187,7 +187,7 @@ void reset_eeprom() {
     sub_menu    = SubMenu("FSW", num_options);
     menu_option[0] = MenuOption("",           MENU_TYPE_DUMMY);
     menu_option[1] = MenuOption("MODE",       MENU_TYPE_SUB_MENU, EEP_SUBMENU_FSW_MODE);
-    menu_option[2] = MenuOption("COLOR",      MENU_TYPE_DUMMY);
+    menu_option[2] = MenuOption("COLOR",      MENU_TYPE_FUNCTION, F_SUBMENU_FSW_COLOR);
     menu_option[3] = MenuOption("SHORTPRESS", MENU_TYPE_DUMMY);
     menu_option[4] = MenuOption("LONGPRESS",  MENU_TYPE_DUMMY);
     menu_option[5] = MenuOption("PRESS TYPE", MENU_TYPE_DUMMY);

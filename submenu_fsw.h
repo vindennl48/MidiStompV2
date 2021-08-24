@@ -1,6 +1,17 @@
 #ifndef SUBMENU_FSW_H
 #define SUBMENU_FSW_H
 
+uint8_t submenu_fsw_color(Menu *m) {
+  uint16_t result = submenu_helper_list_loop(m, EEP_START_COLORS, sizeof(Color), "COLORS", EEP_NUM_COLORS, true, 0);
+
+  if ( result ) {
+    fsw_p[sel_fsw_id].colors[sel_fsw_state_id] = result-1;
+    return true;
+  }
+
+  return false;
+}
+
 uint8_t submenu_fsw_mode_off(Menu *m) {
   fsw_p[sel_fsw_id].mode = FSW_MODE_OFF;
   m->jump_to(255);
