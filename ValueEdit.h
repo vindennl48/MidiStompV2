@@ -23,7 +23,6 @@ struct ValueEdit {
     HW::screen.print(13,0, "   ");
     HW::screen.print(13,0, value);
     HW::screen.highlight(true);
-    HW::leds.set(0,0,0);
   }
 
   bool loop() {

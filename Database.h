@@ -93,7 +93,7 @@ struct Footswitch {
  *                        message to a looper pedal to start.  Essentially mimics quantize.
  * */
 
-  uint8_t colors[NUM_STATES] = { 0, 1, 2 };
+  uint8_t colors[NUM_STATES] = { 0, 1, 11 };
 
   // States of footswitch
   union {

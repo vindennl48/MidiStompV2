@@ -79,7 +79,7 @@ uint8_t submenu_fsw_lp_mode_preset(Menu *m) {
   return true;
 }
 
-// --
+
 uint8_t submenu_fsw_param_pedal(Menu *m) {
   uint16_t result = submenu_helper_list_loop(m, EEP_START_PEDALS, sizeof(Pedal), "PEDALS", EEP_NUM_PEDALS, false, sel_pedal_id);
 
@@ -146,6 +146,122 @@ uint8_t submenu_fsw_param_reset(Menu *m) {
       else                            *pedal_param_p = PedalParam();
 
       DB::fsw_param_save(sel_preset_id*NUM_FSW*NUM_SUB_MENUS + sel_fsw_id, sel_fsw_state_id*NUM_PRESET_PARAMS + sel_param_id, pedal_param_p);
+      CLRPTR(pedal_param_p);
+    }
+
+    return true;
+  }
+
+  return false;
+}
+
+uint8_t submenu_fsw_lp_params(Menu *m) {
+  uint8_t old_sel_fsw_state_id = sel_fsw_state_id;
+  uint8_t result               = 0;
+
+  sel_fsw_state_id = 3;  // 4th position is where LongPress params are stored
+
+  result = submenu_helper_pedal_param_loop(m, sel_preset_id*NUM_FSW*NUM_SUB_MENUS + sel_fsw_id, true, sel_param_id);
+
+  sel_fsw_state_id = old_sel_fsw_state_id;
+
+  return result;
+}
+
+uint8_t submenu_fsw_lp_param_pedal(Menu *m) {
+  uint8_t old_sel_fsw_state_id = sel_fsw_state_id;
+  uint8_t result               = 0;
+
+  sel_fsw_state_id = 3;  // 4th position is where LongPress params are stored
+
+  result = submenu_fsw_param_pedal(m);
+
+  sel_fsw_state_id = old_sel_fsw_state_id;
+
+  return result;
+}
+
+uint8_t submenu_fsw_lp_param_pedal_param(Menu *m) {
+  uint8_t old_sel_fsw_state_id = sel_fsw_state_id;
+  uint8_t result               = 0;
+
+  sel_fsw_state_id = 3;  // 4th position is where LongPress params are stored
+
+  result = submenu_fsw_param_pedal_param(m);
+
+  sel_fsw_state_id = old_sel_fsw_state_id;
+
+  return result;
+}
+
+uint8_t submenu_fsw_lp_param_velocity(Menu *m) {
+  uint8_t old_sel_fsw_state_id = sel_fsw_state_id;
+  uint8_t result               = 0;
+
+  sel_fsw_state_id = 3;  // 4th position is where LongPress params are stored
+
+  result = submenu_fsw_param_velocity(m);
+
+  sel_fsw_state_id = old_sel_fsw_state_id;
+
+  return result;
+}
+
+uint8_t submenu_fsw_lp_param_reset(Menu *m) {
+  uint8_t old_sel_fsw_state_id = sel_fsw_state_id;
+  uint8_t result               = 0;
+
+  sel_fsw_state_id = 3;  // 4th position is where LongPress params are stored
+
+  result = submenu_fsw_param_reset(m);
+
+  sel_fsw_state_id = old_sel_fsw_state_id;
+
+  return result;
+}
+
+
+uint8_t submenu_fsw_lp_reset(Menu *m) {
+  uint8_t result = submenu_helper_confirm(m);
+
+  if ( result ) {
+    if ( result == LTRUE ) {
+      //  SAVE
+      if ( pedal_param_p == nullptr )  pedal_param_p = new PedalParam;
+      else                            *pedal_param_p = PedalParam();
+
+      fsw_p[sel_fsw_id].lp_mode = FSW_MODE_OFF;
+
+      for (int i=0; i<NUM_PRESET_PARAMS; i++) {
+        DB::fsw_param_save(sel_preset_id*NUM_FSW*NUM_SUB_MENUS + sel_fsw_id, /*sel_fsw_state_id*/3*NUM_PRESET_PARAMS + /*sel_param_id*/i, pedal_param_p);
+      }
+      CLRPTR(pedal_param_p);
+    }
+
+    return true;
+  }
+
+  return false;
+}
+
+uint8_t submenu_fsw_reset(Menu *m) {
+  uint8_t result = submenu_helper_confirm(m);
+
+  if ( result ) {
+    if ( result == LTRUE ) {
+      //  SAVE
+      if ( pedal_param_p == nullptr )  pedal_param_p = new PedalParam;
+      else                            *pedal_param_p = PedalParam();
+
+      fsw_p[sel_fsw_id].mode      = FSW_MODE_OFF;
+      fsw_p[sel_fsw_id].mode      = FSW_MODE_TOGGLE;
+      fsw_p[sel_fsw_id].colors[0] = 0;
+      fsw_p[sel_fsw_id].colors[1] = 1;
+      fsw_p[sel_fsw_id].colors[2] = 2;
+
+      for (int i=0; i<NUM_PRESET_PARAMS; i++) {
+        DB::fsw_param_save(sel_preset_id*NUM_FSW*NUM_SUB_MENUS + sel_fsw_id, sel_fsw_state_id*NUM_PRESET_PARAMS + i, pedal_param_p);
+      }
       CLRPTR(pedal_param_p);
     }
 

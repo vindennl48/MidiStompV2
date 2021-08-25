@@ -73,6 +73,7 @@
 #define EEP_SUBMENU_FSW_PRESS_TYPE 9
 #define EEP_SUBMENU_FSW_LP         10
 #define EEP_SUBMENU_FSW_LP_MODE    11
+#define EEP_SUBMENU_FSW_LP_PARAM   12
 // -- END EEPROM MAP --
 
 // Footswitch

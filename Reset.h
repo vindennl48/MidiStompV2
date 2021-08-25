@@ -14,25 +14,61 @@ void reset_eeprom() {
       HW::screen.print_with_nline(10,1, String(i));
     }
 
-    color.r = 255; color.g = 0; color.b = 0;
-    memcpy(color.name, "RED         ", STR_LEN_MAX);
+    color.r = 2; color.g = 0; color.b = 0;
+    memcpy(color.name, "RED_OFF     ", STR_LEN_MAX);
     set_data<Color>( &color, EEP_START_COLORS + (sizeof(Color) * 0) );
 
-    color.r = 0; color.g = 255; color.b = 0;
-    memcpy(color.name, "GREEN       ", STR_LEN_MAX);
+    color.r = 255; color.g = 0; color.b = 0;
+    memcpy(color.name, "RED_ON      ", STR_LEN_MAX);
     set_data<Color>( &color, EEP_START_COLORS + (sizeof(Color) * 1) );
 
-    color.r = 0; color.g = 0; color.b = 255;
-    memcpy(color.name, "BLUE        ", STR_LEN_MAX);
+    color.r = 0; color.g = 2; color.b = 255;
+    memcpy(color.name, "GREEN_OFF   ", STR_LEN_MAX);
     set_data<Color>( &color, EEP_START_COLORS + (sizeof(Color) * 2) );
 
-    color.r = 255; color.g = 255; color.b = 0;
-    memcpy(color.name, "YELLOW      ", STR_LEN_MAX);
+    color.r = 0; color.g = 255; color.b = 0;
+    memcpy(color.name, "GREEN_ON    ", STR_LEN_MAX);
     set_data<Color>( &color, EEP_START_COLORS + (sizeof(Color) * 3) );
 
-    color.r = 255; color.g = 0; color.b = 255;
-    memcpy(color.name, "PURPLE      ", STR_LEN_MAX);
+    color.r = 0; color.g = 0; color.b = 2;
+    memcpy(color.name, "BLUE_OFF    ", STR_LEN_MAX);
     set_data<Color>( &color, EEP_START_COLORS + (sizeof(Color) * 4) );
+
+    color.r = 0; color.g = 0; color.b = 255;
+    memcpy(color.name, "BLUE_ON     ", STR_LEN_MAX);
+    set_data<Color>( &color, EEP_START_COLORS + (sizeof(Color) * 5) );
+
+    color.r = 40; color.g = 14; color.b = 0;
+    memcpy(color.name, "YELLOW_OFF  ", STR_LEN_MAX);
+    set_data<Color>( &color, EEP_START_COLORS + (sizeof(Color) * 6) );
+
+    color.r = 255; color.g = 106; color.b = 0;
+    memcpy(color.name, "YELLOW_ON   ", STR_LEN_MAX);
+    set_data<Color>( &color, EEP_START_COLORS + (sizeof(Color) * 7) );
+
+    color.r = 40; color.g = 5; color.b = 0;
+    memcpy(color.name, "ORANGE_OFF  ", STR_LEN_MAX);
+    set_data<Color>( &color, EEP_START_COLORS + (sizeof(Color) * 8) );
+
+    color.r = 255; color.g = 30; color.b = 0;
+    memcpy(color.name, "ORANGE_ON   ", STR_LEN_MAX);
+    set_data<Color>( &color, EEP_START_COLORS + (sizeof(Color) * 9) );
+
+    color.r = 40; color.g = 0; color.b = 5;
+    memcpy(color.name, "VIOLET_OFF  ", STR_LEN_MAX);
+    set_data<Color>( &color, EEP_START_COLORS + (sizeof(Color) * 10) );
+
+    color.r = 255; color.g = 0; color.b = 80;
+    memcpy(color.name, "VIOLET_ON   ", STR_LEN_MAX);
+    set_data<Color>( &color, EEP_START_COLORS + (sizeof(Color) * 11) );
+
+    color.r = 21; color.g = 8; color.b = 15;
+    memcpy(color.name, "WHITE_OFF   ", STR_LEN_MAX);
+    set_data<Color>( &color, EEP_START_COLORS + (sizeof(Color) * 12) );
+
+    color.r = 80; color.g = 80; color.b = 80;
+    memcpy(color.name, "WHITE_ON    ", STR_LEN_MAX);
+    set_data<Color>( &color, EEP_START_COLORS + (sizeof(Color) * 13) );
   }
   #endif
 
@@ -222,20 +258,20 @@ void reset_eeprom() {
 
     menu_id     = EEP_SUBMENU_FSW_PRESS_TYPE;
     num_options = 3;
-    sub_menu    = SubMenu("FSW PRESS TYPE", num_options);
-    menu_option[0] = MenuOption("",                MENU_TYPE_DUMMY);
-    menu_option[1] = MenuOption("PRESS_TYPE_UP",   MENU_TYPE_DUMMY);
-    menu_option[2] = MenuOption("PRESS_TYPE_DOWN", MENU_TYPE_DUMMY);
+    sub_menu    = SubMenu("PRESS TYPE", num_options);
+    menu_option[0] = MenuOption("",           MENU_TYPE_DUMMY);
+    menu_option[1] = MenuOption("PRESS UP",   MENU_TYPE_DUMMY);
+    menu_option[2] = MenuOption("PRESS DOWN", MENU_TYPE_DUMMY);
     DB::sub_menu_save(menu_id, &sub_menu);
     for (int i=0; i<num_options; i++) DB::menu_option_save(menu_id, i, &menu_option[i]);
 
     menu_id     = EEP_SUBMENU_FSW_LP;
     num_options = 4;
-    sub_menu    = SubMenu("FSW LONGPRESS", num_options);
+    sub_menu    = SubMenu("FSW LNGPRESS", num_options);
     menu_option[0] = MenuOption("",       MENU_TYPE_DUMMY);
-    menu_option[1] = MenuOption("MODE",   MENU_TYPE_SUB_MENU, EEP_SUBMENU_FSW_LP_MODE);
-    menu_option[2] = MenuOption("PARAMS", MENU_TYPE_DUMMY);
-    menu_option[3] = MenuOption("RESET",  MENU_TYPE_DUMMY);
+    menu_option[1] = MenuOption("MODE",   MENU_TYPE_SUB_MENU,     EEP_SUBMENU_FSW_LP_MODE);
+    menu_option[2] = MenuOption("PARAMS", MENU_TYPE_FUNC_AND_SUB, F_SUBMENU_FSW_LP_PARAMS, EEP_SUBMENU_FSW_LP_PARAM);
+    menu_option[3] = MenuOption("RESET",  MENU_TYPE_FUNCTION,     F_SUBMENU_FSW_LP_RESET);
     DB::sub_menu_save(menu_id, &sub_menu);
     for (int i=0; i<num_options; i++) DB::menu_option_save(menu_id, i, &menu_option[i]);
 
@@ -247,6 +283,17 @@ void reset_eeprom() {
     menu_option[2] = MenuOption("ONESHOT", MENU_TYPE_FUNCTION, F_SUBMENU_FSW_LP_MODE_ONESHOT);
     menu_option[3] = MenuOption("SUBMENU", MENU_TYPE_FUNCTION, F_SUBMENU_FSW_LP_MODE_SUBMENU);
     menu_option[4] = MenuOption("PRESET",  MENU_TYPE_FUNCTION, F_SUBMENU_FSW_LP_MODE_PRESET);
+    DB::sub_menu_save(menu_id, &sub_menu);
+    for (int i=0; i<num_options; i++) DB::menu_option_save(menu_id, i, &menu_option[i]);
+
+    menu_id     = EEP_SUBMENU_FSW_LP_PARAM;
+    num_options = 5;
+    sub_menu    = SubMenu("FSW LP PARAM", num_options);
+    menu_option[0] = MenuOption("",            MENU_TYPE_DUMMY);
+    menu_option[1] = MenuOption("PEDAL",       MENU_TYPE_FUNCTION, F_SUBMENU_FSW_LP_PARAM_PEDAL);
+    menu_option[2] = MenuOption("PEDAL PARAM", MENU_TYPE_FUNCTION, F_SUBMENU_FSW_LP_PARAM_PEDAL_PARAM);
+    menu_option[3] = MenuOption("VELOCITY",    MENU_TYPE_FUNCTION, F_SUBMENU_FSW_LP_PARAM_VELOCITY);
+    menu_option[4] = MenuOption("RESET",       MENU_TYPE_FUNCTION, F_SUBMENU_FSW_LP_PARAM_RESET);
     DB::sub_menu_save(menu_id, &sub_menu);
     for (int i=0; i<num_options; i++) DB::menu_option_save(menu_id, i, &menu_option[i]);
   }

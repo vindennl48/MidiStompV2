@@ -12,7 +12,6 @@ struct Confirm {
     HW::screen.print_with_nline(0,1, "YES           NO");
     HW::screen.highlight(true);
     HW::screen.blink(true);
-    HW::leds.set(0,0,0);
   }
 
   uint8_t loop() {

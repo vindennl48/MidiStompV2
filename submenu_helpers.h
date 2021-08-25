@@ -89,7 +89,7 @@ uint16_t submenu_helper_value(Menu *m, uint16_t value, uint16_t min, uint16_t ma
   }
   else {
     if ( value_edit_p->loop() ) {
-      value = value_edit_p->get_result()-1;
+      value = value_edit_p->get_result();
       CLRPTR(value_edit_p);
       m->back();
       return value;
