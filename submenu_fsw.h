@@ -43,9 +43,22 @@ uint8_t submenu_fsw_mode_oneshot(Menu *m) {
 
 uint8_t submenu_fsw_mode_submenu(Menu *m) {
   fsw_p[sel_fsw_id].mode = FSW_MODE_SUBMENU;
-  // Use the velocity value from the first MIDI param
-  m->jump_to(255);
-  return true;
+  uint8_t result = submenu_helper_value(m, 0, 0, 3, "SUBMENU");
+
+  if ( result ) {
+    if ( pedal_param_p == nullptr ) pedal_param_p = new PedalParam;
+    *pedal_param_p = DB::fsw_param_at(sel_preset_id*NUM_FSW*NUM_SUB_MENUS + sel_fsw_id, 0);
+
+    pedal_param_p->velocity = result-1;
+
+    DB::fsw_param_save(sel_preset_id*NUM_FSW*NUM_SUB_MENUS + sel_fsw_id, 0, pedal_param_p);
+
+    CLRPTR(pedal_param_p);
+    m->jump_to(255);
+    return true;
+  }
+
+  return false;
 }
 
 uint8_t submenu_fsw_mode_preset(Menu *m) {
@@ -68,9 +81,22 @@ uint8_t submenu_fsw_lp_mode_oneshot(Menu *m) {
 
 uint8_t submenu_fsw_lp_mode_submenu(Menu *m) {
   fsw_p[sel_fsw_id].lp_mode = FSW_MODE_SUBMENU;
-  // Use the velocity value from the first MIDI param
-  m->jump_to(255);
-  return true;
+  uint8_t result = submenu_helper_value(m, 0, 0, 3, "SUBMENU");
+
+  if ( result ) {
+    if ( pedal_param_p == nullptr ) pedal_param_p = new PedalParam;
+    *pedal_param_p = DB::fsw_param_at(sel_preset_id*NUM_FSW*NUM_SUB_MENUS + sel_fsw_id, 3);
+
+    pedal_param_p->velocity = result-1;
+
+    DB::fsw_param_save(sel_preset_id*NUM_FSW*NUM_SUB_MENUS + sel_fsw_id, 3, pedal_param_p);
+
+    CLRPTR(pedal_param_p);
+    m->jump_to(255);
+    return true;
+  }
+
+  return false;
 }
 
 uint8_t submenu_fsw_lp_mode_preset(Menu *m) {

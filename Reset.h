@@ -240,7 +240,7 @@ void reset_eeprom() {
     menu_option[2] = MenuOption("TOGGLE",  MENU_TYPE_FUNCTION, F_SUBMENU_FSW_MODE_TOGGLE);
     menu_option[3] = MenuOption("CYCLE",   MENU_TYPE_FUNCTION, F_SUBMENU_FSW_MODE_CYCLE);
     menu_option[4] = MenuOption("ONESHOT", MENU_TYPE_FUNCTION, F_SUBMENU_FSW_MODE_ONESHOT);
-    menu_option[5] = MenuOption("SUBMENU", MENU_TYPE_DUMMY);
+    menu_option[5] = MenuOption("SUBMENU", MENU_TYPE_FUNCTION, F_SUBMENU_FSW_MODE_SUBMENU);
     menu_option[6] = MenuOption("PRESET",  MENU_TYPE_DUMMY);
     DB::sub_menu_save(menu_id, &sub_menu);
     for (int i=0; i<num_options; i++) DB::menu_option_save(menu_id, i, &menu_option[i]);

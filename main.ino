@@ -44,7 +44,12 @@ void loop() {
           int j = (NUM_FSW * sel_preset_submenu_id) + i;
 
           HW::btns.at(i)->set_press_type(fsw_p[j].press_type);
-          HW::leds.at(i)->set( DB::color_at( fsw_p[j].colors[fsw_p[j].state] ) );
+          if ( fsw_p[j].mode != FSW_MODE_OFF ) {
+            HW::leds.at(i)->set( DB::color_at( fsw_p[j].colors[fsw_p[j].state] ) );
+          }
+          else {
+            HW::leds.at(i)->set(0,0,0);
+          }
         }
       }
       else {
@@ -52,13 +57,50 @@ void loop() {
           int j = (NUM_FSW * sel_preset_submenu_id) + i;
 
           if ( HW::btns.at(i)->is_pressed() ) {
-            fsw_p[j].increase_state();
-            HW::leds.at(i)->set( DB::color_at( fsw_p[j].colors[fsw_p[j].state] ) );
+            switch( fsw_p[j].mode ) {
+              case FSW_MODE_OFF:
+                break;
+
+              case FSW_MODE_SUBMENU:
+                if ( pedal_param_p == nullptr ) pedal_param_p = new PedalParam;
+                *pedal_param_p = DB::fsw_param_at(sel_preset_id*NUM_FSW*NUM_SUB_MENUS + j, 0);
+
+                sel_preset_submenu_id = pedal_param_p->velocity;
+
+                CLRPTR(pedal_param_p);
+                m.jump_to(E_MAIN);
+                break;
+
+              case FSW_MODE_PRESET:
+                break;
+
+              default:
+                fsw_p[j].increase_state();
+                HW::leds.at(i)->set( DB::color_at( fsw_p[j].colors[fsw_p[j].state] ) );
+                break;
+            };
           }
           else if ( HW::btns.at(i)->is_long_pressed() ) {
-            if ( fsw_p[j].lp_mode == FSW_MODE_ONESHOT ) {
-              HW::screen.flash();
-            }
+            switch( fsw_p[j].lp_mode ) {
+              case FSW_MODE_OFF:
+                break;
+
+              case FSW_MODE_SUBMENU:
+                HW::screen.flash();
+
+                if ( pedal_param_p == nullptr ) pedal_param_p = new PedalParam;
+                *pedal_param_p = DB::fsw_param_at(sel_preset_id*NUM_FSW*NUM_SUB_MENUS + j, 3);
+
+                sel_preset_submenu_id = pedal_param_p->velocity;
+
+                CLRPTR(pedal_param_p);
+                m.jump_to(E_MAIN);
+                break;
+
+              default:
+                HW::screen.flash();
+                break;
+            };
           }
         }
 
@@ -71,6 +113,10 @@ void loop() {
           *preset_p = DB::preset_at(sel_preset_id);
           for (int i=0; i<NUM_FSW_PER_PRESET; i++)
             fsw_p[i] = DB::fsw_at(sel_preset_id, i);
+
+          // Reset submenu
+          sel_preset_submenu_id = 0;
+
           m.jump_to(E_MAIN);
         }
       }
@@ -107,10 +153,10 @@ void loop() {
       if ( m.not_initialized() ) {
         *mh_p = MenuHost();
         mh_p->setup(EEP_SUBMENU_FSW);
-        mh_p->change_title( String( "FSW" + String(sel_fsw_id+1) + " S" + String(sel_fsw_state_id+1) + " M" + String(sel_preset_submenu_id+1) ).c_str() );
+        mh_p->change_title( String( "FSW" + String(sel_fsw_id+1-(NUM_FSW*sel_preset_submenu_id)) + " S" + String(sel_fsw_state_id+1) + " M" + String(sel_preset_submenu_id+1) ).c_str() );
 
         HW::leds.set(0,0,0);
-        HW::leds.at(sel_fsw_id)->set( DB::color_at( fsw_p[sel_fsw_id].colors[sel_fsw_state_id] ) );
+        HW::leds.at( sel_fsw_id-(NUM_FSW*sel_preset_submenu_id) )->set( DB::color_at( fsw_p[sel_fsw_id].colors[sel_fsw_state_id] ) );
       }
       else {
         if ( mh_p->loop() ) {
