@@ -227,7 +227,7 @@ void reset_eeprom() {
     menu_option[2] = MenuOption("COLOR",      MENU_TYPE_FUNCTION,     F_SUBMENU_FSW_COLOR);
     menu_option[3] = MenuOption("PARAMS",     MENU_TYPE_FUNC_AND_SUB, F_SUBMENU_FSW_PARAMS, EEP_SUBMENU_FSW_PARAM);
     menu_option[4] = MenuOption("LONGPRESS",  MENU_TYPE_SUB_MENU,     EEP_SUBMENU_FSW_LP);
-    menu_option[5] = MenuOption("PRESS TYPE", MENU_TYPE_DUMMY);
+    menu_option[5] = MenuOption("PRESS TYPE", MENU_TYPE_SUB_MENU,     EEP_SUBMENU_FSW_PRESS_TYPE);
     menu_option[6] = MenuOption("RESET",      MENU_TYPE_DUMMY);
     DB::sub_menu_save(menu_id, &sub_menu);
     for (int i=0; i<num_options; i++) DB::menu_option_save(menu_id, i, &menu_option[i]);
@@ -260,8 +260,8 @@ void reset_eeprom() {
     num_options = 3;
     sub_menu    = SubMenu("PRESS TYPE", num_options);
     menu_option[0] = MenuOption("",           MENU_TYPE_DUMMY);
-    menu_option[1] = MenuOption("PRESS UP",   MENU_TYPE_DUMMY);
-    menu_option[2] = MenuOption("PRESS DOWN", MENU_TYPE_DUMMY);
+    menu_option[1] = MenuOption("PRESS UP",   MENU_TYPE_FUNCTION, F_SUBMENU_FSW_PRESS_TYPE_UP);
+    menu_option[2] = MenuOption("PRESS DOWN", MENU_TYPE_FUNCTION, F_SUBMENU_FSW_PRESS_TYPE_DOWN);
     DB::sub_menu_save(menu_id, &sub_menu);
     for (int i=0; i<num_options; i++) DB::menu_option_save(menu_id, i, &menu_option[i]);
 

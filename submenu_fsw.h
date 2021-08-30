@@ -67,6 +67,18 @@ uint8_t submenu_fsw_mode_preset(Menu *m) {
   return true;
 }
 
+uint8_t submenu_fsw_press_type_up(Menu *m) {
+  fsw_p[sel_fsw_id].press_type = PRESS_TYPE_UP;
+  m->jump_to(255);
+  return true;
+}
+
+uint8_t submenu_fsw_press_type_down(Menu *m) {
+  fsw_p[sel_fsw_id].press_type = PRESS_TYPE_DOWN;
+  m->jump_to(255);
+  return true;
+}
+
 uint8_t submenu_fsw_lp_mode_off(Menu *m) {
   fsw_p[sel_fsw_id].lp_mode = FSW_MODE_OFF;
   m->jump_to(255);
