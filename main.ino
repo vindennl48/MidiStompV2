@@ -198,33 +198,33 @@ void loop() {
 #ifdef ALT_PROGRAM
 /* For testing random stuff */
 
-Menu m;  // NEEDED
+Menu m; // NEEDED
 
 void setup() {
   HW::setup();  // NEEDED
   HW::screen.clear();
 
-  pedal_param_p  = new PedalParam();
-  /*memcpy(pedal_p->name, "ADAM        ", STR_LEN_MAX);*/
-  /*pedal_p->channel = 10;*/
-  /*DB::pedal_save(0, pedal_p);*/
+  value_edit_p = new ValueEdit(0,0,127);
 }
 
 void loop() {
   HW::loop();  // NEEDED
 
-  if ( m.not_initialized() ) {
-    for (int i=0; i<10; i++) {
-      *pedal_param_p = DB::preset_param_at(sel_preset_id, i);
-      HW::screen.print(0,0, "pedal");
-      HW::screen.print(0,1, "param");
+  switch(m.e()) {
+    case 0:
+      if ( value_edit_p->loop() ) m.jump_to(1);
+      break;
 
-      HW::screen.print(15,0, pedal_param_p->pedal);
-      HW::screen.print(15,1, pedal_param_p->param);
-
-      delay(1000);
-    }
-  }
+    case 1:
+      if ( m.not_initialized() ) {
+        HW::screen.clear();
+        HW::screen.print(0,0, "VALUE");
+        HW::screen.print(0,1, String(value_edit_p->get_result()));
+        delay(5000);
+        m.jump_to(0);
+      }
+      break;
+  };
 }
 
 #endif

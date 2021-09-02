@@ -25,7 +25,7 @@ struct ValueEdit {
     HW::screen.highlight(true);
   }
 
-  bool loop() {
+  uint8_t loop() {
     switch( m.e() ) {
       case E_MAIN:
         if ( m.not_initialized() ) {
@@ -33,6 +33,7 @@ struct ValueEdit {
           HW::screen.print(13,0, value);
           cursor = 0;
           HW::screen.blink(true);
+          HW::screen.set_cursor(13, 0);
         }
         else {
           if ( HW::knob.is_left() || HW::knob.is_right() ) {
@@ -43,23 +44,32 @@ struct ValueEdit {
             else if ( cursor == 1 ) HW::screen.set_cursor(0,  1);
             else if ( cursor == 2 ) HW::screen.set_cursor(10, 1);
           }
-          else if ( HW::knob.is_pressed() ) {
-            if ( cursor == 0 ) { // EDIT
-              m.jump_to(E_EDIT_VALUE); 
+          else if ( HW::knob.is_pressed() || HW::knob.is_long_pressed() ) {
+            if ( HW::knob.is_pressed() ) {
+              if ( cursor == 0 ) { // EDIT
+                m.jump_to(E_EDIT_VALUE); 
+              }
+              else if ( cursor == 1 ) { // SAVE
+                HW::screen.highlight(false);
+                HW::screen.blink(false);
+                m.back();
+                return LTRUE;
+              }
             }
-            else if ( cursor == 1 ) { // SAVE
+            if ( cursor == 2 || HW::knob.is_long_pressed() ) { // CANCEL
               HW::screen.highlight(false);
               HW::screen.blink(false);
               m.back();
-              return value;
-            }
-            else { // CANCEL
-              HW::screen.highlight(false);
-              HW::screen.blink(false);
               value = value_old;
-              m.back();
-              return value;
+              return LFALSE;
             }
+          }
+          else if ( HW::knob.is_long_pressed() ) {  // CANCEL
+            HW::screen.highlight(false);
+            HW::screen.blink(false);
+            m.back();
+            value = value_old;
+            return LFALSE;
           }
         }
         break;

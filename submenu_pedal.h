@@ -132,7 +132,7 @@ uint8_t submenu_pedal_param_pitch(Menu *m) {
     *param_p = DB::param_at(sel_pedal_id, sel_param_id);
   }
 
-  uint16_t result = submenu_helper_value(m, param_p->pitch, 0, 126, "PITCH"); 
+  uint16_t result = submenu_helper_value(m, param_p->pitch, 0, 127, "PITCH"); 
 
   if ( result ) {
     param_p->pitch = result-1;
