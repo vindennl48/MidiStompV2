@@ -82,6 +82,77 @@ uint8_t submenu_pedal_param_name(Menu *m) {
   return false;
 }
 
+uint8_t submenu_pedal_param_type_none(Menu *m) {
+  if ( param_p == nullptr ) param_p = new Param;
+  *param_p = DB::param_at(sel_pedal_id, sel_param_id);
+
+  param_p->type = PEDAL_PARAM_TYPE_NONE;
+
+  DB::param_save(sel_pedal_id, sel_param_id, param_p);
+  CLRPTR(param_p)
+  m->jump_to(255);
+  return true;
+}
+uint8_t submenu_pedal_param_type_note(Menu *m) {
+  if ( param_p == nullptr ) param_p = new Param;
+  *param_p = DB::param_at(sel_pedal_id, sel_param_id);
+
+  param_p->type = PEDAL_PARAM_TYPE_NOTE;
+
+  DB::param_save(sel_pedal_id, sel_param_id, param_p);
+  CLRPTR(param_p)
+  m->jump_to(255);
+  return true;
+}
+uint8_t submenu_pedal_param_type_cc(Menu *m) {
+  if ( param_p == nullptr ) param_p = new Param;
+  *param_p = DB::param_at(sel_pedal_id, sel_param_id);
+
+  param_p->type = PEDAL_PARAM_TYPE_CC;
+
+  DB::param_save(sel_pedal_id, sel_param_id, param_p);
+  CLRPTR(param_p)
+  m->jump_to(255);
+  return true;
+}
+uint8_t submenu_pedal_param_type_pc(Menu *m) {
+  if ( param_p == nullptr ) param_p = new Param;
+  *param_p = DB::param_at(sel_pedal_id, sel_param_id);
+
+  param_p->type = PEDAL_PARAM_TYPE_PC;
+
+  DB::param_save(sel_pedal_id, sel_param_id, param_p);
+  CLRPTR(param_p)
+  m->jump_to(255);
+  return true;
+}
+uint8_t submenu_pedal_param_pitch(Menu *m) {
+  if ( !m->initialized ) {
+    if ( param_p == nullptr ) param_p = new Param;
+    *param_p = DB::param_at(sel_pedal_id, sel_param_id);
+  }
+
+  uint16_t result = submenu_helper_value(m, param_p->pitch, 0, 126, "PITCH"); 
+
+  if ( result ) {
+    param_p->pitch = result-1;
+
+    DB::param_save(sel_pedal_id, sel_param_id, param_p);
+    CLRPTR(param_p)
+    return true;
+  }
+
+  return false;
+}
+uint8_t submenu_pedal_param_reset(Menu *m) {
+  if ( param_p == nullptr )  param_p = new Param;
+  else                      *param_p = Param();
+
+  DB::param_save(sel_pedal_id, sel_param_id, param_p);
+  CLRPTR(param_p)
+  return true;
+}
+
 // Reset Pedal
 uint8_t submenu_pedal_reset(Menu *m) {
   uint8_t result = submenu_helper_confirm(m);

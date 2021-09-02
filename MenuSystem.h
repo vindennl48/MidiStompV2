@@ -17,36 +17,42 @@
 #define F_SUBMENU_PEDAL_NAME               11
 #define F_SUBMENU_PEDAL_PARAMS             12
 #define F_SUBMENU_PEDAL_PARAM_NAME         13
-#define F_SUBMENU_PEDAL_CHAN               14
-#define F_SUBMENU_PEDAL_RESET              15
-#define F_SUBMENU_COLORS                   16
-#define F_SUBMENU_COLOR_NAME               17
-#define F_SUBMENU_COLOR_EDIT               18
-#define F_SUBMENU_COLOR_RESET              19
-#define F_SUBMENU_FSW_COLOR                20
-#define F_SUBMENU_FSW_MODE_OFF             21
-#define F_SUBMENU_FSW_MODE_TOGGLE          22
-#define F_SUBMENU_FSW_MODE_CYCLE           23
-#define F_SUBMENU_FSW_MODE_ONESHOT         24
-#define F_SUBMENU_FSW_MODE_SUBMENU         25
-#define F_SUBMENU_FSW_MODE_PRESET          26
-#define F_SUBMENU_FSW_PARAMS               27
-#define F_SUBMENU_FSW_PARAM_PEDAL          28
-#define F_SUBMENU_FSW_PARAM_PEDAL_PARAM    29
-#define F_SUBMENU_FSW_PARAM_VELOCITY       30
-#define F_SUBMENU_FSW_PARAM_RESET          31
-#define F_SUBMENU_FSW_PRESS_TYPE_UP        32
-#define F_SUBMENU_FSW_PRESS_TYPE_DOWN      33
-#define F_SUBMENU_FSW_LP_MODE_OFF          34
-#define F_SUBMENU_FSW_LP_MODE_ONESHOT      35
-#define F_SUBMENU_FSW_LP_MODE_SUBMENU      36
-#define F_SUBMENU_FSW_LP_MODE_PRESET       37
-#define F_SUBMENU_FSW_LP_PARAMS            38
-#define F_SUBMENU_FSW_LP_PARAM_PEDAL       39
-#define F_SUBMENU_FSW_LP_PARAM_PEDAL_PARAM 40
-#define F_SUBMENU_FSW_LP_PARAM_VELOCITY    41
-#define F_SUBMENU_FSW_LP_PARAM_RESET       42
-#define F_SUBMENU_FSW_LP_RESET             43
+#define F_SUBMENU_PEDAL_PARAM_TYPE_NONE    14
+#define F_SUBMENU_PEDAL_PARAM_TYPE_NOTE    15
+#define F_SUBMENU_PEDAL_PARAM_TYPE_CC      16
+#define F_SUBMENU_PEDAL_PARAM_TYPE_PC      17
+#define F_SUBMENU_PEDAL_PARAM_PITCH        18
+#define F_SUBMENU_PEDAL_PARAM_RESET        19
+#define F_SUBMENU_PEDAL_CHAN               20
+#define F_SUBMENU_PEDAL_RESET              21
+#define F_SUBMENU_COLORS                   22
+#define F_SUBMENU_COLOR_NAME               23
+#define F_SUBMENU_COLOR_EDIT               24
+#define F_SUBMENU_COLOR_RESET              25
+#define F_SUBMENU_FSW_COLOR                26
+#define F_SUBMENU_FSW_MODE_OFF             27
+#define F_SUBMENU_FSW_MODE_TOGGLE          28
+#define F_SUBMENU_FSW_MODE_CYCLE           29
+#define F_SUBMENU_FSW_MODE_ONESHOT         30
+#define F_SUBMENU_FSW_MODE_SUBMENU         31
+#define F_SUBMENU_FSW_MODE_PRESET          32
+#define F_SUBMENU_FSW_PARAMS               33
+#define F_SUBMENU_FSW_PARAM_PEDAL          34
+#define F_SUBMENU_FSW_PARAM_PEDAL_PARAM    35
+#define F_SUBMENU_FSW_PARAM_VELOCITY       36
+#define F_SUBMENU_FSW_PARAM_RESET          37
+#define F_SUBMENU_FSW_PRESS_TYPE_UP        38
+#define F_SUBMENU_FSW_PRESS_TYPE_DOWN      39
+#define F_SUBMENU_FSW_LP_MODE_OFF          40
+#define F_SUBMENU_FSW_LP_MODE_ONESHOT      41
+#define F_SUBMENU_FSW_LP_MODE_SUBMENU      42
+#define F_SUBMENU_FSW_LP_MODE_PRESET       43
+#define F_SUBMENU_FSW_LP_PARAMS            44
+#define F_SUBMENU_FSW_LP_PARAM_PEDAL       45
+#define F_SUBMENU_FSW_LP_PARAM_PEDAL_PARAM 46
+#define F_SUBMENU_FSW_LP_PARAM_VELOCITY    47
+#define F_SUBMENU_FSW_LP_PARAM_RESET       48
+#define F_SUBMENU_FSW_LP_RESET             49
 
 typedef uint8_t (*SelectedFunction)(Menu*);
 
@@ -65,6 +71,12 @@ SelectedFunction get_selected_function(uint8_t id) {
     case F_SUBMENU_PEDAL_NAME:               return &submenu_pedal_name;
     case F_SUBMENU_PEDAL_PARAMS:             return &submenu_pedal_params;
     case F_SUBMENU_PEDAL_PARAM_NAME:         return &submenu_pedal_param_name;
+    case F_SUBMENU_PEDAL_PARAM_TYPE_NONE:    return &submenu_pedal_param_type_none;
+    case F_SUBMENU_PEDAL_PARAM_TYPE_NOTE:    return &submenu_pedal_param_type_note;
+    case F_SUBMENU_PEDAL_PARAM_TYPE_CC:      return &submenu_pedal_param_type_cc;
+    case F_SUBMENU_PEDAL_PARAM_TYPE_PC:      return &submenu_pedal_param_type_pc;
+    case F_SUBMENU_PEDAL_PARAM_PITCH:        return &submenu_pedal_param_pitch;
+    case F_SUBMENU_PEDAL_PARAM_RESET:        return &submenu_pedal_param_reset;
     case F_SUBMENU_PEDAL_CHAN:               return &submenu_pedal_channel;
     case F_SUBMENU_PEDAL_RESET:              return &submenu_pedal_reset;
     case F_SUBMENU_COLORS:                   return &submenu_colors;

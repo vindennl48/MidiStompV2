@@ -82,10 +82,8 @@ uint8_t submenu_helper_confirm(Menu *m) {
 
 uint16_t submenu_helper_value(Menu *m, uint16_t value, uint16_t min, uint16_t max, String title) {
   if ( m->not_initialized() ) {
-    if ( value_edit_p == nullptr )
-      value_edit_p = new ValueEdit(value+1, min+1, max+1, title);
-    else
-      *value_edit_p = ValueEdit(value+1, min+1, max+1, title);
+    if ( value_edit_p == nullptr ) CLRPTR(value_edit_p);
+    value_edit_p = new ValueEdit(value+1, min+1, max+1, title);
   }
   else {
     if ( value_edit_p->loop() ) {

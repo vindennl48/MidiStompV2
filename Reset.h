@@ -203,9 +203,20 @@ void reset_eeprom() {
     sub_menu    = SubMenu("PEDAL PARAM", num_options);
     menu_option[0] = MenuOption("",      MENU_TYPE_DUMMY);
     menu_option[1] = MenuOption("NAME",  MENU_TYPE_FUNCTION, F_SUBMENU_PEDAL_PARAM_NAME);
-    menu_option[2] = MenuOption("TYPE",  MENU_TYPE_DUMMY);
-    menu_option[3] = MenuOption("PITCH", MENU_TYPE_DUMMY);
-    menu_option[4] = MenuOption("RESET", MENU_TYPE_DUMMY);
+    menu_option[2] = MenuOption("TYPE",  MENU_TYPE_SUB_MENU, EEP_SUBMENU_PEDAL_PARAM_TYPE);
+    menu_option[3] = MenuOption("PITCH", MENU_TYPE_FUNCTION, F_SUBMENU_PEDAL_PARAM_PITCH);
+    menu_option[4] = MenuOption("RESET", MENU_TYPE_FUNCTION, F_SUBMENU_PEDAL_PARAM_RESET);
+    DB::sub_menu_save(menu_id, &sub_menu);
+    for (int i=0; i<num_options; i++) DB::menu_option_save(menu_id, i, &menu_option[i]);
+
+    menu_id     = EEP_SUBMENU_PEDAL_PARAM_TYPE;
+    num_options = 5;
+    sub_menu    = SubMenu("PARAM TYPE", num_options);
+    menu_option[0] = MenuOption("",      MENU_TYPE_DUMMY);
+    menu_option[1] = MenuOption("NONE",  MENU_TYPE_FUNCTION, F_SUBMENU_PEDAL_PARAM_TYPE_NONE);
+    menu_option[2] = MenuOption("NOTE",  MENU_TYPE_FUNCTION, F_SUBMENU_PEDAL_PARAM_TYPE_NOTE);
+    menu_option[3] = MenuOption("CC",    MENU_TYPE_FUNCTION, F_SUBMENU_PEDAL_PARAM_TYPE_CC);
+    menu_option[4] = MenuOption("PC",    MENU_TYPE_FUNCTION, F_SUBMENU_PEDAL_PARAM_TYPE_PC);
     DB::sub_menu_save(menu_id, &sub_menu);
     for (int i=0; i<num_options; i++) DB::menu_option_save(menu_id, i, &menu_option[i]);
 

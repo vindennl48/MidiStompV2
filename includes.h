@@ -61,19 +61,20 @@
 // --
 
 // EEPROM MENUS
-#define EEP_SUBMENU_PRESET         0
-#define EEP_SUBMENU_GLOBAL         1
-#define EEP_SUBMENU_PRESET_PARAM   2
-#define EEP_SUBMENU_PEDAL          3
-#define EEP_SUBMENU_PEDAL_PARAM    4
-#define EEP_SUBMENU_COLOR          5
-#define EEP_SUBMENU_FSW            6
-#define EEP_SUBMENU_FSW_MODE       7
-#define EEP_SUBMENU_FSW_PARAM      8
-#define EEP_SUBMENU_FSW_PRESS_TYPE 9
-#define EEP_SUBMENU_FSW_LP         10
-#define EEP_SUBMENU_FSW_LP_MODE    11
-#define EEP_SUBMENU_FSW_LP_PARAM   12
+#define EEP_SUBMENU_PRESET           1
+#define EEP_SUBMENU_GLOBAL           2
+#define EEP_SUBMENU_PRESET_PARAM     3
+#define EEP_SUBMENU_PEDAL            4
+#define EEP_SUBMENU_PEDAL_PARAM      5
+#define EEP_SUBMENU_PEDAL_PARAM_TYPE 6
+#define EEP_SUBMENU_COLOR            7
+#define EEP_SUBMENU_FSW              8
+#define EEP_SUBMENU_FSW_MODE         9
+#define EEP_SUBMENU_FSW_PARAM        10
+#define EEP_SUBMENU_FSW_PRESS_TYPE   11
+#define EEP_SUBMENU_FSW_LP           12
+#define EEP_SUBMENU_FSW_LP_MODE      13
+#define EEP_SUBMENU_FSW_LP_PARAM     14
 // -- END EEPROM MAP --
 
 // Footswitch
@@ -88,6 +89,12 @@
 #define FSW_MODE_PRESET   5  // Change to a different preset
 //#define FSW_MODE_PRESET_N 6  // Change preset up or down by N
 //#define FSW_MODE_QUANTIZE 7  // Send out midi notes on downbeat of midi-clock data
+
+// Screen
+#define PEDAL_PARAM_TYPE_NONE 0
+#define PEDAL_PARAM_TYPE_NOTE 1
+#define PEDAL_PARAM_TYPE_CC   2
+#define PEDAL_PARAM_TYPE_PC   3
 
 // Screen
 #define LCD_ADDR   0x27
