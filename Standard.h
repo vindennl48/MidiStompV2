@@ -22,9 +22,9 @@
 
 /* :: END CREATOR MACROS :: */
 
+#define SERIAL_MIDI_SETUP        Serial.begin(31250)
 
 /* :: ACTUAL HARDWARE PIN MAPS :: */
-
 #define LED_BOARD_SETUP          PIN_OUTPUT_SETUP(B, 5)
 #define LED_BOARD_TRUE           PIN_SET_TRUE(    B, 5)
 #define LED_BOARD_FALSE          PIN_SET_FALSE(   B, 5)
