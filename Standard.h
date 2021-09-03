@@ -1,6 +1,3 @@
-#ifndef STANDARD_H
-#define STANDARD_H
-
 /* :: CREATOR MACROS :: */
 
 #define BIT_OUTPUT_SETUP(DDR, POS)       DDR  |=  _BV(POS)
@@ -115,5 +112,3 @@
 /* :: TYPEDEFS :: */
 typedef unsigned long Timer;
 /* :: END - TYPEDEFS :: */
-
-#endif

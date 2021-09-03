@@ -9,6 +9,8 @@
 #define SHIFT_REG_RESOLUTION 100
 
 // PRIVATE DEFINES
+
+// LEDs
 #define LED1_SR_PINS 3,  2,  1
 #define LED2_SR_PINS 7,  6,  5
 #define LED3_SR_PINS 11, 10, 9
@@ -18,6 +20,9 @@
 // buttons on foot-pedal
 Button btns[NUM_BTNS];
 
+// Knob Encoder
+Knob knob;
+
 // LEDs
 ShiftRegisterPWM shift_reg(NUM_SHIFT_REGISTERS, SHIFT_REG_RESOLUTION);
 LED              leds[NUM_LEDS];
@@ -26,6 +31,8 @@ void leds_set(uint8_t r_new, uint8_t g_new, uint8_t b_new, uint16_t time=DEFAULT
 }
 
 void hw_setup() {
+  SERIAL_MIDI_SETUP;
+
   // Board LED
   LED_BOARD_SETUP;
 
@@ -43,11 +50,20 @@ void hw_setup() {
   leds[3].setup(LED4_SR_PINS, &shift_reg);
 
   // Knob
+  knob.setup(PIN_D3, PIN_D2, PIN_D4);
+
+  // LCD Screen
+  lcd_setup();
 }
 
 void hw_loop() {
   // Buttons & LEDs
   for (uint8_t i=0; i<NUM_BTNS; i++) { btns[i].loop(); leds[i].loop(); }
+
+  // Knob
+  knob.loop();
+
+  lcd_loop();
 }
 
 // PRIVATE UNDEF
