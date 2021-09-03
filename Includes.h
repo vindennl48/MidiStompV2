@@ -1,3 +1,6 @@
 #include "Standard.h"
 #include "Button.h"
+#include "ShiftRegisterPWM.h"
+#include "LED.h"
 #include "Hardware.h"
+#include "Nav.h"

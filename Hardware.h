@@ -1,10 +1,29 @@
 // PUBLIC DEFINES
+
+// Buttons
 #define NUM_BTNS 4
+
+// LEDs
+#define NUM_LEDS             NUM_BTNS
+#define NUM_SHIFT_REGISTERS  2
+#define SHIFT_REG_RESOLUTION 100
+
 // PRIVATE DEFINES
+#define LED1_SR_PINS 3,  2,  1
+#define LED2_SR_PINS 7,  6,  5
+#define LED3_SR_PINS 11, 10, 9
+#define LED4_SR_PINS 15, 14, 13
 // --
 
 // buttons on foot-pedal
 Button btns[NUM_BTNS];
+
+// LEDs
+ShiftRegisterPWM shift_reg(NUM_SHIFT_REGISTERS, SHIFT_REG_RESOLUTION);
+LED              leds[NUM_LEDS];
+void leds_set(uint8_t r_new, uint8_t g_new, uint8_t b_new, uint16_t time=DEFAULT_LED_TIME_MS) {
+  for (uint8_t i=0; i<NUM_LEDS; i++) leds[i].set(r_new, g_new, b_new, time);
+}
 
 void hw_setup() {
   // Board LED
@@ -16,10 +35,24 @@ void hw_setup() {
   btns[2].setup(PIN_D6);
   btns[3].setup(PIN_D5);
 
+  // LEDs
+  shift_reg.setup();
+  leds[0].setup(LED1_SR_PINS, &shift_reg);
+  leds[1].setup(LED2_SR_PINS, &shift_reg);
+  leds[2].setup(LED3_SR_PINS, &shift_reg);
+  leds[3].setup(LED4_SR_PINS, &shift_reg);
+
   // Knob
 }
 
 void hw_loop() {
-  // Buttons
-  for (uint8_t i=0; i<NUM_BTNS; i++) btns[i].loop();
+  // Buttons & LEDs
+  for (uint8_t i=0; i<NUM_BTNS; i++) { btns[i].loop(); leds[i].loop(); }
 }
+
+// PRIVATE UNDEF
+#undef LED1_SR_PINS
+#undef LED2_SR_PINS
+#undef LED3_SR_PINS
+#undef LED4_SR_PINS
+// --
