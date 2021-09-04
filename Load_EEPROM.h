@@ -1,5 +1,5 @@
 // Uncomment to use this program
-//#define LOAD_EEPROM // <----
+#define LOAD_EEPROM // <----
 
 #ifdef LOAD_EEPROM
 
@@ -104,11 +104,13 @@ void setup() {
   PRINT_NLINE(11,0, NUM_FEATURES_TOTAL);
   print_nline(0, 1, "> FEATURES");
   memcpy(text[0], "UNTITLED    ", TEXT_SZ);
-  for (uint16_t i=0; i<NUM_FEATURES_TOTAL; i++) {
-    if ( !(i%10) ) PRINT_NLINE(11,1, i);
-    Feature::set_name(i, TXT_BUF_1);
-    Feature::set_type(i, 0);
-    Feature::set_pitch(i, 0);
+  for (uint16_t i=0; i<NUM_PEDALS; i++) {
+    for (uint16_t j=0; j<NUM_FEATURES_PER_PEDAL; j++) {
+      if ( !((i*j)%10) ) PRINT_NLINE(11,1, i+j);
+      Feature::set_name( i, j, TXT_BUF_1);
+      Feature::set_type( i, j, 0);
+      Feature::set_pitch(i, j, 0);
+    }
   }
 }
 #endif // -- END FEATURES --

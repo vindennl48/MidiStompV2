@@ -6,9 +6,22 @@
 /* :: HELPFUL MACROS :: */
 #define GET_NIBBLE(input, mask, shift)  ((mask & input) >> shift)
 
+// These help get the start address in eeprom
 #define GET_PARENT(start, id, size) (start + (id*size))
 #define GET_CHILD(start, parent_id, id, size, num_in_parent) (start + (parent_id*size*num_in_parent) + (id*size))
 #define GET_END(start, quantity, size) ((uint16_t)start + ((uint16_t)quantity*(uint16_t)size))
+
+// Given the local ID of a child, this helps get the absolute ID of the child in the eeprom
+// For example: If we have fsw_id of 2, this means the 3rd physical footswitch..
+//              however, if we are on thie 3rd preset, 2nd submenu, the absolute ID is actually 38..
+//              4 fsw per submenu, 4 submenu per preset, which is 16 fsw per preset.
+//              3rd preset is preset_id=2, 16*2 = 32
+//              2nd submenu is submenu_id=1, 32+4*1 = 36
+//              fsw_id of 2, 36+2 = 38
+//              So in the EEPROM, this fsw is the 39th one, absolute fsw_id = 38
+#define GET_ABS_CHILD_ID(parent_id, child_id, num_children_in_parent) (parent_id*num_children_in_parent+child_id)
+#define GET_ABS_CHILD_ID_2(parent1_id, parent2_id, child_id, num_children_in_parent2, num_parent2_in_parent1) \
+  ((num_children_in_parent2*num_parent2_in_parent1*parent1_id) + (num_children_in_parent2*parent2_id) + child_id)
 /* :: END HELPFUL MACROS :: */
 
 
@@ -58,18 +71,45 @@
 /* :: FUNC BUILDERS:: */
 // i: what text buffer to apply to, 0 or 1
 #define BUILD_OBJ_NAME(start, size) \
-  static void get_name(uint8_t id, uint8_t i) { \
+  static void get_name(uint16_t id, uint8_t i) { \
     eReadBlock( GET_PARENT(start, id, size), (uint8_t*)text[i], TEXT_SZ ); \
   } \
-  static void set_name(uint8_t id, uint8_t i) { \
+  static void set_name(uint16_t id, uint8_t i) { \
+    eWriteBlock( GET_PARENT(start, id, size), (uint8_t*)text[i], TEXT_SZ ); \
+  }
+#define BUILD_OBJ_NAME_1_PARENT(start, size, num_children_in_parent) \
+  static void get_name(uint16_t parent_id, uint16_t id, uint8_t i) { \
+    id = GET_ABS_CHILD_ID(parent_id, id, num_children_in_parent); \
+    eReadBlock( GET_PARENT(start, id, size), (uint8_t*)text[i], TEXT_SZ ); \
+  } \
+  static void set_name(uint16_t parent_id, uint16_t id, uint8_t i) { \
+    id = GET_ABS_CHILD_ID(parent_id, id, num_children_in_parent); \
     eWriteBlock( GET_PARENT(start, id, size), (uint8_t*)text[i], TEXT_SZ ); \
   }
 // i: amount of bytes to get to variable
 #define BUILD_OBJ_VARIABLE(var_name, obj_class, start, size, i) \
-  static obj_class get_##var_name(uint8_t id) { \
+  static obj_class get_##var_name(uint16_t id) { \
     return read_data<obj_class>( GET_PARENT(start, id, size) + i ); \
   } \
-  static void set_##var_name(uint8_t id, obj_class new_var) { \
+  static void set_##var_name(uint16_t id, obj_class new_var) { \
+    write_data<obj_class>( &new_var, GET_PARENT(start, id, size) + i ); \
+  }
+#define BUILD_OBJ_VARIABLE_1_PARENT(var_name, obj_class, start, size, i, num_children_in_parent) \
+  static obj_class get_##var_name(uint16_t parent_id, uint16_t id) { \
+    id = GET_ABS_CHILD_ID(parent_id, id, num_children_in_parent); \
+    return read_data<obj_class>( GET_PARENT(start, id, size) + i ); \
+  } \
+  static void set_##var_name(uint16_t parent_id, uint16_t id, obj_class new_var) { \
+    id = GET_ABS_CHILD_ID(parent_id, id, num_children_in_parent); \
+    write_data<obj_class>( &new_var, GET_PARENT(start, id, size) + i ); \
+  }
+#define BUILD_OBJ_VARIABLE_2_PARENT(var_name, obj_class, start, size, i, num_children_in_parent2, num_parent2_in_parent1 ) \
+  static obj_class get_##var_name(uint16_t parent1_id, uint16_t parent2_id, uint16_t id) { \
+    id = GET_ABS_CHILD_ID_2(parent1_id, parent2_id, id, num_children_in_parent2, num_parent2_in_parent1); \
+    return read_data<obj_class>( GET_PARENT(start, id, size) + i ); \
+  } \
+  static void set_##var_name(uint16_t parent1_id, uint16_t parent2_id, uint16_t id, obj_class new_var) { \
+    id = GET_ABS_CHILD_ID_2(parent1_id, parent2_id, id, num_children_in_parent2, num_parent2_in_parent1); \
     write_data<obj_class>( &new_var, GET_PARENT(start, id, size) + i ); \
   }
 // nib_obj: object type that will be pulled from eeprom before getting nibble, ie:
@@ -82,12 +122,40 @@
 // num_bits_to_shift: the number of bits to shift the bit_mask to get to the proper nibble location,
 //                    ie. if 4 least significant bits of uint16_t, this will be 12
 #define BUILD_OBJ_VAR_NIBBLE(var_name, nib_class, bit_mask, start, size, num_bits_to_shift) \
-  static uint8_t get_##var_name(uint8_t id) { \
+  static uint8_t get_##var_name(uint16_t id) { \
     nib_class result = 0; \
     eReadBlock( GET_PARENT(start, id, size), (uint8_t*)&result, sizeof(nib_class) ); \
     return (result & (bit_mask << num_bits_to_shift)) >> num_bits_to_shift; \
   } \
-  static void set_##var_name(uint8_t id, nib_class new_var) { \
+  static void set_##var_name(uint16_t id, nib_class new_var) { \
+    nib_class result = 0; \
+    eReadBlock( GET_PARENT(start, id, size), (uint8_t*)&result, sizeof(nib_class) ); \
+    result = (result & ~(bit_mask<<num_bits_to_shift)) | (new_var << num_bits_to_shift); \
+    eWriteBlock( GET_PARENT(start, id, size), (uint8_t*)&result, sizeof(nib_class) ); \
+  }
+#define BUILD_OBJ_VAR_NIBBLE_1_PARENT(var_name, nib_class, bit_mask, start, size, num_bits_to_shift, num_children_in_parent) \
+  static uint8_t get_##var_name(uint16_t parent_id, uint16_t id) { \
+    id = GET_ABS_CHILD_ID(parent_id, id, num_children_in_parent); \
+    nib_class result = 0; \
+    eReadBlock( GET_PARENT(start, id, size), (uint8_t*)&result, sizeof(nib_class) ); \
+    return (result & (bit_mask << num_bits_to_shift)) >> num_bits_to_shift; \
+  } \
+  static void set_##var_name(uint16_t parent_id, uint16_t id, nib_class new_var) { \
+    id = GET_ABS_CHILD_ID(parent_id, id, num_children_in_parent); \
+    nib_class result = 0; \
+    eReadBlock( GET_PARENT(start, id, size), (uint8_t*)&result, sizeof(nib_class) ); \
+    result = (result & ~(bit_mask<<num_bits_to_shift)) | (new_var << num_bits_to_shift); \
+    eWriteBlock( GET_PARENT(start, id, size), (uint8_t*)&result, sizeof(nib_class) ); \
+  }
+#define BUILD_OBJ_VAR_NIBBLE_2_PARENT(var_name, nib_class, bit_mask, start, size, num_bits_to_shift, num_children_in_parent2, num_parent2_in_parent1) \
+  static uint8_t get_##var_name(uint16_t parent1_id, uint16_t parent2_id, uint16_t id) { \
+    id = GET_ABS_CHILD_ID_2(parent1_id, parent2_id, id, num_children_in_parent2, num_parent2_in_parent1); \
+    nib_class result = 0; \
+    eReadBlock( GET_PARENT(start, id, size), (uint8_t*)&result, sizeof(nib_class) ); \
+    return (result & (bit_mask << num_bits_to_shift)) >> num_bits_to_shift; \
+  } \
+  static void set_##var_name(uint16_t parent1_id, uint16_t parent2_id, uint16_t id, nib_class new_var) { \
+    id = GET_ABS_CHILD_ID_2(parent1_id, parent2_id, id, num_children_in_parent2, num_parent2_in_parent1); \
     nib_class result = 0; \
     eReadBlock( GET_PARENT(start, id, size), (uint8_t*)&result, sizeof(nib_class) ); \
     result = (result & ~(bit_mask<<num_bits_to_shift)) | (new_var << num_bits_to_shift); \
@@ -110,18 +178,18 @@ struct Pedal {
 };
 
 struct Feature {
-  BUILD_OBJ_NAME(M_FEATURES, FEATURE_SZ);
-  BUILD_OBJ_VARIABLE(type,  uint8_t, M_FEATURES, FEATURE_SZ, 13);
-  BUILD_OBJ_VARIABLE(pitch, uint8_t, M_FEATURES, FEATURE_SZ, 14);
+  BUILD_OBJ_NAME_1_PARENT(M_FEATURES, FEATURE_SZ, NUM_FEATURES_PER_PEDAL);
+  BUILD_OBJ_VARIABLE_1_PARENT(type,  uint8_t, M_FEATURES, FEATURE_SZ, 13, NUM_FEATURES_PER_PEDAL);
+  BUILD_OBJ_VARIABLE_1_PARENT(pitch, uint8_t, M_FEATURES, FEATURE_SZ, 14, NUM_FEATURES_PER_PEDAL);
 };
 
 struct PresetParam {
   // unsigned pedal:4;
   // unsigned feature:5;
   // unsigned velocity:7;
-  BUILD_OBJ_VAR_NIBBLE(pedal,    uint16_t, 0b1111,    M_PRESET_PARAMS, PRESET_PARAM_SZ, 12);
-  BUILD_OBJ_VAR_NIBBLE(feature,  uint16_t, 0b11111,   M_PRESET_PARAMS, PRESET_PARAM_SZ, 7);
-  BUILD_OBJ_VAR_NIBBLE(velocity, uint16_t, 0b1111111, M_PRESET_PARAMS, PRESET_PARAM_SZ, 0);
+  BUILD_OBJ_VAR_NIBBLE_1_PARENT(pedal,    uint16_t, 0b1111,    M_PRESET_PARAMS, PRESET_PARAM_SZ, 12, NUM_PRESET_PARAMS_PER_PRESET);
+  BUILD_OBJ_VAR_NIBBLE_1_PARENT(feature,  uint16_t, 0b11111,   M_PRESET_PARAMS, PRESET_PARAM_SZ, 7 , NUM_PRESET_PARAMS_PER_PRESET);
+  BUILD_OBJ_VAR_NIBBLE_1_PARENT(velocity, uint16_t, 0b1111111, M_PRESET_PARAMS, PRESET_PARAM_SZ, 0 , NUM_PRESET_PARAMS_PER_PRESET);
   // Resets all nibbles
   BUILD_OBJ_VARIABLE(data, uint16_t, M_PRESET_PARAMS, PRESET_PARAM_SZ, 0);
 };
@@ -130,9 +198,9 @@ struct FswParam {
   // unsigned pedal:4;
   // unsigned feature:5;
   // unsigned velocity:7;
-  BUILD_OBJ_VAR_NIBBLE(pedal,    uint16_t, 0b1111,    M_FSW_PARAMS, FSW_PARAM_SZ, 12);
-  BUILD_OBJ_VAR_NIBBLE(feature,  uint16_t, 0b11111,   M_FSW_PARAMS, FSW_PARAM_SZ, 7);
-  BUILD_OBJ_VAR_NIBBLE(velocity, uint16_t, 0b1111111, M_FSW_PARAMS, FSW_PARAM_SZ, 0);
+  BUILD_OBJ_VAR_NIBBLE_2_PARENT(pedal,    uint16_t, 0b1111,    M_FSW_PARAMS, FSW_PARAM_SZ, 12, NUM_FSW_PER_SUBMENU, NUM_SUBMENUS_PER_PRESET);
+  BUILD_OBJ_VAR_NIBBLE_2_PARENT(feature,  uint16_t, 0b11111,   M_FSW_PARAMS, FSW_PARAM_SZ, 7 , NUM_FSW_PER_SUBMENU, NUM_SUBMENUS_PER_PRESET);
+  BUILD_OBJ_VAR_NIBBLE_2_PARENT(velocity, uint16_t, 0b1111111, M_FSW_PARAMS, FSW_PARAM_SZ, 0 , NUM_FSW_PER_SUBMENU, NUM_SUBMENUS_PER_PRESET);
   // Resets all nibbles
   BUILD_OBJ_VARIABLE(data, uint16_t, M_FSW_PARAMS, FSW_PARAM_SZ, 0);
 };
