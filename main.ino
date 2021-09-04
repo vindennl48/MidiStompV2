@@ -1,6 +1,7 @@
 #include "Includes.h"
 
 #ifndef ALT_PROGRAM
+#ifndef LOAD_EEPROM
 
 Nav n;
 
@@ -12,10 +13,9 @@ void loop() {
   hw_loop();
 
   if ( n.not_init() ) {
-    leds_set(200, 0, 255);
-    print(0,0, "Hello");
-    print_nline(0,0, "Hi");
+    print(0,1, "main");
   }
 }
 
+#endif
 #endif

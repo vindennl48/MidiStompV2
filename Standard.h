@@ -1,5 +1,30 @@
-/* :: CREATOR MACROS :: */
+/* :: TYPEDEFS :: */
+typedef unsigned long Timer;
+/* :: END - TYPEDEFS :: */
 
+
+/* :: VARS TO SAVE SRAM :: */
+#define TEXT_SZ      13 // bytes, 12 chars + 1 null termination
+#define RAM_TEXT_MAX 2
+#define TXT_BUF_1    0
+#define TXT_BUF_2    1
+char text[RAM_TEXT_MAX][TEXT_SZ] = {{' '}};
+/* :: END VARS TO SAVE SRAM :: */
+
+
+/* :: LOGIC :: */
+#define LTRUE  1  // True with 0 return
+#define LFALSE 2  // False with 0 return
+/* :: END LOGIC :: */
+
+
+/* :: HELPFUL MACROS :: */
+#define CONTAIN(i, min, max) (i>(min) ? (i<(max) ? i : (max-1)) : (min))
+#define ROTATE(i, min, max) (i>(min) ? (i<(max) ? i : (min)) : (max-1))
+/* :: END HELPFUL MACROS :: */
+
+
+/* :: CREATOR MACROS :: */
 #define BIT_OUTPUT_SETUP(DDR, POS)       DDR  |=  _BV(POS)
 #define BIT_SET_TRUE(PORT, POS)          PORT |=  _BV(POS)
 #define BIT_SET_FALSE(PORT, POS)         PORT &= ~_BV(POS)
@@ -16,10 +41,13 @@
 #define PIN_GET_VALUE(X, POS)            ( PIN##X & _BV(POS) ) ? false : true
 
 #define BUILD_ARGS(X, POS)               &DDR##X, &PIN##X, &PORT##X, POS
-
 /* :: END CREATOR MACROS :: */
 
-#define SERIAL_MIDI_SETUP        Serial.begin(31250)
+
+/* :: SERIAL SETUP :: */
+#define SERIAL_MIDI_SETUP Serial.begin(31250)
+/* :: END SERIAL SETUP :: */
+
 
 /* :: ACTUAL HARDWARE PIN MAPS :: */
 #define LED_BOARD_SETUP          PIN_OUTPUT_SETUP(B, 5)
@@ -106,9 +134,6 @@
 #define PIN_B12_TRUE             PIN_SET_TRUE(    B, 4)
 #define PIN_B12_FALSE            PIN_SET_FALSE(   B, 4)
 #define PIN_B12_TOGGLE           PIN_SET_TOGGLE(  B, 4)
-
 /* :: END - ACTUAL HARDWARE PIN MAPS :: */
 
-/* :: TYPEDEFS :: */
-typedef unsigned long Timer;
-/* :: END - TYPEDEFS :: */
+

@@ -28,6 +28,7 @@ void print(uint8_t x, uint8_t y, String text) {
   lcd.setCursor(x, y);
   lcd.print(text);
 }
+#define PRINT(x, y, t) print(x, y, String(t))
 
 void print_nline(uint8_t x, uint8_t y, String text) {
   uint8_t pad_sz = 0;
@@ -40,6 +41,7 @@ void print_nline(uint8_t x, uint8_t y, String text) {
   for (uint8_t i=0; i<pad_sz; i++)
     lcd.print(' ');
 }
+#define PRINT_NLINE(x, y, t) print_nline(x, y, String(t))
 
 void flash() {
   lcd_timer = millis();
