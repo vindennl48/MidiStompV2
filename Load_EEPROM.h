@@ -1,5 +1,5 @@
 // Uncomment to use this program
-#define LOAD_EEPROM // <----
+//#define LOAD_EEPROM // <----
 
 #ifdef LOAD_EEPROM
 
@@ -11,6 +11,7 @@
 #define RESET_PRESET_PARAMS
 #define RESET_FSW
 #define RESET_FSW_PARAMS
+#define RESET_MENUS
 // --
 
 void setup() {
@@ -142,6 +143,40 @@ void setup() {
   }
 }
 #endif // -- END PRESET PARAMS --
+
+#ifdef RESET_MENUS
+{
+  PRINT_NLINE(11,0, " ");
+  print_nline(0, 1, "> MENUS");
+
+  memcpy(text[0], "PRESET      ", TEXT_SZ);
+  Menu::set_name           (MENU_PRESET, TXT_BUF_1);
+  Menu::set_num_options    (MENU_PRESET, 6);
+  Menu::set_start_addr     (MENU_PRESET, GET_CHILD(M_OPTIONS, MENU_PRESET, 0, OPTION_SZ, NUM_OPTIONS_PER_MENU));
+  Menu::set_size           (MENU_PRESET, OPTION_SZ);
+  Menu::set_menu_return_id (MENU_PRESET, MENU_MAIN);
+  //Menu::menu_forward_id  (MENU_PRESET, MENU_MAIN);
+  //Menu::menu_callback_id (MENU_PRESET, MENU_MAIN);
+
+    memcpy(text[0], "NAME        ", TEXT_SZ);
+    Option::set_name        (MENU_PRESET, 0, TXT_BUF_1);
+    Option::set_result      (MENU_PRESET, 0, RESULT_TEXT_EDIT);
+    Option::set_callback_id (MENU_PRESET, 0, CALL_NONE);
+
+    memcpy(text[0], "PARAMS      ", TEXT_SZ);
+    Option::set_name        (MENU_PRESET, 1, TXT_BUF_1);
+    Option::set_result      (MENU_PRESET, 1, RESULT_MENU);
+    Option::set_menu_id     (MENU_PRESET, 1, MENU_PRESET_PARAMS);
+    Option::set_callback_id (MENU_PRESET, 1, CALL_NONE);
+
+  memcpy(text[0], "GLOBAL      ", TEXT_SZ);
+  Menu::set_name           (MENU_GLOBAL, TXT_BUF_1);
+  Menu::set_num_options    (MENU_GLOBAL, 6);
+  Menu::set_start_addr     (MENU_GLOBAL, GET_CHILD(M_OPTIONS, MENU_GLOBAL, 0, OPTION_SZ, NUM_OPTIONS_PER_MENU));
+  Menu::set_size           (MENU_GLOBAL, OPTION_SZ);
+  Menu::set_menu_return_id (MENU_GLOBAL, MENU_MAIN);
+}
+#endif // -- END MENUS --
 
   lcd.clear();
   print_nline(0,0, "DONE!");
