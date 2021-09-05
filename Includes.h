@@ -13,6 +13,7 @@
 #include "Database.h"
 #include "Callbacks.h"
 #include "Database_Menu.h"
+#include "TextEdit.h"
 #include "MenuSystem.h"
 #include "Load_EEPROM.h"
 #include "Alt_Program.h"

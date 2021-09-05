@@ -4,6 +4,7 @@
 #define MENU_PRESET_PARAM  3
 #define MENU_GLOBAL        4
 #define MENU_PEDALS        5
+#define MENU_PEDAL         6
 struct Menu {
   // Variables we need
   //   - number of options

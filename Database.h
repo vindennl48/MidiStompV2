@@ -88,6 +88,22 @@
 #define IS_IN_PARTITION_FSW_PARAMS(address)    IS_IN_PARTITION(M_FSW_PARAMS,    M_MENUS,         address)
 #define IS_IN_PARTITION_MENUS(address)         IS_IN_PARTITION(M_MENUS,         M_OPTIONS,       address)
 #define IS_IN_PARTITION_OPTIONS(address)       IS_IN_PARTITION(M_OPTIONS,       M_END,           address)
+
+// Get active parent that is not an option struct
+// Cant put it earlier since we need the above macros
+uint8_t get_active_parent_id_not_option() {
+  // This function gets the newest parent that is not an option struct
+  // Used for finding the newest object to edit
+  // Cant make this in Standard.h, need macros above
+  uint8_t result = 0;
+  for (uint8_t i=0; i<=GET_ACTIVE_PARENT_ID; i++) {
+    result = GET_ACTIVE_PARENT_ID-i;
+    if ( !IS_IN_PARTITION_OPTIONS(parents[result]) )
+      return result;
+  }
+  return 0;
+}
+#define GET_ACTIVE_PARENT_NOT_OPTION parents[get_active_parent_id_not_option()]
 /* :: ENDEEPROM MACROS :: */
 
 /* :: FUNC BUILDERS:: */
