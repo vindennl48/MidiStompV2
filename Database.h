@@ -11,6 +11,8 @@
 #define GET_CHILD(start, parent_id, id, size, num_in_parent) (start + (parent_id*size*num_in_parent) + (id*size))
 #define GET_END(start, quantity, size) ((uint16_t)start + ((uint16_t)quantity*(uint16_t)size))
 
+#define GET_ID_FROM_ADDR(list_start, addr, size) ((addr-list_start) == 0 ? (uint16_t)0 : (uint16_t)((addr-list_start)/size))
+
 // Given the local ID of a child, this helps get the absolute ID of the child in the eeprom
 // For example: If we have fsw_id of 2, this means the 3rd physical footswitch..
 //              however, if we are on thie 3rd preset, 2nd submenu, the absolute ID is actually 38..
@@ -56,8 +58,8 @@
 #define PRESET_PARAM_SZ 2
 #define FSW_SZ          5
 #define FSW_PARAM_SZ    2
-#define MENU_SZ         14
-#define OPTION_SZ       13
+#define MENU_SZ         21
+#define OPTION_SZ       16
 /* :: END OBJECT SIZES :: */
 
 
@@ -74,6 +76,19 @@
 #define M_END           GET_END(M_OPTIONS,       NUM_OPTIONS_TOTAL,       OPTION_SZ)
 /* :: END EEPROM MAP :: */
 
+/* :: EEPROM MACROS :: */
+#define IS_IN_PARTITION(part_start, part_end, address) ((part_start<=address && address<=part_end) ? true : false)
+#define IS_IN_LIST(start_addr, num_items, size, address) ((start_addr<=address && address<=(start_addr+(num_items*size))) ? true : false)
+#define IS_IN_PARTITION_COLORS(address)        IS_IN_PARTITION(M_COLORS,        M_PEDALS,        address)
+#define IS_IN_PARTITION_PEDALS(address)        IS_IN_PARTITION(M_PEDALS,        M_FEATURES,      address)
+#define IS_IN_PARTITION_FEATURES(address)      IS_IN_PARTITION(M_FEATURES,      M_PRESETS,       address)
+#define IS_IN_PARTITION_PRESETS(address)       IS_IN_PARTITION(M_PRESETS,       M_PRESET_PARAMS, address)
+#define IS_IN_PARTITION_PRESET_PARAMS(address) IS_IN_PARTITION(M_PRESET_PARAMS, M_FSW,           address)
+#define IS_IN_PARTITION_FSW(address)           IS_IN_PARTITION(M_FSW,           M_FSW_PARAMS,    address)
+#define IS_IN_PARTITION_FSW_PARAMS(address)    IS_IN_PARTITION(M_FSW_PARAMS,    M_MENUS,         address)
+#define IS_IN_PARTITION_MENUS(address)         IS_IN_PARTITION(M_MENUS,         M_OPTIONS,       address)
+#define IS_IN_PARTITION_OPTIONS(address)       IS_IN_PARTITION(M_OPTIONS,       M_END,           address)
+/* :: ENDEEPROM MACROS :: */
 
 /* :: FUNC BUILDERS:: */
 // i: what text buffer to apply to, 0 or 1
@@ -263,123 +278,4 @@ struct Footswitch {
     return read_data<Footswitch>( GET_CHILD(M_FSW, preset_id, submenu_id*NUM_FSW_PER_SUBMENU+fsw_id, FSW_SZ, NUM_FSW_PER_PRESET) );
   }
 };
-
 /* :: END STRUCTS :: */
-
-
-/* :: MENU STRUCTS :: */
-#define MENU_MAIN          0
-#define MENU_PRESET        1
-#define MENU_PRESET_PARAMS 2
-#define MENU_PRESET_PARAM  3
-#define MENU_GLOBAL        4
-struct Menu {
-  // Variables we need
-  //   - number of options
-  //   - start address of options
-  //   - size inbetween options
-  // On complete, selected option returns:
-  //   - either editor or another menu
-  //   - number of options
-  //   - start address of options
-  //   - size inbetween options
-  // Also create menus for the ListLoop, we can store the vars
-  // for start address, size, and num options there
-
-  // Need a global var to store the section of eeprom that we are trying to edit
-
-  BUILD_OBJ_NAME(M_MENUS, MENU_SZ);
-  BUILD_OBJ_VARIABLE(num_options,    uint8_t,  M_MENUS, MENU_SZ, 13);
-  BUILD_OBJ_VARIABLE(start_addr,     uint16_t, M_MENUS, MENU_SZ, 14);
-  BUILD_OBJ_VARIABLE(size,           uint8_t,  M_MENUS, MENU_SZ, 16);
-  BUILD_OBJ_VARIABLE(menu_return_id, uint8_t,  M_MENUS, MENU_SZ, 17); // gives the ID of the menu to return to
-
-  // For list-loop selection, we need to know what menu to go to after
-  BUILD_OBJ_VARIABLE(menu_forward_id, uint8_t,  M_MENUS, MENU_SZ, 19);
-
-  // callback id to run every time we switch between options, ie. for changing the LED
-  // colors when switching between color choices
-  BUILD_OBJ_VARIABLE(callback_id,    uint8_t,  M_MENUS, MENU_SZ, 18);
-
-  // need var to know if we are in a standard menu with standard options or
-  // if we are in a list-loop and need a different action on the way out
-  //   - ListLoop
-  //     - Object eeprom address selected goes in global var
-  //     - need a var in the menu object to know what menu to jump to next
-};
-
-#define RESULT_MENU       0
-#define RESULT_CONFIRM    1
-#define RESULT_TEXT_EDIT  2
-#define RESULT_VALUE_EDIT 3
-#define RESULT_COLOR_EDIT 4
-#define RESULT_MIDI_EDIT  5
-
-#define CALL_NONE 0
-struct Option {
-  BUILD_OBJ_NAME_1_PARENT(M_OPTIONS, OPTION_SZ, NUM_OPTIONS_PER_MENU);
-
-  // menu, confirm, textEdit, valueEdit, colorEdit, midiEdit, ColorSelect, PedalSelect, PedalParamSelect.. ?
-  BUILD_OBJ_VARIABLE_1_PARENT(result,      uint8_t, M_OPTIONS, OPTION_SZ, 13, NUM_OPTIONS_PER_MENU);
-  // menu id of next menu item
-  BUILD_OBJ_VARIABLE_1_PARENT(menu_id,     uint8_t, M_OPTIONS, OPTION_SZ, 14, NUM_OPTIONS_PER_MENU);
-  // callback id to run on selection of this option, before switching to next menu
-  BUILD_OBJ_VARIABLE_1_PARENT(callback_id, uint8_t, M_OPTIONS, OPTION_SZ, 15, NUM_OPTIONS_PER_MENU);
-};
-/* :: END MENU STRUCTS :: */
-
-
-
-#ifdef NOTES
-- Need 2 parents
-uint16_t parent[2] = { 0 };
-
-- What do we know for TextEdit:
-  - ALL texts that we are going to be editing are the first 13 bytes of a struct
-  - SO if we do have the start location of a struct and we enter into a textEdit,
-    it will ALWAYS edit the 13 bytes at the start location.
-
-- What do we know for ValueEdit:
-  - We will have the eeprom start address for the struct
-  - We can add a variable to the menu option to add bytes to the start address to get
-    the location of the byte we are trying to edit.. ie:
-      - Select pedal, this puts start address in global parent variable
-      - Scroll thru pedal settings menu and select CHANNEL option
-      - This option has an extra variable that tells the menu function this channel
-        variable is at the 13th byte of the pedal struct.
-      - When clicked, parent 2 variable is filled with the location of byte to be edited
-      - ValueEdit opens and edits the selected struct's variable
-
-- ColorEdit
-  - We will set the parent address as the first byte for the 3 channels
-  - The color edit will pull in the 3 bytes from that address and edit those
-
-- MidiEdit (CBOBOX)
-  - Same thing as the ColorEdit, except the options will be stored in the editor as
-    F("NOTE"), F("CC"), F("PC"), etc.  This macro stores the strings in the Arduino
-    eeprom on the chip to reduce program size.
-  - When that option is selected, its corrolated integer value is stored at the 
-    eeprom address.
-
-- Color/Pedal/PedalParam Select
-  - If the option is selected in the menu options, this will be hard-coded in the
-    menu function.  If Color is selected, it will iterate thru the color choices and
-    return the ID of the color selected.  This ID will be written into the byte of
-    the eeprom address globally recorded.
-  - These select menus will start on the number that is already selected,  If none is
-    selected, then it starts on 0.
-
-- Preset Param Edit
-  - When in the preset menu, if you select 'PARAMS', we need a callback function to
-    find the eeprom address of the first PresetParam to start looping from.
-
-- Have the parent field as the start address of the object so..
-  when you enter the Preset menu and select the 'name' option,
-  the program takes the option text and sets that as the title 
-
-- looping through pedals
-  - once we select a pedal, that pedal number is set as the first parent
-  - 
-
-
-#endif

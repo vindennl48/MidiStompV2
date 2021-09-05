@@ -10,13 +10,19 @@ Footswitch fsw[NUM_FSW_PER_PRESET];
 
 void setup() {
   hw_setup();
+
+  // First thing we have to do is load up the preset address in parents
+  SET_NEW_PARENT(M_PRESETS);
 }
 
 void loop() {
   hw_loop();
 
   if ( n.not_init() ) {
-    print_nline(0,0,"Hi");
+    menu.setup(MENU_PRESET);
+  }
+  else {
+    menu.loop();
   }
 }
 

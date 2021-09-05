@@ -9,6 +9,28 @@ typedef unsigned long Timer;
 #define TXT_BUF_1    0
 #define TXT_BUF_2    1
 char text[RAM_TEXT_MAX][TEXT_SZ] = {{' '}};
+
+#define NUM_PARENTS_MAX 6
+uint8_t  parents_used             = 0;  // flip bit for parent being used
+                                        // NEVER delete parent 0 or things will crash
+uint16_t parents[NUM_PARENTS_MAX] = { 0 };
+
+uint8_t get_unused_parent_id() {
+  for (uint8_t i=0; i<8; i++)
+    if ( !(parents_used & 1<<i) ) return i;
+  return 255;
+}
+void activate_new_parent() {
+  parents_used |= 1<<get_unused_parent_id();
+}
+void deactivate_active_parent() {
+  parents_used &= ~(1<<(get_unused_parent_id()-1));
+}
+#define GET_UNUSED_PARENT_ID       (get_unused_parent_id())
+#define GET_ACTIVE_PARENT_ID       (get_unused_parent_id()-1)
+#define GET_ACTIVE_PARENT          (parents[GET_ACTIVE_PARENT_ID])
+#define SET_ACTIVE_PARENT(address) parents[GET_ACTIVE_PARENT_ID] = address
+#define SET_NEW_PARENT(address)    activate_new_parent(); SET_ACTIVE_PARENT(address)
 /* :: END VARS TO SAVE SRAM :: */
 
 
