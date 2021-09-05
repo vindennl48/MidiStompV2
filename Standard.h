@@ -20,17 +20,25 @@ uint8_t get_unused_parent_id() {
     if ( !(parents_used & 1<<i) ) return i;
   return 255;
 }
+uint8_t get_active_parent_id() {
+  for (uint8_t i=0; i<8; i++)
+    if ( !(parents_used & 1<<i) ) return (i > 0 ? i-1 : i);
+  return 0;
+}
 void activate_new_parent() {
-  parents_used |= 1<<get_unused_parent_id();
+  if ( get_unused_parent_id() < 8 )
+    parents_used |= 1<<get_unused_parent_id();
 }
 void deactivate_active_parent() {
-  parents_used &= ~(1<<(get_unused_parent_id()-1));
+  if ( parents_used > 1 )
+    parents_used &= ~(1<<get_active_parent_id());
 }
 #define GET_UNUSED_PARENT_ID       (get_unused_parent_id())
-#define GET_ACTIVE_PARENT_ID       (get_unused_parent_id()-1)
+#define GET_ACTIVE_PARENT_ID       (get_active_parent_id())
 #define GET_ACTIVE_PARENT          (parents[GET_ACTIVE_PARENT_ID])
 #define SET_ACTIVE_PARENT(address) parents[GET_ACTIVE_PARENT_ID] = address
 #define SET_NEW_PARENT(address)    activate_new_parent(); SET_ACTIVE_PARENT(address)
+#define CLEAR_PARENTS              parents_used = 1;
 /* :: END VARS TO SAVE SRAM :: */
 
 
@@ -68,6 +76,7 @@ void deactivate_active_parent() {
 
 /* :: SERIAL SETUP :: */
 #define SERIAL_MIDI_SETUP Serial.begin(31250)
+//#define SERIAL_MIDI_SETUP Serial.begin(9600)
 /* :: END SERIAL SETUP :: */
 
 

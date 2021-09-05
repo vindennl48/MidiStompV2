@@ -22,7 +22,16 @@ void loop() {
     menu.setup(MENU_PRESET);
   }
   else {
-    menu.loop();
+    switch(n.e()) {
+      case 0:
+        if ( menu.loop() ) n.jump_to(1);
+        break;
+
+      case 1:
+        PRINT_NLINE(0,0, "FINISHED");
+        PRINT_NLINE(0,1, " ");
+        break;
+    };
   }
 }
 

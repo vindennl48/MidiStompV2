@@ -39,23 +39,25 @@ struct MenuSystem {
         get_callback(Menu::get_callback_setup_id(menu_id))();
 
     // Write the title of menu to the LCD
+    lcd.clear();
     PRINT_NLINE(0,0, "::");
     PRINT(2,0, text[TXT_BUF_1]);
+    PRINT(2,1, ">");  // Just in case we need it, if not it will get rewritten
   }
 
   uint8_t loop() {
     if ( n.not_init() ) {
+      // Grab the first 13 bytes to display name, if no name in selected struct, callback must be used
+      eReadBlock(GET_ACTIVE_PARENT, (uint8_t*)text[TXT_BUF_2], TEXT_SZ);
+
       // Check if current parent addr is in M_OPTIONS partition
-      if ( IS_IN_PARTITION_OPTIONS(GET_ACTIVE_PARENT) ) {
-        // If yes, copy the name of the option to TXT_BUF_2
-        Option::get_name(menu_id, GET_ID_FROM_ADDR(Menu::get_start_addr(menu_id), GET_ACTIVE_PARENT, OPTION_SZ), (uint8_t)TXT_BUF_2);
-        // and print carrot selector >
-        PRINT_NLINE(2,1, ">");
-      }
-      else {
-        // If no, print ID# of selection, name of option must come from callback
-        PRINT_NLINE(0,1, GET_ID_FROM_ADDR(Menu::get_start_addr(menu_id), GET_ACTIVE_PARENT, OPTION_SZ)+1);
-        PRINT(3,1, ".");
+      if ( !IS_IN_PARTITION_OPTIONS(GET_ACTIVE_PARENT) ) {
+        // If no, print ID# of selection, name of option (if custom) must come from callback
+        uint8_t current_id = GET_ID_FROM_ADDR(Menu::get_start_addr(menu_id), GET_ACTIVE_PARENT, Menu::get_size(menu_id))+1;
+        PRINT(0,1, "   .");
+        if      ( current_id <  10  ) PRINT(2,1, current_id);
+        else if ( current_id <  100 ) PRINT(1,1, current_id);
+        else                          PRINT(0,1, current_id);
       }
 
       // If callback_run_id > 0, Run callback
@@ -67,12 +69,32 @@ struct MenuSystem {
     }
     else {
       if ( knob.is_left() ) {
+        if ( GET_ID_FROM_ADDR(Menu::get_start_addr(menu_id), GET_ACTIVE_PARENT, Menu::get_size(menu_id)) > 0 ) {
+          SET_ACTIVE_PARENT(GET_ACTIVE_PARENT - Menu::get_size(menu_id));
+          n.reinit();
+        }
       }
       else if ( knob.is_right() ) {
+        if ( GET_ID_FROM_ADDR(Menu::get_start_addr(menu_id), GET_ACTIVE_PARENT, Menu::get_size(menu_id))+(uint8_t)1 < Menu::get_num_options(menu_id) ) {
+          SET_ACTIVE_PARENT(GET_ACTIVE_PARENT + Menu::get_size(menu_id));
+          n.reinit();
+        }
       }
       else if ( knob.is_pressed() ) {
+        // If option is in M_OPTIONS partition
+        if ( IS_IN_PARTITION_OPTIONS(GET_ACTIVE_PARENT) ) {
+          // If callback_run_id > 0, Run callback
+          if ( Option::get_callback_id(menu_id, GET_ID_FROM_ADDR(Menu::get_start_addr(menu_id), GET_ACTIVE_PARENT, Menu::get_size(menu_id))) )
+            get_callback( Option::get_callback_id(menu_id, GET_ID_FROM_ADDR(Menu::get_start_addr(menu_id), GET_ACTIVE_PARENT, Menu::get_size(menu_id))) )();
+
+          // Reload MenuSystem with new menu_id
+          setup( Option::get_menu_id(menu_id, GET_ID_FROM_ADDR(Menu::get_start_addr(menu_id), GET_ACTIVE_PARENT, Menu::get_size(menu_id))) );
+        }
       }
       else if ( knob.is_long_pressed() ) {
+        deactivate_active_parent();
+        if ( Menu::get_return_id(menu_id) == MENU_MAIN ) return true;
+        setup( Menu::get_return_id(menu_id) );
       }
     }
     

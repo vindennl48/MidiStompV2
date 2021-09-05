@@ -3,6 +3,7 @@
 #define MENU_PRESET_PARAMS 2
 #define MENU_PRESET_PARAM  3
 #define MENU_GLOBAL        4
+#define MENU_PEDALS        5
 struct Menu {
   // Variables we need
   //   - number of options
@@ -19,20 +20,20 @@ struct Menu {
   // Need a global var to store the section of eeprom that we are trying to edit
 
   BUILD_OBJ_NAME(M_MENUS, MENU_SZ);
-  BUILD_OBJ_VARIABLE(num_options,    uint8_t,  M_MENUS, MENU_SZ, 13);
-  BUILD_OBJ_VARIABLE(start_addr,     uint16_t, M_MENUS, MENU_SZ, 14);
-  BUILD_OBJ_VARIABLE(size,           uint8_t,  M_MENUS, MENU_SZ, 16);
-  BUILD_OBJ_VARIABLE(menu_return_id, uint8_t,  M_MENUS, MENU_SZ, 17); // gives the ID of the menu to return to
+  BUILD_OBJ_VARIABLE(num_options, uint8_t,  M_MENUS, MENU_SZ, 13);
+  BUILD_OBJ_VARIABLE(start_addr,  uint16_t, M_MENUS, MENU_SZ, 14);
+  BUILD_OBJ_VARIABLE(size,        uint8_t,  M_MENUS, MENU_SZ, 16);
+  BUILD_OBJ_VARIABLE(return_id,   uint8_t,  M_MENUS, MENU_SZ, 17); // gives the ID of the menu to return to
 
   // For list-loop selection, we need to know what menu to go to after
   // This is only needed IF start_addr is not inside M_OPTIONS partition
-  BUILD_OBJ_VARIABLE(menu_forward_id, uint8_t,  M_MENUS, MENU_SZ, 18);
+  BUILD_OBJ_VARIABLE(forward_id, uint8_t, M_MENUS, MENU_SZ, 18);
 
   // - callback id to run every time we switch between options, ie. for changing the LED
   //   colors when switching between color choices
   // - This is also used to build the option name when inside of a list-loop, ie.
   //   preset params, pedals, fsw params, etc.
-  BUILD_OBJ_VARIABLE(callback_run_id,   uint8_t, M_MENUS, MENU_SZ, 19);
+  BUILD_OBJ_VARIABLE(callback_run_id, uint8_t, M_MENUS, MENU_SZ, 19);
   // - This is used to create the menu name for PresetParam edit and FSWParam Edit, ie.
   //   when changing a pedal for a PresetParam, we want to update the title of the edit menu to
   //   the newly selected pedal and feature.
