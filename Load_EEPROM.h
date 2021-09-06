@@ -160,82 +160,12 @@ void setup() {
 {
   PRINT_NLINE(11,0, " ");
   print_nline(0, 1, "> MENUS");
-
-  memcpy(text[0], "PRESET      ", TEXT_SZ);
-  Menu::set_name              (MENU_PRESET, TXT_BUF_1);
-  Menu::set_num_options       (MENU_PRESET, 3);
-  Menu::set_start_addr        (MENU_PRESET, GET_CHILD(M_OPTIONS, MENU_PRESET, 0, OPTION_SZ, NUM_OPTIONS_PER_MENU));
-  Menu::set_size              (MENU_PRESET, OPTION_SZ);
-  Menu::set_return_id         (MENU_PRESET, MENU_MAIN);
-  Menu::set_forward_id        (MENU_PRESET, MENU_MAIN); // not used, only used in list-loops
-  Menu::set_callback_run_id   (MENU_PRESET, F_NONE);
-  Menu::set_callback_setup_id (MENU_PRESET, F_NONE);
-
-    memcpy(text[0], "NAME        ", TEXT_SZ);
-    Option::set_name        (MENU_PRESET, 0, TXT_BUF_1);
-    Option::set_result      (MENU_PRESET, 0, RESULT_TEXT_EDIT);
-    Option::set_menu_id     (MENU_PRESET, 0, MENU_PRESET);
-    Option::set_callback_id (MENU_PRESET, 0, F_NONE);
-
-    memcpy(text[0], "PARAMS      ", TEXT_SZ);
-    Option::set_name        (MENU_PRESET, 1, TXT_BUF_1);
-    Option::set_result      (MENU_PRESET, 1, RESULT_MENU);
-    Option::set_menu_id     (MENU_PRESET, 1, MENU_MAIN);
-    Option::set_callback_id (MENU_PRESET, 1, F_NONE);
-
-    memcpy(text[0], "GLOBAL      ", TEXT_SZ);
-    Option::set_name        (MENU_PRESET, 2, TXT_BUF_1);
-    Option::set_result      (MENU_PRESET, 2, RESULT_MENU);
-    Option::set_menu_id     (MENU_PRESET, 2, MENU_GLOBAL);
-    Option::set_callback_id (MENU_PRESET, 2, F_NONE);
-
-  memcpy(text[0], "GLOBAL      ", TEXT_SZ);
-  Menu::set_name              (MENU_GLOBAL, TXT_BUF_1);
-  Menu::set_num_options       (MENU_GLOBAL, 2);
-  Menu::set_start_addr        (MENU_GLOBAL, GET_CHILD(M_OPTIONS, MENU_GLOBAL, 0, OPTION_SZ, NUM_OPTIONS_PER_MENU));
-  Menu::set_size              (MENU_GLOBAL, OPTION_SZ);
-  Menu::set_return_id         (MENU_GLOBAL, MENU_PRESET);
-  Menu::set_forward_id        (MENU_GLOBAL, MENU_MAIN); // not used, only used in list-loops
-  Menu::set_callback_run_id   (MENU_GLOBAL, F_NONE);
-  Menu::set_callback_setup_id (MENU_GLOBAL, F_NONE);
-
-    memcpy(text[0], "PEDALS      ", TEXT_SZ);
-    Option::set_name        (MENU_GLOBAL, 0, TXT_BUF_1);
-    Option::set_result      (MENU_GLOBAL, 0, RESULT_MENU);
-    Option::set_menu_id     (MENU_GLOBAL, 0, MENU_PEDALS);
-    Option::set_callback_id (MENU_GLOBAL, 0, F_NONE);
-
-    memcpy(text[0], "COLORS      ", TEXT_SZ);
-    Option::set_name        (MENU_GLOBAL, 1, TXT_BUF_1);
-    Option::set_result      (MENU_GLOBAL, 1, RESULT_MENU);
-    Option::set_menu_id     (MENU_GLOBAL, 1, MENU_MAIN);
-    Option::set_callback_id (MENU_GLOBAL, 1, F_NONE);
-
-  memcpy(text[0], "PEDAL       ", TEXT_SZ);
-  Menu::set_name              (MENU_PEDAL, TXT_BUF_1);
-  Menu::set_num_options       (MENU_PEDAL, 4);
-  Menu::set_start_addr        (MENU_PEDAL, GET_CHILD(M_OPTIONS, MENU_PEDAL, 0, OPTION_SZ, NUM_OPTIONS_PER_MENU));
-  Menu::set_size              (MENU_PEDAL, OPTION_SZ);
-  Menu::set_return_id         (MENU_PEDAL, MENU_PEDALS);
-  Menu::set_forward_id        (MENU_PEDAL, MENU_MAIN);  // not used, only used in list-loop
-  Menu::set_callback_run_id   (MENU_PEDAL, F_NONE);
-  Menu::set_callback_setup_id (MENU_PEDAL, F_NONE);
-
-    memcpy(text[0], "NAME        ", TEXT_SZ);
-    Option::set_name        (MENU_GLOBAL, 0, TXT_BUF_1);
-    Option::set_result      (MENU_GLOBAL, 0, RESULT_TEXT_EDIT);
-    Option::set_menu_id     (MENU_GLOBAL, 0, MENU_PEDAL);
-    Option::set_callback_id (MENU_GLOBAL, 0, F_NONE);
-
-  memcpy(text[0], "PEDALS      ", TEXT_SZ);
-  Menu::set_name              (MENU_PEDALS, TXT_BUF_1);
-  Menu::set_num_options       (MENU_PEDALS, NUM_PEDALS);
-  Menu::set_start_addr        (MENU_PEDALS, M_PEDALS);
-  Menu::set_size              (MENU_PEDALS, PEDAL_SZ);
-  Menu::set_return_id         (MENU_PEDALS, MENU_GLOBAL);
-  Menu::set_forward_id        (MENU_PEDALS, MENU_GLOBAL);  // This is going to be used
-  Menu::set_callback_run_id   (MENU_PEDALS, F_NONE);
-  Menu::set_callback_setup_id (MENU_PEDALS, F_NONE);
+  #include "Load_EEPROM_Menu_Preset.h"
+  #include "Load_EEPROM_Menu_Preset_Params.h"
+  #include "Load_EEPROM_Menu_Global.h"
+  #include "Load_EEPROM_Menu_Global_Colors.h"
+  #include "Load_EEPROM_Menu_Global_Pedals.h"
+  #include "Load_EEPROM_Menu_Global_Pedal_Features.h"
 }
 #endif // -- END MENUS --
 

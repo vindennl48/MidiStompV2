@@ -5,6 +5,11 @@
 #define MENU_GLOBAL        4
 #define MENU_PEDALS        5
 #define MENU_PEDAL         6
+#define MENU_COLORS        7
+#define MENU_COLOR         8
+#define MENU_FEATURES      9
+#define MENU_FEATURE       10
+
 struct Menu {
   // Variables we need
   //   - number of options
