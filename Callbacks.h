@@ -8,32 +8,31 @@ uint8_t f_colors() {
   return true;
 }
 
-// uint8_t f_preset_params_run() {
-//   uint16_t preset_param_id = GET_ID_FROM_ADDR(M_PRESET_PARAMS, GET_ACTIVE_PARENT_NOT_OPTION, PRESET_PARAM_SZ);
-//   uint8_t  pedal_id        = PresetParam::get_pedal(preset_param_id);
-//   uint8_t  feature_id      = PresetParam::get_feature(preset_param_id);
-// 
-//   if ( pedal_id == NUM_PEDALS )
-//     memcpy(text[TXT_BUF_2], "EMPTY       ", TEXT_SZ);
-//   else {
-//     Pedal::get_name(pedal_id, TXT_BUF_2);
-//     Feature::get_name(pedal_id, feature_id, TXT_BUF_1);
-// 
-//     text[TXT_BUF_2][5] = ' ';
-//     for (uint8_t i=6; i<TEXT_SZ; i++) {
-//       text[TXT_BUF_2][i] = text[TXT_BUF_1][i-6];
-//     }
-//   }
-//   return true;
-// }
-// 
-// uint8_t f_preset_params_setup() {
-//   // preset is always parent 0
-//   uint8_t preset_id = GET_ID_FROM_ADDR(M_PRESETS, parents[0], PRESET_SZ);
-//   alt_start_addr = GET_CHILD(M_PRESET_PARAMS, preset_id, 0, PRESET_PARAM_SZ, NUM_PRESET_PARAMS_PER_PRESET);
-//   return true;
-// }
-// 
+uint8_t f_preset_params_run() {
+  uint8_t  pedal_id   = Parameter::get_pedal(GET_ACTIVE_PARENT_NOT_OPTION);
+  uint8_t  feature_id = Parameter::get_feature(GET_ACTIVE_PARENT_NOT_OPTION);
+
+  if ( pedal_id == NUM_PEDALS )
+    memcpy(text[TXT_BUF_2], "EMPTY       ", TEXT_SZ);
+  else {
+    Pedal::get_name(GET_PARENT(M_PEDALS, pedal_id, sizeof(Pedal)), TXT_BUF_2);
+    Feature::get_name(GET_CHILD(M_FEATURES, pedal_id, feature_id, sizeof(Feature), NUM_FEATURES_PER_PEDAL), TXT_BUF_1);
+
+    text[TXT_BUF_2][5] = ' ';
+    for (uint8_t i=6; i<TEXT_SZ; i++) {
+      text[TXT_BUF_2][i] = text[TXT_BUF_1][i-6];
+    }
+  }
+  return true;
+}
+
+uint8_t f_preset_params_setup() {
+  // preset is always parent 0
+  uint8_t preset_id = GET_ID_FROM_ADDR(M_PRESETS, parents[0], sizeof(Preset));
+  alt_start_addr    = GET_CHILD(M_PRESET_PARAMS, preset_id, 0, sizeof(Parameter), NUM_PRESET_PARAMS_PER_PRESET);
+  return true;
+}
+
 // uint8_t f_global() {
 //   leds_set(0,0,0);
 //   return true;
@@ -64,8 +63,8 @@ typedef uint8_t (*Callback)();
 Callback get_callback(uint8_t id) {
   switch(id) {
     case F_COLORS:                  return &f_colors;
-//    case F_PRESET_PARAMS_RUN:       return &f_preset_params_run;
-//    case F_PRESET_PARAMS_SETUP:     return &f_preset_params_setup;
+    case F_PRESET_PARAMS_RUN:       return &f_preset_params_run;
+    case F_PRESET_PARAMS_SETUP:     return &f_preset_params_setup;
 //    case F_PRESET_PARAM_PEDAL_SAVE: return &f_preset_param_pedal_save;
 //    case F_GLOBAL:                  return &f_global;
   };

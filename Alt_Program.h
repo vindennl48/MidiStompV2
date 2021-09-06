@@ -8,8 +8,6 @@ Nav n;
 
 Footswitch fsw[NUM_FSW_PER_PRESET];
 
-// uint8_t i = 0;
-// 
 // void setup() {
 //   hw_setup();
 // }
@@ -18,9 +16,12 @@ Footswitch fsw[NUM_FSW_PER_PRESET];
 //   hw_loop();
 // 
 //   if ( n.not_init() ) {
-//     Preset::get_name(M_PRESETS, TXT_BUF_1);
-//     PRINT(0,0, text[TXT_BUF_1]);
-//     PRINT(0,1, text[TXT_BUF_2]);
+//     Parameter parameter;
+//     parameter = read_data<Parameter>(M_PRESET_PARAMS);
+//     PRINT_NLINE(0,0, "PARAMETER");
+//     uint16_t result = 0;
+//     eReadBlock(M_PRESET_PARAMS, (uint8_t*)&result, sizeof(uint16_t));
+//     PRINT_NLINE(0,1, Parameter::get_pedal(M_PRESET_PARAMS) );
 //   }
 //   else {
 //   }

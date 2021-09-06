@@ -8,10 +8,10 @@
 //#define RESET_PEDALS
 //#define RESET_FEATURES
 //#define RESET_PRESETS
-//#define RESET_PRESET_PARAMS
+#define RESET_PRESET_PARAMS
 //#define RESET_FSW
 //#define RESET_FSW_PARAMS
-#define RESET_MENUS
+//#define RESET_MENUS
 // --
 
 void setup() {
@@ -163,7 +163,7 @@ void setup() {
   uint8_t  num_options_per_menu;
 
   #include "Load_EEPROM_Menu_Preset.h"
-//  #include "Load_EEPROM_Menu_Preset_Params.h"
+  #include "Load_EEPROM_Menu_Preset_Params.h"
   #include "Load_EEPROM_Menu_Global.h"
 //  #include "Load_EEPROM_Menu_Global_Colors.h"
 //  #include "Load_EEPROM_Menu_Global_Pedals.h"

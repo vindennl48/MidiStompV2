@@ -44,7 +44,7 @@
 #define NUM_FSW_PARAMS_PER_STATE     10
 #define NUM_FSW_PARAMS_PER_FSW       (NUM_STATES_PER_FSW * NUM_FSW_PARAMS_PER_STATE)
 #define NUM_FSW_PARAMS_TOTAL         (NUM_FSW_PARAMS_PER_FSW * NUM_FSW_TOTAL)
-#define NUM_MENUS                    10
+#define NUM_MENUS                    15
 #define NUM_OPTIONS_PER_MENU         10
 #define NUM_OPTIONS_TOTAL            (NUM_MENUS*NUM_OPTIONS_PER_MENU)
 /* :: END OBJECT COUNTS :: */
@@ -124,9 +124,14 @@ struct Feature {
 
 // For presets and fsw's
 struct Parameter {
-  unsigned pedal:4;
-  unsigned feature:5;
-  unsigned velocity:7;
+  union {
+    uint16_t data;
+    struct {
+      unsigned velocity:7;
+      unsigned feature:5;
+      unsigned pedal:4;
+    };
+  };
 
   Parameter() {
     pedal    = NUM_PEDALS;
@@ -243,10 +248,10 @@ struct Menu {
   BUILD_OBJ_VAR(start_addr,        uint16_t, 14);
   BUILD_OBJ_VAR(size,              uint8_t,  16);
   BUILD_OBJ_VAR(return_addr,       uint16_t, 17);
-  BUILD_OBJ_VAR(forward_addr,      uint16_t, 18);
-  BUILD_OBJ_VAR(callback_setup_id, uint8_t,  19);
-  BUILD_OBJ_VAR(callback_run_id,   uint8_t,  20);
-  BUILD_OBJ_VAR(callback_save_id,  uint8_t,  21);
+  BUILD_OBJ_VAR(forward_addr,      uint16_t, 19);
+  BUILD_OBJ_VAR(callback_setup_id, uint8_t,  21);
+  BUILD_OBJ_VAR(callback_run_id,   uint8_t,  22);
+  BUILD_OBJ_VAR(callback_save_id,  uint8_t,  23);
 };
 /* :: END STRUCTS :: */
 
