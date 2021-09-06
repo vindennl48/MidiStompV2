@@ -30,7 +30,8 @@ uint8_t f_preset_params_run() {
 }
 
 uint8_t f_preset_params_setup() {
-  uint8_t preset_id = GET_ID_FROM_ADDR(M_PRESETS, GET_ACTIVE_PARENT_NOT_OPTION, PRESET_SZ);
+  // preset is always parent 0
+  uint8_t preset_id = GET_ID_FROM_ADDR(M_PRESETS, parents[0], PRESET_SZ);
   alt_start_addr = GET_CHILD(M_PRESET_PARAMS, preset_id, 0, PRESET_PARAM_SZ, NUM_PRESET_PARAMS_PER_PRESET);
   return true;
 }
@@ -40,20 +41,35 @@ uint8_t f_global() {
   return true;
 }
 
-#define F_NONE                0
-#define F_COLORS              1
-#define F_PRESET_PARAMS_RUN   2
-#define F_PRESET_PARAMS_SETUP 3
-#define F_GLOBAL              4
+uint8_t f_preset_param_pedal_save() {
+  uint8_t pedal_id        = GET_ID_FROM_ADDR(M_PEDALS,        GET_ACTIVE_PARENT,               PEDAL_SZ);
+  uint8_t preset_param_id = GET_ID_FROM_ADDR(M_PRESET_PARAMS, parents[GET_ACTIVE_PARENT_ID-2], PRESET_PARAM_SZ);
+
+  uint8_t preset_id = GET_ID_FROM_ADDR(M_PRESETS, parents[0], PRESET_SZ);
+  Serial.print("preset_id:        "); Serial.println(preset_id);
+  Serial.print("pedal_id:        ");  Serial.println(pedal_id);
+  Serial.print("preset_param_id: ");  Serial.println(preset_param_id);
+
+  PresetParam::set_pedal(preset_param_id, pedal_id);
+  return true;
+}
+
+#define F_NONE                    0
+#define F_COLORS                  1
+#define F_PRESET_PARAMS_RUN       2
+#define F_PRESET_PARAMS_SETUP     3
+#define F_PRESET_PARAM_PEDAL_SAVE 4
+#define F_GLOBAL                  5
 
 typedef uint8_t (*Callback)();
 
 Callback get_callback(uint8_t id) {
   switch(id) {
-    case F_COLORS:              return &f_colors;
-    case F_PRESET_PARAMS_RUN:   return &f_preset_params_run;
-    case F_PRESET_PARAMS_SETUP: return &f_preset_params_setup;
-    case F_GLOBAL:              return &f_global;
+    case F_COLORS:                  return &f_colors;
+    case F_PRESET_PARAMS_RUN:       return &f_preset_params_run;
+    case F_PRESET_PARAMS_SETUP:     return &f_preset_params_setup;
+    case F_PRESET_PARAM_PEDAL_SAVE: return &f_preset_param_pedal_save;
+    case F_GLOBAL:                  return &f_global;
   };
 
   return nullptr;

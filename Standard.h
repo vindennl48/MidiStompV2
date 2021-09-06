@@ -80,8 +80,8 @@ void deactivate_active_parent() {
 
 
 /* :: SERIAL SETUP :: */
-#define SERIAL_MIDI_SETUP Serial.begin(31250)
-//#define SERIAL_MIDI_SETUP Serial.begin(9600)
+//#define SERIAL_MIDI_SETUP Serial.begin(31250)
+#define SERIAL_MIDI_SETUP Serial.begin(9600)
 /* :: END SERIAL SETUP :: */
 
 

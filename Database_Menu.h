@@ -1,14 +1,15 @@
-#define MENU_MAIN          0
-#define MENU_PRESET        1
-#define MENU_PRESET_PARAMS 2
-#define MENU_PRESET_PARAM  3
-#define MENU_GLOBAL        4
-#define MENU_PEDALS        5
-#define MENU_PEDAL         6
-#define MENU_COLORS        7
-#define MENU_COLOR         8
-#define MENU_FEATURES      9
-#define MENU_FEATURE       10
+#define MENU_MAIN               0
+#define MENU_PRESET             1
+#define MENU_PRESET_PARAMS      2
+#define MENU_PRESET_PARAM       3
+#define MENU_PRESET_PARAM_PEDAL 4
+#define MENU_GLOBAL             5
+#define MENU_PEDALS             6
+#define MENU_PEDAL              7
+#define MENU_COLORS             8
+#define MENU_COLOR              9
+#define MENU_FEATURES           10
+#define MENU_FEATURE            11
 
 struct Menu {
   // Variables we need
@@ -44,6 +45,10 @@ struct Menu {
   //   when changing a pedal for a PresetParam, we want to update the title of the edit menu to
   //   the newly selected pedal and feature.
   BUILD_OBJ_VARIABLE(callback_setup_id, uint8_t, M_MENUS, MENU_SZ, 20);
+
+  // This is for saving a selection back to a previous object, ie. saving a pedal
+  // ID to a preset param.
+  BUILD_OBJ_VARIABLE(callback_save_id, uint8_t, M_MENUS, MENU_SZ, 21);
 
   // Only delete the latest parent[x] when the menu start_addr is not in M_OPTIONS partition
 

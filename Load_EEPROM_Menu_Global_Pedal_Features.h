@@ -10,6 +10,7 @@ Menu::set_return_id         (MENU_FEATURES, MENU_GLOBAL);
 Menu::set_forward_id        (MENU_FEATURES, MENU_FEATURE);  // This is going to be used
 Menu::set_callback_run_id   (MENU_FEATURES, F_NONE);
 Menu::set_callback_setup_id (MENU_FEATURES, F_NONE);
+Menu::set_callback_save_id  (MENU_FEATURES, F_NONE);
 
 memcpy(text[0], "FEATURE     ", TEXT_SZ);
 Menu::set_name              (MENU_FEATURE, TXT_BUF_1);
@@ -20,6 +21,7 @@ Menu::set_return_id         (MENU_FEATURE, MENU_FEATURES);
 Menu::set_forward_id        (MENU_FEATURE, MENU_MAIN);  // not used, only used in list-loop
 Menu::set_callback_run_id   (MENU_FEATURE, F_NONE);
 Menu::set_callback_setup_id (MENU_FEATURE, F_NONE);
+Menu::set_callback_save_id  (MENU_FEATURE, F_NONE);
 
   memcpy(text[0], "NAME        ", TEXT_SZ);
   Option::set_name        (MENU_FEATURE, 0, TXT_BUF_1);

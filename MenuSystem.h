@@ -114,6 +114,11 @@ struct MenuSystem {
               }
             }
             else {
+              // Need some way to loop this until callback returns true
+                // If callback_setup_id > 0, Run callback
+                if ( Menu::get_callback_save_id(menu_id) )
+                  get_callback(Menu::get_callback_save_id(menu_id))();
+
               // We need to resort to the Menu struct's forward_id to know what menu to navigate to
               setup( Menu::get_forward_id(menu_id) );
             }

@@ -10,6 +10,7 @@ Menu::set_return_id         (MENU_PEDALS, MENU_GLOBAL);
 Menu::set_forward_id        (MENU_PEDALS, MENU_PEDAL);  // This is going to be used
 Menu::set_callback_run_id   (MENU_PEDALS, F_NONE);
 Menu::set_callback_setup_id (MENU_PEDALS, F_NONE);
+Menu::set_callback_save_id  (MENU_PEDALS, F_NONE);
 
 memcpy(text[0], "PEDAL       ", TEXT_SZ);
 Menu::set_name              (MENU_PEDAL, TXT_BUF_1);
@@ -20,6 +21,7 @@ Menu::set_return_id         (MENU_PEDAL, MENU_PEDALS);
 Menu::set_forward_id        (MENU_PEDAL, MENU_MAIN);  // not used, only used in list-loop
 Menu::set_callback_run_id   (MENU_PEDAL, F_NONE);
 Menu::set_callback_setup_id (MENU_PEDAL, F_NONE);
+Menu::set_callback_save_id  (MENU_PEDAL, F_NONE);
 
   memcpy(text[0], "NAME        ", TEXT_SZ);
   Option::set_name        (MENU_PEDAL, 0, TXT_BUF_1);

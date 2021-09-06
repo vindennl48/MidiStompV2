@@ -10,6 +10,7 @@ Menu::set_return_id         (MENU_PRESET, MENU_MAIN);
 Menu::set_forward_id        (MENU_PRESET, MENU_MAIN); // not used, only used in list-loops
 Menu::set_callback_run_id   (MENU_PRESET, F_NONE);
 Menu::set_callback_setup_id (MENU_PRESET, F_NONE);
+Menu::set_callback_save_id  (MENU_PRESET, F_NONE);
 
   memcpy(text[0], "NAME        ", TEXT_SZ);
   Option::set_name        (MENU_PRESET, 0, TXT_BUF_1);

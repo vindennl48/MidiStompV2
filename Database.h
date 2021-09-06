@@ -58,7 +58,7 @@
 #define PRESET_PARAM_SZ 2
 #define FSW_SZ          5
 #define FSW_PARAM_SZ    2
-#define MENU_SZ         21
+#define MENU_SZ         22
 #define OPTION_SZ       16
 /* :: END OBJECT SIZES :: */
 

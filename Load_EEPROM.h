@@ -8,7 +8,7 @@
 //#define RESET_PEDALS
 //#define RESET_FEATURES
 //#define RESET_PRESETS
-#define RESET_PRESET_PARAMS
+//#define RESET_PRESET_PARAMS
 //#define RESET_FSW
 //#define RESET_FSW_PARAMS
 #define RESET_MENUS
@@ -107,7 +107,7 @@ void setup() {
   memcpy(text[0], "UNTITLED    ", TEXT_SZ);
   for (uint16_t i=0; i<NUM_PEDALS; i++) {
     for (uint16_t j=0; j<NUM_FEATURES_PER_PEDAL; j++) {
-      if ( !((i*j)%10) ) PRINT_NLINE(11,1, i+j);
+      if ( !((i*j)%10) ) PRINT_NLINE(11,1, i*j);
       Feature::set_name( i, j, TXT_BUF_1);
       Feature::set_type( i, j, 0);
       Feature::set_pitch(i, j, 0);
