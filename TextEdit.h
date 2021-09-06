@@ -65,6 +65,39 @@ struct TextEdit {
             lcd.noBlink();
             return n.back();
           }
+          else if ( btns[0].is_down && btns[1].is_down ) {
+            btns[0].is_down = false;
+            btns[1].is_down = false;
+            lcd.noCursor(); // noHighlight
+            lcd.noBlink();
+            eWriteBlock( GET_ACTIVE_PARENT_NOT_OPTION, (uint8_t*)text[TXT_BUF_1], TEXT_SZ );
+            return n.back();
+          }
+          else if ( btns[1].is_down && btns[2].is_down ) {
+            btns[1].is_down = false;
+            btns[2].is_down = false;
+            lcd.noCursor(); // noHighlight
+            lcd.noBlink();
+            return n.back();
+          }
+          else if ( btns[0].is_pressed() ) {
+            //btns[0].is_down = false;
+            text[TXT_BUF_1][cursor] = alphabet[0];
+            lcd.print( alphabet[0] );
+            lcd.setCursor(cursor, 0);
+          }
+          else if ( btns[1].is_pressed() ) {
+            //btns[1].is_down = false;
+            text[TXT_BUF_1][cursor] = alphabet[38];
+            lcd.print( alphabet[38] );
+            lcd.setCursor(cursor, 0);
+          }
+          else if ( btns[2].is_pressed() ) {
+            //btns[2].is_down = false;
+            text[TXT_BUF_1][cursor] = alphabet[27];
+            lcd.print( alphabet[27] );
+            lcd.setCursor(cursor, 0);
+          }
         }
         break;
 

@@ -20,7 +20,7 @@ Menu::set_callback_setup_id (MENU_PRESET, F_NONE);
   memcpy(text[0], "PARAMS      ", TEXT_SZ);
   Option::set_name        (MENU_PRESET, 1, TXT_BUF_1);
   Option::set_result      (MENU_PRESET, 1, RESULT_MENU);
-  Option::set_menu_id     (MENU_PRESET, 1, MENU_MAIN);
+  Option::set_menu_id     (MENU_PRESET, 1, MENU_PRESET_PARAMS);
   Option::set_callback_id (MENU_PRESET, 1, F_NONE);
 
   memcpy(text[0], "GLOBAL      ", TEXT_SZ);

@@ -103,7 +103,8 @@ uint8_t get_active_parent_id_not_option() {
   }
   return 0;
 }
-#define GET_ACTIVE_PARENT_NOT_OPTION parents[get_active_parent_id_not_option()]
+#define GET_ACTIVE_PARENT_ID_NOT_OPTION get_active_parent_id_not_option()
+#define GET_ACTIVE_PARENT_NOT_OPTION    parents[GET_ACTIVE_PARENT_ID_NOT_OPTION]
 /* :: ENDEEPROM MACROS :: */
 
 /* :: FUNC BUILDERS:: */
@@ -225,6 +226,10 @@ struct PresetParam {
   // unsigned pedal:4;
   // unsigned feature:5;
   // unsigned velocity:7;
+  BUILD_OBJ_VAR_NIBBLE(pedal,    uint16_t, 0b1111,    M_PRESET_PARAMS, PRESET_PARAM_SZ, 12);
+  BUILD_OBJ_VAR_NIBBLE(feature,  uint16_t, 0b11111,   M_PRESET_PARAMS, PRESET_PARAM_SZ, 7 );
+  BUILD_OBJ_VAR_NIBBLE(velocity, uint16_t, 0b1111111, M_PRESET_PARAMS, PRESET_PARAM_SZ, 0 );
+
   BUILD_OBJ_VAR_NIBBLE_1_PARENT(pedal,    uint16_t, 0b1111,    M_PRESET_PARAMS, PRESET_PARAM_SZ, 12, NUM_PRESET_PARAMS_PER_PRESET);
   BUILD_OBJ_VAR_NIBBLE_1_PARENT(feature,  uint16_t, 0b11111,   M_PRESET_PARAMS, PRESET_PARAM_SZ, 7 , NUM_PRESET_PARAMS_PER_PRESET);
   BUILD_OBJ_VAR_NIBBLE_1_PARENT(velocity, uint16_t, 0b1111111, M_PRESET_PARAMS, PRESET_PARAM_SZ, 0 , NUM_PRESET_PARAMS_PER_PRESET);
@@ -236,6 +241,10 @@ struct FswParam {
   // unsigned pedal:4;
   // unsigned feature:5;
   // unsigned velocity:7;
+  BUILD_OBJ_VAR_NIBBLE(pedal,    uint16_t, 0b1111,    M_FSW_PARAMS, FSW_PARAM_SZ, 12);
+  BUILD_OBJ_VAR_NIBBLE(feature,  uint16_t, 0b11111,   M_FSW_PARAMS, FSW_PARAM_SZ, 7 );
+  BUILD_OBJ_VAR_NIBBLE(velocity, uint16_t, 0b1111111, M_FSW_PARAMS, FSW_PARAM_SZ, 0 );
+
   BUILD_OBJ_VAR_NIBBLE_2_PARENT(pedal,    uint16_t, 0b1111,    M_FSW_PARAMS, FSW_PARAM_SZ, 12, NUM_FSW_PER_SUBMENU, NUM_SUBMENUS_PER_PRESET);
   BUILD_OBJ_VAR_NIBBLE_2_PARENT(feature,  uint16_t, 0b11111,   M_FSW_PARAMS, FSW_PARAM_SZ, 7 , NUM_FSW_PER_SUBMENU, NUM_SUBMENUS_PER_PRESET);
   BUILD_OBJ_VAR_NIBBLE_2_PARENT(velocity, uint16_t, 0b1111111, M_FSW_PARAMS, FSW_PARAM_SZ, 0 , NUM_FSW_PER_SUBMENU, NUM_SUBMENUS_PER_PRESET);

@@ -15,8 +15,10 @@ uint8_t  parents_used             = 0;  // flip bit for parent being used
                                         // NEVER delete parent 0 or things will crash
 uint16_t parents[NUM_PARENTS_MAX] = { 0 };
 
-#define ALPHABET_SZ 39
-char alphabet[ALPHABET_SZ] = " ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789-_";
+#define ALPHABET_SZ 40
+char alphabet[ALPHABET_SZ] = " ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_";
+
+uint16_t alt_start_addr = 0;
 
 uint8_t get_unused_parent_id() {
   for (uint8_t i=0; i<8; i++)

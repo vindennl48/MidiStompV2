@@ -20,7 +20,12 @@
 
 struct MenuSystem {
   Nav     n;
-  uint8_t menu_id = 0;
+  uint8_t  menu_id = 0;
+
+  uint16_t get_start_addr() {
+    if ( alt_start_addr ) return alt_start_addr;
+    return Menu::get_start_addr(menu_id);
+  }
 
   void setup(uint8_t menu_id) {
     // Reset the navigation helper
@@ -29,19 +34,22 @@ struct MenuSystem {
     // Update the menu id
     this->menu_id = menu_id;
 
-    // Check parents list if last addr is not in the menu options list
-    if ( !IS_IN_LIST(Menu::get_start_addr(menu_id), Menu::get_num_options(menu_id), Menu::get_size(menu_id), GET_ACTIVE_PARENT) ) {
-      // If it's not, then set new parent addr as the start_addr of menu struct
-      SET_NEW_PARENT(Menu::get_start_addr(menu_id));
-    }
-
-    // Set the first text buffer with the name of the menu
-    Menu::get_name(menu_id, TXT_BUF_1);
+    // Reset alt_start_addr
+    alt_start_addr = 0;
 
     // Need some way to loop this until callback returns true
       // If callback_setup_id > 0, Run callback
       if ( Menu::get_callback_setup_id(menu_id) )
         get_callback(Menu::get_callback_setup_id(menu_id))();
+
+    // Check parents list if last addr is not in the menu options list
+    if ( !IS_IN_LIST(get_start_addr(), Menu::get_num_options(menu_id), Menu::get_size(menu_id), GET_ACTIVE_PARENT) ) {
+      // If it's not, then set new parent addr as the start_addr of menu struct
+      SET_NEW_PARENT(get_start_addr());
+    }
+
+    // Set the first text buffer with the name of the menu
+    Menu::get_name(menu_id, TXT_BUF_1);
 
     // Write the title of menu to the LCD
     lcd.clear();
@@ -60,7 +68,7 @@ struct MenuSystem {
           // Check if current parent addr is in M_OPTIONS partition
           if ( !IS_IN_PARTITION_OPTIONS(GET_ACTIVE_PARENT) ) {
             // If no, print ID# of selection, name of option (if custom) must come from callback
-            uint8_t current_id = GET_ID_FROM_ADDR(Menu::get_start_addr(menu_id), GET_ACTIVE_PARENT, Menu::get_size(menu_id))+1;
+            uint8_t current_id = GET_ID_FROM_ADDR(get_start_addr(), GET_ACTIVE_PARENT, Menu::get_size(menu_id))+1;
             PRINT(0,1, "   .");
             if      ( current_id <  10  ) PRINT(2,1, current_id);
             else if ( current_id <  100 ) PRINT(1,1, current_id);
@@ -76,13 +84,13 @@ struct MenuSystem {
         }
         else {
           if ( knob.is_left() ) {
-            if ( GET_ID_FROM_ADDR(Menu::get_start_addr(menu_id), GET_ACTIVE_PARENT, Menu::get_size(menu_id)) > 0 ) {
+            if ( GET_ID_FROM_ADDR(get_start_addr(), GET_ACTIVE_PARENT, Menu::get_size(menu_id)) > 0 ) {
               SET_ACTIVE_PARENT(GET_ACTIVE_PARENT - Menu::get_size(menu_id));
               n.reinit();
             }
           }
           else if ( knob.is_right() ) {
-            if ( GET_ID_FROM_ADDR(Menu::get_start_addr(menu_id), GET_ACTIVE_PARENT, Menu::get_size(menu_id))+(uint8_t)1 < Menu::get_num_options(menu_id) ) {
+            if ( GET_ID_FROM_ADDR(get_start_addr(), GET_ACTIVE_PARENT, Menu::get_size(menu_id))+(uint8_t)1 < Menu::get_num_options(menu_id) ) {
               SET_ACTIVE_PARENT(GET_ACTIVE_PARENT + Menu::get_size(menu_id));
               n.reinit();
             }
@@ -90,16 +98,16 @@ struct MenuSystem {
           else if ( knob.is_pressed() ) {
             // If option is in M_OPTIONS partition
             if ( IS_IN_PARTITION_OPTIONS(GET_ACTIVE_PARENT) ) {
-              uint8_t option_id = GET_ID_FROM_ADDR(Menu::get_start_addr(menu_id), GET_ACTIVE_PARENT, Menu::get_size(menu_id));
+              uint8_t option_id = GET_ID_FROM_ADDR(get_start_addr(), GET_ACTIVE_PARENT, Menu::get_size(menu_id));
 
               // If option result is RESULT_MENU
               if ( Option::get_result(menu_id, option_id) == RESULT_MENU ) {
                 // If callback_run_id > 0, Run callback
-                if ( Option::get_callback_id(menu_id, GET_ID_FROM_ADDR(Menu::get_start_addr(menu_id), GET_ACTIVE_PARENT, Menu::get_size(menu_id))) )
-                  get_callback( Option::get_callback_id(menu_id, GET_ID_FROM_ADDR(Menu::get_start_addr(menu_id), GET_ACTIVE_PARENT, Menu::get_size(menu_id))) )();
+                if ( Option::get_callback_id(menu_id, GET_ID_FROM_ADDR(get_start_addr(), GET_ACTIVE_PARENT, Menu::get_size(menu_id))) )
+                  get_callback( Option::get_callback_id(menu_id, GET_ID_FROM_ADDR(get_start_addr(), GET_ACTIVE_PARENT, Menu::get_size(menu_id))) )();
 
                 // Reload MenuSystem with new menu_id
-                setup( Option::get_menu_id(menu_id, GET_ID_FROM_ADDR(Menu::get_start_addr(menu_id), GET_ACTIVE_PARENT, Menu::get_size(menu_id))) );
+                setup( Option::get_menu_id(menu_id, GET_ID_FROM_ADDR(get_start_addr(), GET_ACTIVE_PARENT, Menu::get_size(menu_id))) );
               }
               else if ( Option::get_result(menu_id, option_id) == RESULT_TEXT_EDIT ) {
                 n.jump_to(E_TEXT_EDIT);
@@ -125,7 +133,7 @@ struct MenuSystem {
         else {
           if ( text_edit.loop() ) {
             // Go to the next menu item selected by this option
-            setup( Option::get_menu_id(menu_id, GET_ID_FROM_ADDR(Menu::get_start_addr(menu_id), GET_ACTIVE_PARENT, Menu::get_size(menu_id))) );
+            setup( Option::get_menu_id(menu_id, GET_ID_FROM_ADDR(get_start_addr(), GET_ACTIVE_PARENT, Menu::get_size(menu_id))) );
           }
         }
         break;

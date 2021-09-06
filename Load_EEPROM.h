@@ -8,7 +8,7 @@
 //#define RESET_PEDALS
 //#define RESET_FEATURES
 //#define RESET_PRESETS
-//#define RESET_PRESET_PARAMS
+#define RESET_PRESET_PARAMS
 //#define RESET_FSW
 //#define RESET_FSW_PARAMS
 #define RESET_MENUS
@@ -135,6 +135,7 @@ void setup() {
   for (uint16_t i=0; i<NUM_PRESET_PARAMS_TOTAL; i++) {
     if ( !(i%10) ) PRINT_NLINE(12,1, i);
     PresetParam::set_data(i, 0);
+    PresetParam::set_pedal(i, NUM_PEDALS);  // if == NUM_PEDALS, this is empty
     //PresetParam::set_pedal(   i, 0);
     //PresetParam::set_feature( i, 0);
     //PresetParam::set_velocity(i, 0);

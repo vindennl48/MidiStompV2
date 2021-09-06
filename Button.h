@@ -26,6 +26,8 @@ struct Button {
       unsigned state:2;        // 0 off, 1 is_pressed, 2 is_long_pressed
       unsigned reset:1;        // 0 no reset, 1 needs reset (long pressed)
       unsigned press_type:1;   // 0 on up-stroke, 1 on down-stroke
+      unsigned is_down:1;      // used to find if 2 or more pedals are down
+                               // at the same time
     };
   };
 
@@ -49,7 +51,8 @@ struct Button {
     if ( toggle ) {
 
       if ( !get_pin_state() ) {  // When button is finally released
-        toggle = false;
+        toggle  = false;
+        is_down = false;
 
         // allow long_press and short_press only on up-stroke press_type
         if ( !press_type ) {
@@ -65,7 +68,8 @@ struct Button {
 
     } else {
       if ( get_pin_state() ) {
-        toggle = true;
+        toggle  = true;
+        is_down = true;
 
         // allow long_press on up-stroke press_type
         if ( !press_type ) {

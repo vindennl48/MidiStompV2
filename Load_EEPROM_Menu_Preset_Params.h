@@ -4,12 +4,12 @@
 memcpy(text[0], "PSET PARAMS ", TEXT_SZ);
 Menu::set_name              (MENU_PRESET_PARAMS, TXT_BUF_1);
 Menu::set_num_options       (MENU_PRESET_PARAMS, NUM_PRESET_PARAMS_PER_PRESET);
-Menu::set_start_addr        (MENU_PRESET_PARAMS, 0);                  // Set this from callback
+Menu::set_start_addr        (MENU_PRESET_PARAMS, M_PRESET_PARAMS);        // Set this from callback
 Menu::set_size              (MENU_PRESET_PARAMS, PRESET_PARAM_SZ);
 Menu::set_return_id         (MENU_PRESET_PARAMS, MENU_PRESET);
-Menu::set_forward_id        (MENU_PRESET_PARAMS, MENU_PRESET_PARAM);  // This is going to be used
+Menu::set_forward_id        (MENU_PRESET_PARAMS, MENU_PRESET_PARAM);      // This is going to be used
 Menu::set_callback_run_id   (MENU_PRESET_PARAMS, F_PRESET_PARAMS_RUN);
-Menu::set_callback_setup_id (MENU_PRESET_PARAMS, F_PRESET_PARAMS_SETUP);    // Set start address
+Menu::set_callback_setup_id (MENU_PRESET_PARAMS, F_PRESET_PARAMS_SETUP);  // Set start address
 
 memcpy(text[0], "PSET PARAM  ", TEXT_SZ);
 Menu::set_name              (MENU_PRESET_PARAM, TXT_BUF_1);
