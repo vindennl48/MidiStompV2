@@ -29,8 +29,8 @@ write_data<Menu>(&menu, MENU_PRESET_PARAMS);
     option = Option();
     //-------------------------------------------------------------------------------- 
     memcpy(option.name, "PEDAL       ", TEXT_SZ);
-    option.result    = RESULT_TEXT_EDIT;
-    option.menu_addr = MENU_PRESET_PARAM;
+    option.result    = RESULT_MENU;
+    option.menu_addr = MENU_PRESET_PARAM_PEDAL;
     write_data<Option>(&option, address);
 
     address = menu.start_addr + ( 1 * sizeof(Option) );
@@ -49,6 +49,19 @@ write_data<Menu>(&menu, MENU_PRESET_PARAMS);
     option.menu_addr = MENU_PRESET_PARAM;
     write_data<Option>(&option, address);
 
+
+    // MENU 0, PEDAL CHOOSE
+      // Loop thru available pedals
+      menu = Menu();
+      //-------------------------------------------------------------------------------- 
+      memcpy(menu.name, "PEDALS      ", TEXT_SZ);
+      menu.num_options      = NUM_PEDALS;
+      menu.start_addr       = M_PEDALS;
+      menu.size             = sizeof(Pedal);
+      menu.return_addr      = MENU_PRESET_PARAM;
+      menu.forward_addr     = MENU_PRESET_PARAM;
+      menu.callback_save_id = F_PRESET_PARAM_PEDAL_SAVE;
+      write_data<Menu>(&menu, MENU_PRESET_PARAM_PEDAL);
 
 //memcpy(text[0], "PSET PARAMS ", TEXT_SZ);
 //Menu::set_name              (MENU_PRESET_PARAMS, TXT_BUF_1);

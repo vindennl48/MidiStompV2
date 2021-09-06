@@ -38,18 +38,20 @@ uint8_t f_preset_params_setup() {
 //   return true;
 // }
 // 
-// uint8_t f_preset_param_pedal_save() {
-//   uint8_t pedal_id        = GET_ID_FROM_ADDR(M_PEDALS,        GET_ACTIVE_PARENT,               PEDAL_SZ);
-//   uint8_t preset_param_id = GET_ID_FROM_ADDR(M_PRESET_PARAMS, parents[GET_ACTIVE_PARENT_ID-2], PRESET_PARAM_SZ);
-// 
-//   uint8_t preset_id = GET_ID_FROM_ADDR(M_PRESETS, parents[0], PRESET_SZ);
-//   Serial.print("preset_id:        "); Serial.println(preset_id);
-//   Serial.print("pedal_id:        ");  Serial.println(pedal_id);
-//   Serial.print("preset_param_id: ");  Serial.println(preset_param_id);
-// 
-//   PresetParam::set_pedal(preset_param_id, pedal_id);
-//   return true;
-// }
+uint8_t f_preset_param_pedal_save() {
+  uint8_t pedal_id        = GET_ID_FROM_ADDR(M_PEDALS,        GET_ACTIVE_PARENT,               sizeof(Pedal));
+  //uint8_t preset_param_id = GET_ID_FROM_ADDR(M_PRESET_PARAMS, parents[GET_ACTIVE_PARENT_ID-2], sizeof(Parameter));
+
+  //uint8_t preset_id = GET_ID_FROM_ADDR(M_PRESETS, parents[0], sizeof(Preset));
+  //Serial.print("preset_id:        "); Serial.println(preset_id);
+  //Serial.print("pedal_id:        ");  Serial.println(pedal_id);
+  //Serial.print("preset_param_id: ");  Serial.println(preset_param_id);
+
+  Parameter::set_pedal(parents[GET_ACTIVE_PARENT_ID-2], pedal_id);
+
+  //PresetParam::set_pedal(preset_param_id, pedal_id);
+  return true;
+}
 
 #define F_NONE                    0
 #define F_COLORS                  1
@@ -65,7 +67,7 @@ Callback get_callback(uint8_t id) {
     case F_COLORS:                  return &f_colors;
     case F_PRESET_PARAMS_RUN:       return &f_preset_params_run;
     case F_PRESET_PARAMS_SETUP:     return &f_preset_params_setup;
-//    case F_PRESET_PARAM_PEDAL_SAVE: return &f_preset_param_pedal_save;
+    case F_PRESET_PARAM_PEDAL_SAVE: return &f_preset_param_pedal_save;
 //    case F_GLOBAL:                  return &f_global;
   };
 

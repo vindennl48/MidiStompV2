@@ -5,13 +5,13 @@
 
 // -- LOADING OPTIONS --
 //#define RESET_COLORS
-//#define RESET_PEDALS
+#define RESET_PEDALS
 //#define RESET_FEATURES
 //#define RESET_PRESETS
-#define RESET_PRESET_PARAMS
+//#define RESET_PRESET_PARAMS
 //#define RESET_FSW
 //#define RESET_FSW_PARAMS
-//#define RESET_MENUS
+#define RESET_MENUS
 // --
 
 void setup() {
