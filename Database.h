@@ -50,210 +50,101 @@
 /* :: END OBJECT COUNTS :: */
 
 
-/* :: OBJECT SIZES :: */
-#define COLOR_SZ        16
-#define PEDAL_SZ        14
-#define FEATURE_SZ      15
-#define PRESET_SZ       13
-#define PRESET_PARAM_SZ 2
-#define FSW_SZ          5
-#define FSW_PARAM_SZ    2
-#define MENU_SZ         22
-#define OPTION_SZ       16
-/* :: END OBJECT SIZES :: */
-
-
-/* :: EEPROM MAP :: */
-#define M_COLORS        0
-#define M_PEDALS        GET_END(M_COLORS,        NUM_COLORS,              COLOR_SZ)
-#define M_FEATURES      GET_END(M_PEDALS,        NUM_PEDALS,              PEDAL_SZ)
-#define M_PRESETS       GET_END(M_FEATURES,      NUM_FEATURES_TOTAL,      FEATURE_SZ)
-#define M_PRESET_PARAMS GET_END(M_PRESETS,       NUM_PRESETS,             PRESET_SZ)
-#define M_FSW           GET_END(M_PRESET_PARAMS, NUM_PRESET_PARAMS_TOTAL, PRESET_PARAM_SZ)
-#define M_FSW_PARAMS    GET_END(M_FSW,           NUM_FSW_TOTAL,           FSW_SZ)
-#define M_MENUS         GET_END(M_FSW_PARAMS,    NUM_FSW_PARAMS_TOTAL,    FSW_PARAM_SZ)
-#define M_OPTIONS       GET_END(M_MENUS,         NUM_MENUS,               MENU_SZ)
-#define M_END           GET_END(M_OPTIONS,       NUM_OPTIONS_TOTAL,       OPTION_SZ)
-/* :: END EEPROM MAP :: */
-
-/* :: EEPROM MACROS :: */
-#define IS_IN_PARTITION(part_start, part_end, address) ((part_start<=address && address<=part_end) ? true : false)
-#define IS_IN_LIST(start_addr, num_items, size, address) ((start_addr<=address && address<=(start_addr+(num_items*size))) ? true : false)
-#define IS_IN_PARTITION_COLORS(address)        IS_IN_PARTITION(M_COLORS,        M_PEDALS,        address)
-#define IS_IN_PARTITION_PEDALS(address)        IS_IN_PARTITION(M_PEDALS,        M_FEATURES,      address)
-#define IS_IN_PARTITION_FEATURES(address)      IS_IN_PARTITION(M_FEATURES,      M_PRESETS,       address)
-#define IS_IN_PARTITION_PRESETS(address)       IS_IN_PARTITION(M_PRESETS,       M_PRESET_PARAMS, address)
-#define IS_IN_PARTITION_PRESET_PARAMS(address) IS_IN_PARTITION(M_PRESET_PARAMS, M_FSW,           address)
-#define IS_IN_PARTITION_FSW(address)           IS_IN_PARTITION(M_FSW,           M_FSW_PARAMS,    address)
-#define IS_IN_PARTITION_FSW_PARAMS(address)    IS_IN_PARTITION(M_FSW_PARAMS,    M_MENUS,         address)
-#define IS_IN_PARTITION_MENUS(address)         IS_IN_PARTITION(M_MENUS,         M_OPTIONS,       address)
-#define IS_IN_PARTITION_OPTIONS(address)       IS_IN_PARTITION(M_OPTIONS,       M_END,           address)
-
-// Get active parent that is not an option struct
-// Cant put it earlier since we need the above macros
-uint8_t get_active_parent_id_not_option() {
-  // This function gets the newest parent that is not an option struct
-  // Used for finding the newest object to edit
-  // Cant make this in Standard.h, need macros above
-  uint8_t result = 0;
-  for (uint8_t i=0; i<=GET_ACTIVE_PARENT_ID; i++) {
-    result = GET_ACTIVE_PARENT_ID-i;
-    if ( !IS_IN_PARTITION_OPTIONS(parents[result]) )
-      return result;
-  }
-  return 0;
-}
-#define GET_ACTIVE_PARENT_ID_NOT_OPTION get_active_parent_id_not_option()
-#define GET_ACTIVE_PARENT_NOT_OPTION    parents[GET_ACTIVE_PARENT_ID_NOT_OPTION]
-/* :: ENDEEPROM MACROS :: */
-
 /* :: FUNC BUILDERS:: */
-// i: what text buffer to apply to, 0 or 1
-#define BUILD_OBJ_NAME(start, size) \
-  static void get_name(uint16_t id, uint8_t i) { \
-    eReadBlock( GET_PARENT(start, id, size), (uint8_t*)text[i], TEXT_SZ ); \
+// Takes an address of the object plus the text buffer to
+// write the name to.
+#define BUILD_OBJ_NAME \
+  static void get_name(uint16_t addr, uint8_t i) { \
+    eReadBlock( addr, (uint8_t*)text[i], TEXT_SZ ); \
   } \
-  static void set_name(uint16_t id, uint8_t i) { \
-    eWriteBlock( GET_PARENT(start, id, size), (uint8_t*)text[i], TEXT_SZ ); \
+  static void set_name(uint16_t addr, uint8_t i) { \
+    eWriteBlock( addr, (uint8_t*)text[i], TEXT_SZ ); \
   }
-#define BUILD_OBJ_NAME_1_PARENT(start, size, num_children_in_parent) \
-  static void get_name(uint16_t parent_id, uint16_t id, uint8_t i) { \
-    id = GET_ABS_CHILD_ID(parent_id, id, num_children_in_parent); \
-    eReadBlock( GET_PARENT(start, id, size), (uint8_t*)text[i], TEXT_SZ ); \
+// Takes name you want the function to be
+//  obj_class of the return value
+//  addr of start of struct
+//  i is how many bytes to get thru struct to the var you want
+#define BUILD_OBJ_VAR(var_name, obj_class, i) \
+  static obj_class get_##var_name(uint16_t addr) { \
+    return read_data<obj_class>( addr + i ); \
   } \
-  static void set_name(uint16_t parent_id, uint16_t id, uint8_t i) { \
-    id = GET_ABS_CHILD_ID(parent_id, id, num_children_in_parent); \
-    eWriteBlock( GET_PARENT(start, id, size), (uint8_t*)text[i], TEXT_SZ ); \
+  static void set_##var_name(uint16_t addr, obj_class new_var) { \
+    write_data<obj_class>( &new_var, addr + i ); \
   }
-// i: amount of bytes to get to variable
-#define BUILD_OBJ_VARIABLE(var_name, obj_class, start, size, i) \
-  static obj_class get_##var_name(uint16_t id) { \
-    return read_data<obj_class>( GET_PARENT(start, id, size) + i ); \
-  } \
-  static void set_##var_name(uint16_t id, obj_class new_var) { \
-    write_data<obj_class>( &new_var, GET_PARENT(start, id, size) + i ); \
-  }
-#define BUILD_OBJ_VARIABLE_1_PARENT(var_name, obj_class, start, size, i, num_children_in_parent) \
-  static obj_class get_##var_name(uint16_t parent_id, uint16_t id) { \
-    id = GET_ABS_CHILD_ID(parent_id, id, num_children_in_parent); \
-    return read_data<obj_class>( GET_PARENT(start, id, size) + i ); \
-  } \
-  static void set_##var_name(uint16_t parent_id, uint16_t id, obj_class new_var) { \
-    id = GET_ABS_CHILD_ID(parent_id, id, num_children_in_parent); \
-    write_data<obj_class>( &new_var, GET_PARENT(start, id, size) + i ); \
-  }
-#define BUILD_OBJ_VARIABLE_2_PARENT(var_name, obj_class, start, size, i, num_children_in_parent2, num_parent2_in_parent1 ) \
-  static obj_class get_##var_name(uint16_t parent1_id, uint16_t parent2_id, uint16_t id) { \
-    id = GET_ABS_CHILD_ID_2(parent1_id, parent2_id, id, num_children_in_parent2, num_parent2_in_parent1); \
-    return read_data<obj_class>( GET_PARENT(start, id, size) + i ); \
-  } \
-  static void set_##var_name(uint16_t parent1_id, uint16_t parent2_id, uint16_t id, obj_class new_var) { \
-    id = GET_ABS_CHILD_ID_2(parent1_id, parent2_id, id, num_children_in_parent2, num_parent2_in_parent1); \
-    write_data<obj_class>( &new_var, GET_PARENT(start, id, size) + i ); \
-  }
-// nib_obj: object type that will be pulled from eeprom before getting nibble, ie:
-//          if nibble is stored in a uint16_t
-// nib_class: class type to retrieve from eeprom, ie. uint8_t/uint16_t
-// bit_mask: binary of bits to keep.  ie top 4 least significant bits of a uint16_t is 0b1111.
-//           The num_bits_to_shift will shift this mask up to the correct location
-// start: start address in eeprom of struct type
-// size: size of struct that contains this nibble (used to find address in eeprom of nibble)
-// num_bits_to_shift: the number of bits to shift the bit_mask to get to the proper nibble location,
-//                    ie. if 4 least significant bits of uint16_t, this will be 12
-#define BUILD_OBJ_VAR_NIBBLE(var_name, nib_class, bit_mask, start, size, num_bits_to_shift) \
-  static uint8_t get_##var_name(uint16_t id) { \
+// Takes name you want the function to be
+//  nib_class is obj_class of how many bytes stores the nibble
+//  bit_mask of where the nibble is located in the nib_class
+//  addr of the start of struct
+//  i is how many bytes to get thru struct to the var you want
+#define BUILD_OBJ_VAR_NIBBLE(var_name, nib_class, bit_mask, num_bits_to_shift, i) \
+  static uint8_t get_##var_name(uint16_t addr) { \
     nib_class result = 0; \
-    eReadBlock( GET_PARENT(start, id, size), (uint8_t*)&result, sizeof(nib_class) ); \
+    eReadBlock( (addr + i), (uint8_t*)&result, sizeof(nib_class) ); \
     return (result & (bit_mask << num_bits_to_shift)) >> num_bits_to_shift; \
   } \
-  static void set_##var_name(uint16_t id, nib_class new_var) { \
+  static void set_##var_name(uint16_t addr, nib_class new_var) { \
     nib_class result = 0; \
-    eReadBlock( GET_PARENT(start, id, size), (uint8_t*)&result, sizeof(nib_class) ); \
+    eReadBlock( (addr + i), (uint8_t*)&result, sizeof(nib_class) ); \
     result = (result & ~(bit_mask<<num_bits_to_shift)) | (new_var << num_bits_to_shift); \
-    eWriteBlock( GET_PARENT(start, id, size), (uint8_t*)&result, sizeof(nib_class) ); \
-  }
-#define BUILD_OBJ_VAR_NIBBLE_1_PARENT(var_name, nib_class, bit_mask, start, size, num_bits_to_shift, num_children_in_parent) \
-  static uint8_t get_##var_name(uint16_t parent_id, uint16_t id) { \
-    id = GET_ABS_CHILD_ID(parent_id, id, num_children_in_parent); \
-    nib_class result = 0; \
-    eReadBlock( GET_PARENT(start, id, size), (uint8_t*)&result, sizeof(nib_class) ); \
-    return (result & (bit_mask << num_bits_to_shift)) >> num_bits_to_shift; \
-  } \
-  static void set_##var_name(uint16_t parent_id, uint16_t id, nib_class new_var) { \
-    id = GET_ABS_CHILD_ID(parent_id, id, num_children_in_parent); \
-    nib_class result = 0; \
-    eReadBlock( GET_PARENT(start, id, size), (uint8_t*)&result, sizeof(nib_class) ); \
-    result = (result & ~(bit_mask<<num_bits_to_shift)) | (new_var << num_bits_to_shift); \
-    eWriteBlock( GET_PARENT(start, id, size), (uint8_t*)&result, sizeof(nib_class) ); \
-  }
-#define BUILD_OBJ_VAR_NIBBLE_2_PARENT(var_name, nib_class, bit_mask, start, size, num_bits_to_shift, num_children_in_parent2, num_parent2_in_parent1) \
-  static uint8_t get_##var_name(uint16_t parent1_id, uint16_t parent2_id, uint16_t id) { \
-    id = GET_ABS_CHILD_ID_2(parent1_id, parent2_id, id, num_children_in_parent2, num_parent2_in_parent1); \
-    nib_class result = 0; \
-    eReadBlock( GET_PARENT(start, id, size), (uint8_t*)&result, sizeof(nib_class) ); \
-    return (result & (bit_mask << num_bits_to_shift)) >> num_bits_to_shift; \
-  } \
-  static void set_##var_name(uint16_t parent1_id, uint16_t parent2_id, uint16_t id, nib_class new_var) { \
-    id = GET_ABS_CHILD_ID_2(parent1_id, parent2_id, id, num_children_in_parent2, num_parent2_in_parent1); \
-    nib_class result = 0; \
-    eReadBlock( GET_PARENT(start, id, size), (uint8_t*)&result, sizeof(nib_class) ); \
-    result = (result & ~(bit_mask<<num_bits_to_shift)) | (new_var << num_bits_to_shift); \
-    eWriteBlock( GET_PARENT(start, id, size), (uint8_t*)&result, sizeof(nib_class) ); \
+    eWriteBlock( (addr + i), (uint8_t*)&result, sizeof(nib_class) ); \
   }
 /* :: END FUNC BUILDERS:: */
 
 
 /* :: STRUCTS :: */
 struct Color {
-  BUILD_OBJ_NAME(M_COLORS, COLOR_SZ);
-  BUILD_OBJ_VARIABLE(red,   uint8_t, M_COLORS, COLOR_SZ, 13);
-  BUILD_OBJ_VARIABLE(green, uint8_t, M_COLORS, COLOR_SZ, 14);
-  BUILD_OBJ_VARIABLE(blue,  uint8_t, M_COLORS, COLOR_SZ, 15);
+  char    name[TEXT_SZ] = "UNTITLED ";
+  uint8_t red           = 0;
+  uint8_t green         = 0;
+  uint8_t blue          = 0;
+
+  BUILD_OBJ_NAME;
+  BUILD_OBJ_VAR(red,   uint8_t, 13);
+  BUILD_OBJ_VAR(green, uint8_t, 14);
+  BUILD_OBJ_VAR(blue,  uint8_t, 15);
 };
 
 struct Pedal {
-  BUILD_OBJ_NAME(M_PEDALS, PEDAL_SZ);
-  BUILD_OBJ_VARIABLE(channel, uint8_t, M_PEDALS, PEDAL_SZ, 13);
+  char    name[TEXT_SZ] = "UNTITLED ";
+  uint8_t channel       = 0;
+
+  BUILD_OBJ_NAME;
+  BUILD_OBJ_VAR(channel, uint8_t, 13);
 };
 
 struct Feature {
-  BUILD_OBJ_NAME_1_PARENT(M_FEATURES, FEATURE_SZ, NUM_FEATURES_PER_PEDAL);
-  BUILD_OBJ_VARIABLE_1_PARENT(type,  uint8_t, M_FEATURES, FEATURE_SZ, 13, NUM_FEATURES_PER_PEDAL);
-  BUILD_OBJ_VARIABLE_1_PARENT(pitch, uint8_t, M_FEATURES, FEATURE_SZ, 14, NUM_FEATURES_PER_PEDAL);
+  char    name[TEXT_SZ] = "UNTITLED ";
+  uint8_t type          = 0;
+  uint8_t pitch         = 0;
+
+  BUILD_OBJ_NAME;
+  BUILD_OBJ_VAR(type,  uint8_t, 13);
+  BUILD_OBJ_VAR(pitch, uint8_t, 14);
 };
 
-struct PresetParam {
-  // unsigned pedal:4;
-  // unsigned feature:5;
-  // unsigned velocity:7;
-  BUILD_OBJ_VAR_NIBBLE(pedal,    uint16_t, 0b1111,    M_PRESET_PARAMS, PRESET_PARAM_SZ, 12);
-  BUILD_OBJ_VAR_NIBBLE(feature,  uint16_t, 0b11111,   M_PRESET_PARAMS, PRESET_PARAM_SZ, 7 );
-  BUILD_OBJ_VAR_NIBBLE(velocity, uint16_t, 0b1111111, M_PRESET_PARAMS, PRESET_PARAM_SZ, 0 );
+// For presets and fsw's
+struct Parameter {
+  unsigned pedal:4;
+  unsigned feature:5;
+  unsigned velocity:7;
 
-  BUILD_OBJ_VAR_NIBBLE_1_PARENT(pedal,    uint16_t, 0b1111,    M_PRESET_PARAMS, PRESET_PARAM_SZ, 12, NUM_PRESET_PARAMS_PER_PRESET);
-  BUILD_OBJ_VAR_NIBBLE_1_PARENT(feature,  uint16_t, 0b11111,   M_PRESET_PARAMS, PRESET_PARAM_SZ, 7 , NUM_PRESET_PARAMS_PER_PRESET);
-  BUILD_OBJ_VAR_NIBBLE_1_PARENT(velocity, uint16_t, 0b1111111, M_PRESET_PARAMS, PRESET_PARAM_SZ, 0 , NUM_PRESET_PARAMS_PER_PRESET);
+  Parameter() {
+    pedal    = NUM_PEDALS;
+    feature  = 0;
+    velocity = 0;
+  }
+
+  BUILD_OBJ_VAR_NIBBLE(pedal,    uint16_t, 0b1111,    12, 0);
+  BUILD_OBJ_VAR_NIBBLE(feature,  uint16_t, 0b11111,    7, 0);
+  BUILD_OBJ_VAR_NIBBLE(velocity, uint16_t, 0b1111111,  0, 0);
+
   // Resets all nibbles
-  BUILD_OBJ_VARIABLE(data, uint16_t, M_PRESET_PARAMS, PRESET_PARAM_SZ, 0);
-};
-
-struct FswParam {
-  // unsigned pedal:4;
-  // unsigned feature:5;
-  // unsigned velocity:7;
-  BUILD_OBJ_VAR_NIBBLE(pedal,    uint16_t, 0b1111,    M_FSW_PARAMS, FSW_PARAM_SZ, 12);
-  BUILD_OBJ_VAR_NIBBLE(feature,  uint16_t, 0b11111,   M_FSW_PARAMS, FSW_PARAM_SZ, 7 );
-  BUILD_OBJ_VAR_NIBBLE(velocity, uint16_t, 0b1111111, M_FSW_PARAMS, FSW_PARAM_SZ, 0 );
-
-  BUILD_OBJ_VAR_NIBBLE_2_PARENT(pedal,    uint16_t, 0b1111,    M_FSW_PARAMS, FSW_PARAM_SZ, 12, NUM_FSW_PER_SUBMENU, NUM_SUBMENUS_PER_PRESET);
-  BUILD_OBJ_VAR_NIBBLE_2_PARENT(feature,  uint16_t, 0b11111,   M_FSW_PARAMS, FSW_PARAM_SZ, 7 , NUM_FSW_PER_SUBMENU, NUM_SUBMENUS_PER_PRESET);
-  BUILD_OBJ_VAR_NIBBLE_2_PARENT(velocity, uint16_t, 0b1111111, M_FSW_PARAMS, FSW_PARAM_SZ, 0 , NUM_FSW_PER_SUBMENU, NUM_SUBMENUS_PER_PRESET);
-  // Resets all nibbles
-  BUILD_OBJ_VARIABLE(data, uint16_t, M_FSW_PARAMS, FSW_PARAM_SZ, 0);
+  BUILD_OBJ_VAR(data, uint16_t, 0);
 };
 
 struct Preset {
-  BUILD_OBJ_NAME(M_PRESETS, PRESET_SZ);
+  char name[TEXT_SZ] = "UNTITLED ";
+  BUILD_OBJ_NAME;
 };
 
 #define FSW_MODE_OFF     0  // NONE
@@ -294,13 +185,113 @@ struct Footswitch {
     else if ( FSW_MODE_TOGGLE && state >= 2 ) state = 0;
   }
 
-  void save(uint8_t preset_id, uint8_t submenu_id, uint8_t fsw_id) {
-    return write_data<Footswitch>( this, GET_CHILD(M_FSW, preset_id, submenu_id*NUM_FSW_PER_SUBMENU+fsw_id, FSW_SZ, NUM_FSW_PER_PRESET) );
-  }
+//  void save(uint8_t preset_id, uint8_t submenu_id, uint8_t fsw_id) {
+//    return write_data<Footswitch>( this, GET_CHILD(M_FSW, preset_id, submenu_id*NUM_FSW_PER_SUBMENU+fsw_id, sizeof(Footswitch), NUM_FSW_PER_PRESET) );
+//  }
+//
+//  // STATIC
+//  static Footswitch get(uint8_t preset_id, uint8_t submenu_id, uint8_t fsw_id) {
+//    return read_data<Footswitch>( GET_CHILD(M_FSW, preset_id, submenu_id*NUM_FSW_PER_SUBMENU+fsw_id, sizeof(Footswitch), NUM_FSW_PER_PRESET) );
+//  }
+};
 
-  // STATIC
-  static Footswitch get(uint8_t preset_id, uint8_t submenu_id, uint8_t fsw_id) {
-    return read_data<Footswitch>( GET_CHILD(M_FSW, preset_id, submenu_id*NUM_FSW_PER_SUBMENU+fsw_id, FSW_SZ, NUM_FSW_PER_PRESET) );
-  }
+
+#define RESULT_MENU       0
+#define RESULT_CONFIRM    1
+#define RESULT_TEXT_EDIT  2
+#define RESULT_VALUE_EDIT 3
+#define RESULT_COLOR_EDIT 4
+#define RESULT_MIDI_EDIT  5
+struct Option {
+  char     name[TEXT_SZ]     = "UNTITLED    ";
+  uint8_t  result            = RESULT_MENU;
+  uint16_t menu_addr         = 0;
+  uint8_t  callback_id       = 0;
+
+  BUILD_OBJ_NAME;
+  BUILD_OBJ_VAR(result,      uint8_t,  13);
+  BUILD_OBJ_VAR(menu_addr,   uint16_t, 14);
+  BUILD_OBJ_VAR(callback_id, uint8_t,  16);
+};
+
+
+#define MENU_MAIN               0
+#define MENU_PRESET             (M_MENUS +  0 * sizeof(Menu))
+#define MENU_PRESET_PARAMS      (M_MENUS +  1 * sizeof(Menu))
+#define MENU_PRESET_PARAM       (M_MENUS +  2 * sizeof(Menu))
+#define MENU_PRESET_PARAM_PEDAL (M_MENUS +  3 * sizeof(Menu))
+#define MENU_GLOBAL             (M_MENUS +  4 * sizeof(Menu))
+#define MENU_PEDALS             (M_MENUS +  5 * sizeof(Menu))
+#define MENU_PEDAL              (M_MENUS +  6 * sizeof(Menu))
+#define MENU_COLORS             (M_MENUS +  7 * sizeof(Menu))
+#define MENU_COLOR              (M_MENUS +  8 * sizeof(Menu))
+#define MENU_FEATURES           (M_MENUS +  9 * sizeof(Menu))
+#define MENU_FEATURE            (M_MENUS + 10 * sizeof(Menu))
+struct Menu {
+  char     name[TEXT_SZ]     = "UNTITLED    ";
+  uint8_t  num_options       = 0;
+  uint16_t start_addr        = 0;
+  uint8_t  size              = sizeof(Option);
+  uint16_t return_addr       = 0;
+  uint16_t forward_addr      = 0;
+  uint8_t  callback_setup_id = 0;
+  uint8_t  callback_run_id   = 0;
+  uint8_t  callback_save_id  = 0;
+
+  BUILD_OBJ_NAME;
+  BUILD_OBJ_VAR(num_options,       uint8_t,  13);
+  BUILD_OBJ_VAR(start_addr,        uint16_t, 14);
+  BUILD_OBJ_VAR(size,              uint8_t,  16);
+  BUILD_OBJ_VAR(return_addr,       uint16_t, 17);
+  BUILD_OBJ_VAR(forward_addr,      uint16_t, 18);
+  BUILD_OBJ_VAR(callback_setup_id, uint8_t,  19);
+  BUILD_OBJ_VAR(callback_run_id,   uint8_t,  20);
+  BUILD_OBJ_VAR(callback_save_id,  uint8_t,  21);
 };
 /* :: END STRUCTS :: */
+
+
+/* :: EEPROM MAP :: */
+#define M_COLORS        0
+#define M_PEDALS        GET_END(M_COLORS,        NUM_COLORS,              sizeof(Color))
+#define M_FEATURES      GET_END(M_PEDALS,        NUM_PEDALS,              sizeof(Pedal))
+#define M_PRESETS       GET_END(M_FEATURES,      NUM_FEATURES_TOTAL,      sizeof(Feature))
+#define M_PRESET_PARAMS GET_END(M_PRESETS,       NUM_PRESETS,             sizeof(Preset))
+#define M_FSW           GET_END(M_PRESET_PARAMS, NUM_PRESET_PARAMS_TOTAL, sizeof(Parameter))
+#define M_FSW_PARAMS    GET_END(M_FSW,           NUM_FSW_TOTAL,           sizeof(Footswitch))
+#define M_MENUS         GET_END(M_FSW_PARAMS,    NUM_FSW_PARAMS_TOTAL,    sizeof(Parameter))
+#define M_OPTIONS       GET_END(M_MENUS,         NUM_MENUS,               sizeof(Menu))
+#define M_END           GET_END(M_OPTIONS,       NUM_OPTIONS_TOTAL,       sizeof(Option))
+/* :: END EEPROM MAP :: */
+
+
+/* :: EEPROM MACROS :: */
+#define IS_IN_PARTITION(part_start, part_end, address) ((part_start<=address && address<part_end) ? true : false)
+#define IS_IN_LIST(start_addr, num_items, size, address) ((start_addr<=address && address<=(start_addr+(num_items*size))) ? true : false)
+#define IS_IN_PARTITION_COLORS(address)        IS_IN_PARTITION(M_COLORS,        M_PEDALS,        address)
+#define IS_IN_PARTITION_PEDALS(address)        IS_IN_PARTITION(M_PEDALS,        M_FEATURES,      address)
+#define IS_IN_PARTITION_FEATURES(address)      IS_IN_PARTITION(M_FEATURES,      M_PRESETS,       address)
+#define IS_IN_PARTITION_PRESETS(address)       IS_IN_PARTITION(M_PRESETS,       M_PRESET_PARAMS, address)
+#define IS_IN_PARTITION_PRESET_PARAMS(address) IS_IN_PARTITION(M_PRESET_PARAMS, M_FSW,           address)
+#define IS_IN_PARTITION_FSW(address)           IS_IN_PARTITION(M_FSW,           M_FSW_PARAMS,    address)
+#define IS_IN_PARTITION_FSW_PARAMS(address)    IS_IN_PARTITION(M_FSW_PARAMS,    M_MENUS,         address)
+#define IS_IN_PARTITION_MENUS(address)         IS_IN_PARTITION(M_MENUS,         M_OPTIONS,       address)
+#define IS_IN_PARTITION_OPTIONS(address)       IS_IN_PARTITION(M_OPTIONS,       M_END,           address)
+
+// Get active parent that is not an option struct
+// Cant put it earlier since we need the above macros
+uint8_t get_active_parent_id_not_option() {
+  // This function gets the newest parent that is not an option struct
+  // Used for finding the newest object to edit
+  // Cant make this in Standard.h, need macros above
+  uint8_t result = 0;
+  for (uint8_t i=0; i<=GET_ACTIVE_PARENT_ID; i++) {
+    result = GET_ACTIVE_PARENT_ID-i;
+    if ( !IS_IN_PARTITION_OPTIONS(parents[result]) )
+      return result;
+  }
+  return 0;
+}
+#define GET_ACTIVE_PARENT_ID_NOT_OPTION get_active_parent_id_not_option()
+#define GET_ACTIVE_PARENT_NOT_OPTION    parents[GET_ACTIVE_PARENT_ID_NOT_OPTION]
+/* :: ENDEEPROM MACROS :: */

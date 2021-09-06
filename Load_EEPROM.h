@@ -24,9 +24,9 @@ void setup() {
   PRINT_NLINE(11,0, NUM_COLORS);
   print_nline(0, 1, "> COLORS");
 
-  for (uint8_t i=0; i<NUM_COLORS; i++) {
-    if ( !(i%10) ) PRINT_NLINE(9,1, i);
-    switch(i) {
+  for (uint16_t i=M_COLORS, j=0; j<NUM_COLORS; i+=sizeof(Color), j++) {
+    if ( !(j%10) ) PRINT_NLINE(9,1, j);
+    switch(j) {
       case 0:
         memcpy(text[0], "RED_OFF     ", TEXT_SZ);
         Color::set_name( i, TXT_BUF_1);
@@ -92,9 +92,9 @@ void setup() {
   PRINT_NLINE(11,0, NUM_PEDALS);
   print_nline(0, 1, "> PEDALS");
   memcpy(text[0], "UNTITLED    ", TEXT_SZ);
-  for (uint8_t i=0; i<NUM_PEDALS; i++) {
-    PRINT_NLINE(9,1, i);
-    Pedal::set_name(i, TXT_BUF_1);
+  for (uint16_t i=M_PEDALS, j=0; j<NUM_PEDALS; i+=sizeof(Pedal), j++) {
+    PRINT_NLINE(9,1, j);
+    Pedal::set_name(   i, TXT_BUF_1);
     Pedal::set_channel(i, 0);
   }
 }
@@ -105,13 +105,11 @@ void setup() {
   PRINT_NLINE(11,0, NUM_FEATURES_TOTAL);
   print_nline(0, 1, "> FEATURES");
   memcpy(text[0], "UNTITLED    ", TEXT_SZ);
-  for (uint16_t i=0; i<NUM_PEDALS; i++) {
-    for (uint16_t j=0; j<NUM_FEATURES_PER_PEDAL; j++) {
-      if ( !((i*j)%10) ) PRINT_NLINE(11,1, i*j);
-      Feature::set_name( i, j, TXT_BUF_1);
-      Feature::set_type( i, j, 0);
-      Feature::set_pitch(i, j, 0);
-    }
+  for (uint16_t i=M_FEATURES, j=0; j<NUM_FEATURES_TOTAL; i+=sizeof(Feature), j++) {
+    if ( !(j%10) ) PRINT_NLINE(11,1, j);
+    Feature::set_name( i, TXT_BUF_1);
+    Feature::set_type( i, 0);
+    Feature::set_pitch(i, 0);
   }
 }
 #endif // -- END FEATURES --
@@ -121,8 +119,8 @@ void setup() {
   PRINT_NLINE(11,0, NUM_PRESETS);
   print_nline(0, 1, "> PRESETS");
   memcpy(text[0], "UNTITLED    ", TEXT_SZ);
-  for (uint16_t i=0; i<NUM_PRESETS; i++) {
-    PRINT_NLINE(10,1, i);
+  for (uint16_t i=M_PRESETS, j=0; j<NUM_PRESETS; i+=sizeof(Preset), j++) {
+    PRINT_NLINE(10,1, j);
     Preset::set_name(i, TXT_BUF_1);
   }
 }
@@ -132,13 +130,10 @@ void setup() {
 {
   PRINT_NLINE(11,0, NUM_PRESET_PARAMS_TOTAL);
   print_nline(0, 1, "> PRST PRMS");
-  for (uint16_t i=0; i<NUM_PRESET_PARAMS_TOTAL; i++) {
-    if ( !(i%10) ) PRINT_NLINE(12,1, i);
-    PresetParam::set_data(i, 0);
-    PresetParam::set_pedal(i, NUM_PEDALS);  // if == NUM_PEDALS, this is empty
-    //PresetParam::set_pedal(   i, 0);
-    //PresetParam::set_feature( i, 0);
-    //PresetParam::set_velocity(i, 0);
+  Parameter parameter;
+  for (uint16_t i=M_PRESET_PARAMS, j=0; j<NUM_PRESET_PARAMS_TOTAL; i+=sizeof(Parameter), j++) {
+    if ( !(j%10) ) PRINT_NLINE(12,1, j);
+    write_data<Parameter>(&parameter, i);
   }
 }
 #endif // -- END PRESET PARAMS --
@@ -147,12 +142,10 @@ void setup() {
 {
   PRINT_NLINE(11,0, NUM_FSW_PARAMS_TOTAL);
   print_nline(0, 1, "> FSW PRMS");
-  for (uint16_t i=0; i<NUM_FSW_PARAMS_TOTAL; i++) {
-    if ( !(i%500) ) PRINT_NLINE(11,1, i);
-    FswParam::set_data(i, 0);
-    //FswParam::set_pedal(   i, 0);
-    //FswParam::set_feature( i, 0);
-    //FswParam::set_velocity(i, 0);
+  Parameter parameter;
+  for (uint16_t i=M_FSW_PARAMS, j=0; j<NUM_FSW_PARAMS_TOTAL; i+=sizeof(Parameter), j++) {
+    if ( !(j%500) ) PRINT_NLINE(11,1, j);
+    write_data<Parameter>(&parameter, i);
   }
 }
 #endif // -- END PRESET PARAMS --
@@ -161,12 +154,20 @@ void setup() {
 {
   PRINT_NLINE(11,0, " ");
   print_nline(0, 1, "> MENUS");
+
+  // Helper variables
+  Menu     menu;
+  Option   option;
+  uint16_t address;
+  uint16_t option_partition_addr;
+  uint8_t  num_options_per_menu;
+
   #include "Load_EEPROM_Menu_Preset.h"
-  #include "Load_EEPROM_Menu_Preset_Params.h"
+//  #include "Load_EEPROM_Menu_Preset_Params.h"
   #include "Load_EEPROM_Menu_Global.h"
-  #include "Load_EEPROM_Menu_Global_Colors.h"
-  #include "Load_EEPROM_Menu_Global_Pedals.h"
-  #include "Load_EEPROM_Menu_Global_Pedal_Features.h"
+//  #include "Load_EEPROM_Menu_Global_Colors.h"
+//  #include "Load_EEPROM_Menu_Global_Pedals.h"
+//  #include "Load_EEPROM_Menu_Global_Pedal_Features.h"
 }
 #endif // -- END MENUS --
 

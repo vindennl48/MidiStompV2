@@ -14,6 +14,10 @@ struct TextEdit {
 
     // Get text to edit
     eReadBlock( GET_ACTIVE_PARENT_NOT_OPTION, (uint8_t*)text[TXT_BUF_1], TEXT_SZ );
+    Serial.print("parent 0: ");Serial.println(parents[0]);
+    Serial.print("active parent, not option: ");Serial.println(GET_ACTIVE_PARENT_NOT_OPTION);
+    Serial.print("text[0]: ");Serial.println(text[0]);
+    Serial.print("M_PRESETS: ");Serial.println(M_PRESETS);
 
     PRINT_NLINE(0,1, F("SAVE      CANCEL"));
     lcd.cursor();  // Highlight

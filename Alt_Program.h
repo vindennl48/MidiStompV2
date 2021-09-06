@@ -18,15 +18,11 @@ Footswitch fsw[NUM_FSW_PER_PRESET];
 //   hw_loop();
 // 
 //   if ( n.not_init() ) {
+//     Preset::get_name(M_PRESETS, TXT_BUF_1);
+//     PRINT(0,0, text[TXT_BUF_1]);
+//     PRINT(0,1, text[TXT_BUF_2]);
 //   }
 //   else {
-//     if ( btns[0].is_down && btns[1].is_down && btns[2].is_down ) {
-//       btns[0].is_down = false;
-//       btns[1].is_down = false;
-//       btns[2].is_down = false;
-//       PRINT(0,0, i);
-//       i++;
-//     }
 //   }
 // }
 
