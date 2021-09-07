@@ -54,16 +54,17 @@ write_data<Menu>(&menu, MENU_PRESET_PARAMS);
       menu = Menu();
       //-------------------------------------------------------------------------------- 
       memcpy(menu.name, "PEDALS      ", TEXT_SZ);
-      menu.num_options      = NUM_PEDALS;
-      menu.start_addr       = M_PEDALS;
-      menu.size             = sizeof(Pedal);
-      menu.return_addr      = MENU_PRESET_PARAM;
-      menu.forward_addr     = MENU_PRESET_PARAM;
-      menu.callback_save_id = F_PRESET_PARAM_PEDAL_SAVE;
+      menu.num_options       = NUM_PEDALS;
+      menu.start_addr        = M_PEDALS;
+      menu.size              = sizeof(Pedal);
+      menu.return_addr       = MENU_PRESET_PARAM;
+      menu.forward_addr      = MENU_PRESET_PARAM;
+      menu.callback_setup_id = F_PRESET_PARAM_PEDAL_SETUP;
+      menu.callback_save_id  = F_PRESET_PARAM_PEDAL_SAVE;
       write_data<Menu>(&menu, MENU_PRESET_PARAM_PEDAL);
 
     // FEATURE CHOOSE
-      // Loop thru available pedals
+      // Loop thru available features of selected pedal
       menu = Menu();
       //-------------------------------------------------------------------------------- 
       memcpy(menu.name, "FEATURES    ", TEXT_SZ);

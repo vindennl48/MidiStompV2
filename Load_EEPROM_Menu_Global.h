@@ -16,13 +16,15 @@ write_data<Menu>(&menu, address);
   option = Option();
   //-------------------------------------------------------------------------------- 
   memcpy(option.name, "PEDALS      ", TEXT_SZ);
-  option.menu_addr = MENU_GLOBAL;
+  option.result    = RESULT_MENU;
+  option.menu_addr = MENU_PEDALS;
   write_data<Option>(&option, address);
 
   address = menu.start_addr + ( 1 * sizeof(Option) );
   option = Option();
   //-------------------------------------------------------------------------------- 
   memcpy(option.name, "COLORS      ", TEXT_SZ);
+  option.result    = RESULT_MENU;
   option.menu_addr = MENU_GLOBAL;
   write_data<Option>(&option, address);
 

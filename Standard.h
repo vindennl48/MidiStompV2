@@ -1,3 +1,5 @@
+#define DISPLAY_DEBUG
+
 /* :: TYPEDEFS :: */
 typedef unsigned long Timer;
 /* :: END - TYPEDEFS :: */
@@ -35,8 +37,10 @@ void activate_new_parent() {
     parents_used |= 1<<get_unused_parent_id();
 }
 void deactivate_active_parent() {
-  if ( parents_used > 1 )
+  if ( parents_used > 1 ) {
     parents_used &= ~(1<<get_active_parent_id());
+    Serial.println("----> deactivate_active_parent() active parent ID: " + String(get_active_parent_id()));
+  }
 }
 #define GET_UNUSED_PARENT_ID       (get_unused_parent_id())
 #define GET_ACTIVE_PARENT_ID       (get_active_parent_id())
@@ -54,6 +58,12 @@ void deactivate_active_parent() {
 
 
 /* :: HELPFUL MACROS :: */
+void debug(String title, String variable) {
+#ifdef DISPLAY_DEBUG
+  Serial.println(title + variable);
+#endif
+}
+#define DEBUG(title, variable) debug(String(title), String(variable))
 #define CONTAIN(i, min, max) (i>(min) ? (i<(max) ? i : (max-1)) : (min))
 #define ROTATE(i, min, max) (i>(min) ? (i<(max) ? i : (min)) : (max-1))
 /* :: END HELPFUL MACROS :: */
