@@ -220,18 +220,19 @@ struct Option {
 };
 
 
-#define MENU_MAIN               0
-#define MENU_PRESET             (M_MENUS +  0 * sizeof(Menu))
-#define MENU_PRESET_PARAMS      (M_MENUS +  1 * sizeof(Menu))
-#define MENU_PRESET_PARAM       (M_MENUS +  2 * sizeof(Menu))
-#define MENU_PRESET_PARAM_PEDAL (M_MENUS +  3 * sizeof(Menu))
-#define MENU_GLOBAL             (M_MENUS +  4 * sizeof(Menu))
-#define MENU_PEDALS             (M_MENUS +  5 * sizeof(Menu))
-#define MENU_PEDAL              (M_MENUS +  6 * sizeof(Menu))
-#define MENU_COLORS             (M_MENUS +  7 * sizeof(Menu))
-#define MENU_COLOR              (M_MENUS +  8 * sizeof(Menu))
-#define MENU_FEATURES           (M_MENUS +  9 * sizeof(Menu))
-#define MENU_FEATURE            (M_MENUS + 10 * sizeof(Menu))
+#define MENU_MAIN                 0
+#define MENU_PRESET               (M_MENUS +  0 * sizeof(Menu))
+#define MENU_PRESET_PARAMS        (M_MENUS +  1 * sizeof(Menu))
+#define MENU_PRESET_PARAM         (M_MENUS +  2 * sizeof(Menu))
+#define MENU_PRESET_PARAM_PEDAL   (M_MENUS +  3 * sizeof(Menu))
+#define MENU_PRESET_PARAM_FEATURE (M_MENUS +  4 * sizeof(Menu))
+#define MENU_GLOBAL               (M_MENUS +  5 * sizeof(Menu))
+#define MENU_PEDALS               (M_MENUS +  6 * sizeof(Menu))
+#define MENU_PEDAL                (M_MENUS +  7 * sizeof(Menu))
+#define MENU_COLORS               (M_MENUS +  8 * sizeof(Menu))
+#define MENU_COLOR                (M_MENUS +  9 * sizeof(Menu))
+#define MENU_FEATURES             (M_MENUS + 10 * sizeof(Menu))
+#define MENU_FEATURE              (M_MENUS + 11 * sizeof(Menu))
 struct Menu {
   char     name[TEXT_SZ]     = "UNTITLED    ";
   uint8_t  num_options       = 0;
