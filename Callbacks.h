@@ -1,3 +1,12 @@
+uint8_t get_pedal_id_from_parents() {
+  uint16_t pedal_addr = 0;
+  for (int i=NUM_PARENTS_MAX-1; i>=0; i--) {
+    if ( IS_IN_PARTITION_PEDALS(parents[i]) )
+      pedal_addr = parents[i];
+  }
+  return GET_ID_FROM_ADDR(M_PEDALS, pedal_addr, sizeof(Pedal));
+}
+
 uint8_t f_colors() {
   uint16_t active_parent_addr = GET_ACTIVE_PARENT_NOT_OPTION;
 
@@ -11,21 +20,23 @@ uint8_t f_colors() {
 }
 
 
+uint8_t f_features_setup() {
+  uint8_t pedal_id = get_pedal_id_from_parents();
+  alt_start_addr   = GET_CHILD(M_FEATURES, pedal_id, 0, sizeof(Feature), NUM_FEATURES_PER_PEDAL);
+  return true;
+}
+
+
 uint8_t f_preset_params_setup() {
   // preset is always parent 0
   uint8_t preset_id = GET_ID_FROM_ADDR(M_PRESETS, parents[0], sizeof(Preset));
   alt_start_addr    = GET_CHILD(M_PRESET_PARAMS, preset_id, 0, sizeof(Parameter), NUM_PRESET_PARAMS_PER_PRESET);
-  DEBUG("----> preset_params_setup() preset_id:      ", preset_id);
-  DEBUG("----> preset_params_setup() alt_start_addr: ", alt_start_addr);
   return true;
 }
 uint8_t f_preset_params_run() {
   uint16_t active_parent_addr  = GET_ACTIVE_PARENT_NOT_OPTION;
   uint8_t  pedal_id            = Parameter::get_pedal(active_parent_addr);
   uint8_t  feature_relative_id = Parameter::get_feature(active_parent_addr);
-
-  DEBUG("----> preset_params_run() pedal_id:            ", pedal_id);
-  DEBUG("----> preset_params_run() feature_relative_id: ", feature_relative_id);
 
   if ( pedal_id == NUM_PEDALS )
     memcpy(text[TXT_BUF_2], "EMPTY       ", TEXT_SZ);
@@ -60,14 +71,13 @@ uint8_t f_preset_param_pedal_setup() {
 
   // Check parents list if last addr is not in the menu options list
   if ( !IS_IN_PARTITION_PEDALS(GET_ACTIVE_PARENT) ) {
-    DEBUG("Setting new parent!: ", GET_UNUSED_PARENT_ID);
     // If it's not, then set new parent addr as the start_addr of menu struct
     SET_NEW_PARENT( GET_PARENT(M_PEDALS, pedal_id, sizeof(Pedal)) );
   }
   return true;
 }
 uint8_t f_preset_param_pedal_save() {
-  uint8_t pedal_id = GET_ID_FROM_ADDR(M_PEDALS, GET_ACTIVE_PARENT, sizeof(Pedal));
+  uint8_t pedal_id = get_pedal_id_from_parents();
   // In this menu, the parameter address is always active_parent - 2
   Parameter::set_pedal(parents[GET_ACTIVE_PARENT_ID-2], pedal_id);
 
@@ -91,10 +101,8 @@ uint8_t f_preset_param_feature_setup() {
     Parameter::set_pedal(preset_param_addr, pedal_id);
   }
 
-
   // Check parents list if last addr is not in the menu options list
   if ( !IS_IN_PARTITION_FEATURES(GET_ACTIVE_PARENT) ) {
-    DEBUG("Setting new parent!: ", GET_UNUSED_PARENT_ID);
     // If it's not, then set new parent addr as the start_addr of menu struct
     SET_NEW_PARENT( GET_CHILD(M_FEATURES, pedal_id, feature_relative_id, sizeof(Feature), NUM_FEATURES_PER_PEDAL) );
   }
@@ -122,7 +130,8 @@ uint8_t f_preset_param_feature_save() {
 #define F_PRESET_PARAM_PEDAL_SAVE    5
 #define F_PRESET_PARAM_FEATURE_SETUP 6
 #define F_PRESET_PARAM_FEATURE_SAVE  7
-#define F_GLOBAL                     8
+#define F_FEATURES_SETUP             8
+#define F_GLOBAL                     9
 
 typedef uint8_t (*Callback)();
 
@@ -135,6 +144,7 @@ Callback get_callback(uint8_t id) {
     case F_PRESET_PARAM_PEDAL_SAVE:    return &f_preset_param_pedal_save;
     case F_PRESET_PARAM_FEATURE_SETUP: return &f_preset_param_feature_setup;
     case F_PRESET_PARAM_FEATURE_SAVE:  return &f_preset_param_feature_save;
+    case F_FEATURES_SETUP:             return &f_features_setup;
     case F_GLOBAL:                     return &f_global;
   };
 

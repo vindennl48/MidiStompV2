@@ -14,8 +14,9 @@
  * */
 
 // PRIVATE
-#define E_MAIN      0
-#define E_TEXT_EDIT 1
+#define E_MAIN       0
+#define E_TEXT_EDIT  1
+#define E_VALUE_EDIT 2
 // --
 
 struct MenuSystem {
@@ -43,7 +44,6 @@ struct MenuSystem {
 
     // Check parents list if last addr is not in the menu options list
     if ( !IS_IN_LIST(get_start_addr(), Menu::get_num_options(menu_addr), Menu::get_size(menu_addr), GET_ACTIVE_PARENT) ) {
-      DEBUG("Setting new parent!: ", GET_UNUSED_PARENT_ID);
       // If it's not, then set new parent addr as the start_addr of menu struct
       SET_NEW_PARENT(get_start_addr());
     }
@@ -56,12 +56,6 @@ struct MenuSystem {
     PRINT_NLINE(0,0, "::");
     PRINT(2,0, text[TXT_BUF_1]);
     PRINT(2,1, ">");  // Just in case we need it, if not it will get rewritten
-
-    DEBUG(text[TXT_BUF_1], 0);
-    DEBUG("----> M_PRESET_PARAMS: ", M_PRESET_PARAMS);
-    DEBUG("----> menu_addr:       ", menu_addr);
-    DEBUG("----> alt_start_addr:  ", alt_start_addr);
-    DEBUG("----> get_start_addr:  ", get_start_addr());
   }
 
   uint8_t loop() {
@@ -75,7 +69,6 @@ struct MenuSystem {
           if ( !IS_IN_PARTITION_OPTIONS(GET_ACTIVE_PARENT) ) {
             // If no, print ID# of selection, name of option (if custom) must come from callback
             uint8_t current_id = GET_ID_FROM_ADDR(get_start_addr(), GET_ACTIVE_PARENT, Menu::get_size(menu_addr)) + 1;
-            DEBUG("----> current_id: ", current_id);
             PRINT(0,1, "   .");
             if      ( current_id <  10  ) PRINT(2,1, current_id);
             else if ( current_id <  100 ) PRINT(1,1, current_id);
@@ -88,13 +81,28 @@ struct MenuSystem {
 
           // print TXT_BUF_2 to the LCD screen
           PRINT_NLINE(4,1, text[TXT_BUF_2]);
+
+#ifdef DISPLAY_DEBUG
+          DEBUG("alt_start_addr: ", alt_start_addr);
+          DEBUG("parents_used:   ", parents_used);
+          Serial.print("Parents Active: ");
+          for (uint8_t i=0; i<NUM_PARENTS_MAX; i++) {
+            Serial.print(String((parents_used & 1<<i) > 0 ? 1 : 0) + ", ");
+          }
+          Serial.println("");
+          Serial.print("Parents Addr: ");
+          for (uint8_t i=0; i<NUM_PARENTS_MAX; i++) {
+            Serial.print(String(parents[i]) + ", ");
+          }
+          Serial.println("");
+#endif
+
         }
         else {
           if ( knob.is_left() ) {
             uint16_t result = GET_ACTIVE_PARENT - Menu::get_size(menu_addr);
             if ( result >= get_start_addr() ) {
               SET_ACTIVE_PARENT(result);
-              DEBUG("----> Active Parent: ", GET_ACTIVE_PARENT);
               n.reinit();
             }
           }
@@ -103,7 +111,6 @@ struct MenuSystem {
             uint16_t end    = get_start_addr() + Menu::get_num_options(menu_addr) * Menu::get_size(menu_addr);
             if ( result < end ) {
               SET_ACTIVE_PARENT(result);
-              DEBUG("----> Active Parent: ", GET_ACTIVE_PARENT);
               n.reinit();
             }
           }
@@ -123,6 +130,9 @@ struct MenuSystem {
               }
               else if ( Option::get_result(GET_ACTIVE_PARENT) == RESULT_TEXT_EDIT ) {
                 n.jump_to(E_TEXT_EDIT);
+              }
+              else if ( Option::get_result(GET_ACTIVE_PARENT) == RESULT_VALUE_EDIT ) {
+                n.jump_to(E_VALUE_EDIT);
               }
             }
             else {
@@ -149,6 +159,20 @@ struct MenuSystem {
         }
         else {
           if ( text_edit.loop() ) {
+            // Go to the next menu item selected by this option
+            uint16_t new_menu_addr = Option::get_menu_addr(GET_ACTIVE_PARENT);
+            if ( new_menu_addr == MENU_MAIN ) return true;
+            setup( new_menu_addr );
+          }
+        }
+        break;
+
+      case E_VALUE_EDIT:
+        if ( n.not_init() ) {
+          value_edit.setup();
+        }
+        else {
+          if ( value_edit.loop() ) {
             // Go to the next menu item selected by this option
             uint16_t new_menu_addr = Option::get_menu_addr(GET_ACTIVE_PARENT);
             if ( new_menu_addr == MENU_MAIN ) return true;

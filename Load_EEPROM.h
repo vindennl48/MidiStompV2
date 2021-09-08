@@ -166,8 +166,8 @@ void setup() {
   #include "Load_EEPROM_Menu_Preset_Params.h"
   #include "Load_EEPROM_Menu_Global.h"
   #include "Load_EEPROM_Menu_Global_Pedals.h"
+  #include "Load_EEPROM_Menu_Global_Pedal_Features.h"
 //  #include "Load_EEPROM_Menu_Global_Colors.h"
-//  #include "Load_EEPROM_Menu_Global_Pedal_Features.h"
 }
 #endif // -- END MENUS --
 

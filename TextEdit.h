@@ -19,7 +19,7 @@ struct TextEdit {
     lcd.cursor();  // Highlight
   }
 
-  bool loop() {
+  uint8_t loop() {
     switch( n.e() ) {
       default:
       case E_SELECT_LETTER:
@@ -31,10 +31,10 @@ struct TextEdit {
         else {
           if ( knob.is_left() || knob.is_right() ) {
             if ( knob.is_left() ) {
-              cursor = CONTAIN(cursor-1, 0, TEXT_SZ+1);
+              cursor = CONTAIN((int)cursor-1, (int)0, (int)TEXT_SZ+1);
             }
             else if ( knob.is_right() ) {
-              cursor = CONTAIN(cursor+1, 0, TEXT_SZ+1);
+              cursor = CONTAIN((int)cursor+1, (int)0, (int)TEXT_SZ+1);
             }
 
             if      ( cursor == TEXT_SZ-1 ) lcd.setCursor(     0, 1);
@@ -110,8 +110,8 @@ struct TextEdit {
         }
         else {
           if ( knob.is_left() || knob.is_right() ) {
-            if      ( knob.is_left() )  letter = CONTAIN(letter-1, 0, ALPHABET_SZ);
-            else if ( knob.is_right() ) letter = CONTAIN(letter+1, 0, ALPHABET_SZ);
+            if      ( knob.is_left() )  letter = CONTAIN((int)letter-1, (int)0, (int)ALPHABET_SZ-1);
+            else if ( knob.is_right() ) letter = CONTAIN((int)letter+1, (int)0, (int)ALPHABET_SZ-1);
             lcd.print( alphabet[letter] );
             lcd.setCursor(cursor, 0);
           }

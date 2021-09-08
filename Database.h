@@ -206,7 +206,7 @@ struct Footswitch {
 #define RESULT_TEXT_EDIT  2
 #define RESULT_VALUE_EDIT 3
 #define RESULT_COLOR_EDIT 4
-#define RESULT_MIDI_EDIT  5
+#define RESULT_CBO_EDIT   5
 struct Option {
   char     name[TEXT_SZ]     = "UNTITLED    ";
   uint8_t  result            = RESULT_MENU;

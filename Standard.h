@@ -1,4 +1,4 @@
-#define DISPLAY_DEBUG
+//#define DISPLAY_DEBUG
 
 /* :: TYPEDEFS :: */
 typedef unsigned long Timer;
@@ -12,8 +12,8 @@ typedef unsigned long Timer;
 #define TXT_BUF_2    1
 char text[RAM_TEXT_MAX][TEXT_SZ] = {{' '}};
 
-#define NUM_PARENTS_MAX 6
-uint8_t  parents_used             = 0;  // flip bit for parent being used
+#define NUM_PARENTS_MAX 8
+uint8_t parents_used = 0;  // flip bit for parent being used
                                         // NEVER delete parent 0 or things will crash
 uint16_t parents[NUM_PARENTS_MAX] = { 0 };
 
@@ -38,8 +38,8 @@ void activate_new_parent() {
 }
 void deactivate_active_parent() {
   if ( parents_used > 1 ) {
+    parents[get_active_parent_id()] = 0;
     parents_used &= ~(1<<get_active_parent_id());
-    Serial.println("----> deactivate_active_parent() active parent ID: " + String(get_active_parent_id()));
   }
 }
 #define GET_UNUSED_PARENT_ID       (get_unused_parent_id())
@@ -90,8 +90,11 @@ void debug(String title, String variable) {
 
 
 /* :: SERIAL SETUP :: */
-//#define SERIAL_MIDI_SETUP Serial.begin(31250)
+#ifdef DISPLAY_DEBUG
 #define SERIAL_MIDI_SETUP Serial.begin(9600)
+#else
+#define SERIAL_MIDI_SETUP Serial.begin(31250)
+#endif
 /* :: END SERIAL SETUP :: */
 
 
