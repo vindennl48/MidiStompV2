@@ -7,6 +7,7 @@ uint8_t get_pedal_id_from_parents() {
   return GET_ID_FROM_ADDR(M_PEDALS, pedal_addr, sizeof(Pedal));
 }
 
+
 uint8_t f_colors() {
   uint16_t active_parent_addr = GET_ACTIVE_PARENT_NOT_OPTION;
 
@@ -15,6 +16,15 @@ uint8_t f_colors() {
     Color::get_green(active_parent_addr),
     Color::get_blue(active_parent_addr)
   );
+
+  return true;
+}
+
+
+uint8_t f_preset_save() {
+  // Because we are going back to the same screen, MenuSystem won't delete it
+  // so we need to make sure active parent gets deleted manually.
+  deactivate_active_parent();
 
   return true;
 }
@@ -124,20 +134,22 @@ uint8_t f_preset_param_feature_save() {
 
 #define F_NONE                       0
 #define F_COLORS                     1
-#define F_PRESET_PARAMS_RUN          2
-#define F_PRESET_PARAMS_SETUP        3
-#define F_PRESET_PARAM_PEDAL_SETUP   4
-#define F_PRESET_PARAM_PEDAL_SAVE    5
-#define F_PRESET_PARAM_FEATURE_SETUP 6
-#define F_PRESET_PARAM_FEATURE_SAVE  7
-#define F_FEATURES_SETUP             8
-#define F_GLOBAL                     9
+#define F_PRESET_SAVE                2
+#define F_PRESET_PARAMS_RUN          3
+#define F_PRESET_PARAMS_SETUP        4
+#define F_PRESET_PARAM_PEDAL_SETUP   5
+#define F_PRESET_PARAM_PEDAL_SAVE    6
+#define F_PRESET_PARAM_FEATURE_SETUP 7
+#define F_PRESET_PARAM_FEATURE_SAVE  8
+#define F_FEATURES_SETUP             9
+#define F_GLOBAL                     10
 
 typedef uint8_t (*Callback)();
 
 Callback get_callback(uint8_t id) {
   switch(id) {
     case F_COLORS:                     return &f_colors;
+    case F_PRESET_SAVE:                return &f_preset_save;
     case F_PRESET_PARAMS_RUN:          return &f_preset_params_run;
     case F_PRESET_PARAMS_SETUP:        return &f_preset_params_setup;
     case F_PRESET_PARAM_PEDAL_SETUP:   return &f_preset_param_pedal_setup;

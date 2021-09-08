@@ -138,6 +138,16 @@ void setup() {
 }
 #endif // -- END PRESET PARAMS --
 
+#ifdef RESET_FSW
+  PRINT_NLINE(11,0, NUM_FSW_TOTAL);
+  print_nline(0, 1, "> FSW");
+  Footswitch footswitch;
+  for (uint16_t i=M_FSW, j=0; j<NUM_FSW_TOTAL; i+=sizeof(Footswitch), j++) {
+    if ( !(j%10) ) PRINT_NLINE(6,1, j);
+    write_data<Footswitch>(&footswitch, i);
+  }
+#endif
+
 #ifdef RESET_FSW_PARAMS
 {
   PRINT_NLINE(11,0, NUM_FSW_PARAMS_TOTAL);

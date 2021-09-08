@@ -179,6 +179,13 @@ struct Footswitch {
     };
   };
 
+  Footswitch() {
+    mode       = FSW_MODE_TOGGLE;
+    lp_mode    = FSW_MODE_OFF;
+    state      = 0;
+    press_type = PRESS_TYPE_UP;
+  }
+
   void increase_state() {
     state += 1;
     if ( mode == FSW_MODE_CYCLE ) {
@@ -198,7 +205,7 @@ struct Footswitch {
 //  static Footswitch get(uint8_t preset_id, uint8_t submenu_id, uint8_t fsw_id) {
 //    return read_data<Footswitch>( GET_CHILD(M_FSW, preset_id, submenu_id*NUM_FSW_PER_SUBMENU+fsw_id, sizeof(Footswitch), NUM_FSW_PER_PRESET) );
 //  }
-};
+} fsw[NUM_FSW_PER_PRESET];
 
 
 #define RESULT_MENU       0

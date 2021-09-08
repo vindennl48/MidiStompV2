@@ -16,6 +16,8 @@ char text[RAM_TEXT_MAX][TEXT_SZ] = {{' '}};
 uint8_t parents_used = 0;  // flip bit for parent being used
                                         // NEVER delete parent 0 or things will crash
 uint16_t parents[NUM_PARENTS_MAX] = { 0 };
+uint8_t  preset_id                = 0;
+uint8_t  submenu_id               = 0;
 
 #define ALPHABET_SZ 40
 char alphabet[ALPHABET_SZ] = " ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_";
@@ -41,6 +43,11 @@ void deactivate_active_parent() {
     parents[get_active_parent_id()] = 0;
     parents_used &= ~(1<<get_active_parent_id());
   }
+}
+void clear_all_parents() {
+  parents_used = 0;
+  for (uint8_t i=0; i<NUM_PARENTS_MAX; i++)
+    parents[i] = 0;
 }
 #define GET_UNUSED_PARENT_ID       (get_unused_parent_id())
 #define GET_ACTIVE_PARENT_ID       (get_active_parent_id())
