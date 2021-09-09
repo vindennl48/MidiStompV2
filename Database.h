@@ -103,6 +103,11 @@ struct Color {
   BUILD_OBJ_VAR(green, uint8_t, 14);
   BUILD_OBJ_VAR(blue,  uint8_t, 15);
 };
+#define GET_RGB_ADDR(color_addr) \
+  read_data<uint8_t>(color_addr+13), \
+  read_data<uint8_t>(color_addr+14), \
+  read_data<uint8_t>(color_addr+15)
+#define GET_RGB(color_id) GET_RGB_ADDR( GET_PARENT(M_COLORS, color_id, sizeof(Color)) )
 
 struct Pedal {
   char    name[TEXT_SZ] = "UNTITLED ";
@@ -197,6 +202,12 @@ struct Footswitch {
     else if ( FSW_MODE_TOGGLE && state >= 2 ) state = 0;
   }
 
+  void run_long_press() {
+    if ( lp_mode > 0 ) {
+      flash();
+    }
+  }
+
 //  void save(uint8_t preset_id, uint8_t submenu_id, uint8_t fsw_id) {
 //    return write_data<Footswitch>( this, GET_CHILD(M_FSW, preset_id, submenu_id*NUM_FSW_PER_SUBMENU+fsw_id, sizeof(Footswitch), NUM_FSW_PER_PRESET) );
 //  }
@@ -207,6 +218,10 @@ struct Footswitch {
 //  }
 } fsw[NUM_FSW_PER_PRESET];
 
+struct FSW_Settings {
+  uint8_t id;
+  uint8_t state;
+} fsw_settings;
 
 #define RESULT_MENU       0
 #define RESULT_CONFIRM    1
@@ -240,6 +255,7 @@ struct Option {
 #define MENU_COLOR                (M_MENUS +  9 * sizeof(Menu))
 #define MENU_FEATURES             (M_MENUS + 10 * sizeof(Menu))
 #define MENU_FEATURE              (M_MENUS + 11 * sizeof(Menu))
+#define MENU_FSW                  (M_MENUS + 12 * sizeof(Menu))
 struct Menu {
   char     name[TEXT_SZ]     = "UNTITLED    ";
   uint8_t  num_options       = 0;

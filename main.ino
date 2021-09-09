@@ -33,6 +33,9 @@ void loop() {
           fsw[j] = read_data<Footswitch>(i);
         }
 
+        fsw[0].lp_mode = FSW_MODE_ONESHOT;
+        fsw[0].mode    = FSW_MODE_CYCLE;
+
         // Reset the submenu
         submenu_id = 0;
 
@@ -41,14 +44,14 @@ void loop() {
       break;
 
     case E_RESET_SCREEN:
-        // Lastly, lets reset the main screen
-        lcd.clear();
-        Preset::get_name(parents[0], TXT_BUF_1);
-        PRINT(0,0, text[TXT_BUF_1]);
-        PRINT(0,1, String("P.") + String( GET_ID_FROM_ADDR(M_PRESETS, parents[0], sizeof(Preset))+1 ));
-        PRINT(10,1, String("MENU ") + String(submenu_id+1));
+      //Lets reset the main screen
+      lcd.clear();
+      Preset::get_name(parents[0], TXT_BUF_1);
+      PRINT(0,0, text[TXT_BUF_1]);
+      PRINT(0,1, String("P.") + String( GET_ID_FROM_ADDR(M_PRESETS, parents[0], sizeof(Preset))+1 ));
+      PRINT(10,1, String("MENU ") + String(submenu_id+1));
 
-        n.jump_to(E_MAIN);
+      n.jump_to(E_MAIN);
       break;
 
     case E_MAIN:
@@ -57,8 +60,7 @@ void loop() {
         for (uint8_t i=submenu_id*NUM_FSW_PER_SUBMENU, j=0; j<NUM_FSW_PER_SUBMENU; i++, j++) {
           btns[j].set_press_type(fsw[i].press_type);
           if ( fsw[i].mode != FSW_MODE_OFF ) {
-            // need to load selected FSW colors
-            /*leds[j].set();*/
+            leds[j].set(GET_RGB(fsw[i].color_id[fsw[i].state]));
           }
           else {
             leds[j].set(0,0,0);
@@ -67,8 +69,13 @@ void loop() {
       }
       else {
         for (uint8_t i=0; i<NUM_FSW_PER_SUBMENU; i++) {
-          if ( btns[i].is_pressed() ) {}
-          else if ( btns[i].is_long_pressed() ) {}
+          if ( btns[i].is_pressed() ) {
+            fsw[i+(NUM_FSW_PER_SUBMENU*submenu_id)].increase_state();
+            n.reinit();
+          }
+          else if ( btns[i].is_long_pressed() ) {
+            fsw[i+(NUM_FSW_PER_SUBMENU*submenu_id)].run_long_press();
+          }
         }
 
         if ( knob.is_long_pressed() ) {
@@ -85,6 +92,51 @@ void loop() {
       }
       else {
         if ( menu.loop() ) n.jump_to(E_RESET_SCREEN);
+        else if ( parents_used == 0b11 ) {
+          for (uint8_t i=0; i<NUM_FSW_PER_SUBMENU; i++) {
+            if ( btns[i].is_pressed() ) {
+              fsw_settings.id    = i+(NUM_FSW_PER_SUBMENU*submenu_id);
+              fsw_settings.state = 0;
+
+              deactivate_active_parent();
+              n.jump_to(E_FSW_SETTINGS);
+            }
+          }
+        }
+      }
+      break;
+
+    case E_FSW_SETTINGS:
+      if ( n.not_init() ) {
+        String title =  "FSW" + String((fsw_settings.id%NUM_FSW_PER_SUBMENU)+1) + " S" + String(fsw_settings.state+1) + " M" + String(submenu_id+1) ;
+        for (uint8_t i=0; i<TEXT_SZ; i++)
+          text[TXT_BUF_1][i] = title[i];
+        menu.setup(MENU_FSW, true);
+
+        leds_set(0,0,0);
+        leds[fsw_settings.id % NUM_FSW_PER_SUBMENU].set(GET_RGB(fsw[fsw_settings.id].color_id[fsw_settings.state]));
+      }
+      else {
+        if ( menu.loop() ) n.jump_to(E_RESET_SCREEN);
+        else if ( parents_used == 0b11 ) {
+          for (uint8_t i=0; i<NUM_FSW_PER_SUBMENU; i++) {
+            if ( btns[i].is_pressed() ) {
+              if ( fsw_settings.id % NUM_FSW_PER_SUBMENU != i ) {
+                fsw_settings.id    = i+(NUM_FSW_PER_SUBMENU*submenu_id);
+                fsw_settings.state = 0;
+              }
+              else {
+                fsw_settings.state = ROTATE(fsw_settings.state+1, 0, 3);
+              }
+
+              leds_set(0,0,0);
+              leds[i].set(GET_RGB(fsw[fsw_settings.id].color_id[fsw_settings.state]));
+
+              deactivate_active_parent();
+              n.jump_to(E_FSW_SETTINGS);
+            }
+          }
+        }
       }
       break;
   };

@@ -28,7 +28,7 @@ struct MenuSystem {
     return Menu::get_start_addr(menu_addr);
   }
 
-  void setup(uint16_t menu_addr) {
+  void setup(uint16_t menu_addr, uint8_t custom_title=false) {
     // Reset the navigation helper
     n.reset();
 
@@ -48,8 +48,10 @@ struct MenuSystem {
       SET_NEW_PARENT(get_start_addr());
     }
 
-    // Set the first text buffer with the name of the menu
-    Menu::get_name(menu_addr, TXT_BUF_1);
+    if ( !custom_title ) {
+      // Set the first text buffer with the name of the menu
+      Menu::get_name(menu_addr, TXT_BUF_1);
+    }
 
     // Write the title of menu to the LCD
     lcd.clear();
