@@ -69,6 +69,35 @@ uint8_t f_global() {
 }
 
 
+uint8_t f_fsw_setup() {
+  String title =  "FSW" + String((fsw_settings.id%NUM_FSW_PER_SUBMENU)+1) + " S" + String(fsw_settings.state+1) + " M" + String(submenu_id+1) ;
+  for (uint8_t i=0; i<TEXT_SZ; i++)
+    text[TXT_BUF_1][i] = title[i];
+  leds_set(0,0,0);
+  leds[fsw_settings.id % NUM_FSW_PER_SUBMENU].set(GET_RGB(fsw[fsw_settings.id].color_id[fsw_settings.state]));
+  return true;
+}
+
+
+uint8_t f_fsw_color_setup() {
+  // Check parents list if last addr is not in the menu options list
+  if ( !IS_IN_PARTITION_COLORS(GET_ACTIVE_PARENT) ) {
+    // If it's not, then set new parent addr as the start_addr of menu struct
+    SET_NEW_PARENT( GET_PARENT(M_COLORS, fsw[fsw_settings.id].color_id[fsw_settings.state], sizeof(Color)) );
+  }
+  return true;
+}
+uint8_t f_fsw_color_save() {
+  fsw[fsw_settings.id].color_id[fsw_settings.state] = GET_ID_FROM_ADDR(M_COLORS, GET_ACTIVE_PARENT, sizeof(Color));
+
+  // Because we are going back to the same screen, MenuSystem won't delete it
+  // so we need to make sure active parent gets deleted manually.
+  deactivate_active_parent();
+
+  return true;
+}
+
+
 uint8_t f_preset_param_pedal_setup() {
   uint16_t preset_param_addr = GET_ACTIVE_PARENT_NOT_OPTION;
   uint8_t  pedal_id          = Parameter::get_pedal(preset_param_addr);
@@ -143,6 +172,9 @@ uint8_t f_preset_param_feature_save() {
 #define F_PRESET_PARAM_FEATURE_SAVE  8
 #define F_FEATURES_SETUP             9
 #define F_GLOBAL                     10
+#define F_FSW_SETUP                  11
+#define F_FSW_COLOR_SETUP            12
+#define F_FSW_COLOR_SAVE             13
 
 typedef uint8_t (*Callback)();
 
@@ -158,6 +190,9 @@ Callback get_callback(uint8_t id) {
     case F_PRESET_PARAM_FEATURE_SAVE:  return &f_preset_param_feature_save;
     case F_FEATURES_SETUP:             return &f_features_setup;
     case F_GLOBAL:                     return &f_global;
+    case F_FSW_SETUP:                  return &f_fsw_setup;
+    case F_FSW_COLOR_SETUP:            return &f_fsw_color_setup;
+    case F_FSW_COLOR_SAVE:             return &f_fsw_color_save;
   };
 
   return nullptr;

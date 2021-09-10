@@ -108,13 +108,7 @@ void loop() {
 
     case E_FSW_SETTINGS:
       if ( n.not_init() ) {
-        String title =  "FSW" + String((fsw_settings.id%NUM_FSW_PER_SUBMENU)+1) + " S" + String(fsw_settings.state+1) + " M" + String(submenu_id+1) ;
-        for (uint8_t i=0; i<TEXT_SZ; i++)
-          text[TXT_BUF_1][i] = title[i];
         menu.setup(MENU_FSW, true);
-
-        leds_set(0,0,0);
-        leds[fsw_settings.id % NUM_FSW_PER_SUBMENU].set(GET_RGB(fsw[fsw_settings.id].color_id[fsw_settings.state]));
       }
       else {
         if ( menu.loop() ) n.jump_to(E_RESET_SCREEN);
@@ -128,10 +122,6 @@ void loop() {
               else {
                 fsw_settings.state = ROTATE(fsw_settings.state+1, 0, 3);
               }
-
-              leds_set(0,0,0);
-              leds[i].set(GET_RGB(fsw[fsw_settings.id].color_id[fsw_settings.state]));
-
               deactivate_active_parent();
               n.jump_to(E_FSW_SETTINGS);
             }

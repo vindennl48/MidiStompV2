@@ -102,9 +102,9 @@ struct MenuSystem {
         }
         else {
           if ( knob.is_left() ) {
-            uint16_t result = GET_ACTIVE_PARENT - Menu::get_size(menu_addr);
-            if ( result >= get_start_addr() ) {
-              SET_ACTIVE_PARENT(result);
+            int result = (int)GET_ACTIVE_PARENT - (int)Menu::get_size(menu_addr);
+            if ( result >= (int)get_start_addr() ) {
+              SET_ACTIVE_PARENT((uint16_t)result);
               n.reinit();
             }
           }
@@ -133,7 +133,7 @@ struct MenuSystem {
               else if ( Option::get_result(GET_ACTIVE_PARENT) == RESULT_TEXT_EDIT ) {
                 n.jump_to(E_TEXT_EDIT);
               }
-              else if ( Option::get_result(GET_ACTIVE_PARENT) == RESULT_VALUE_EDIT ) {
+              else { // RESULT_VALUE_EDIT
                 n.jump_to(E_VALUE_EDIT);
               }
             }
@@ -171,7 +171,7 @@ struct MenuSystem {
 
       case E_VALUE_EDIT:
         if ( n.not_init() ) {
-          value_edit.setup();
+          value_edit.setup( Option::get_result(GET_ACTIVE_PARENT) );
         }
         else {
           if ( value_edit.loop() ) {

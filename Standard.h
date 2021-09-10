@@ -1,4 +1,4 @@
-//#define DISPLAY_DEBUG
+#define DISPLAY_DEBUG
 
 /* :: TYPEDEFS :: */
 typedef unsigned long Timer;
