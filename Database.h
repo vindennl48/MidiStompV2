@@ -258,9 +258,11 @@ struct Option {
 #define MENU_FEATURE              (M_MENUS + 11 * sizeof(Menu))
 #define MENU_FSW                  (M_MENUS + 12 * sizeof(Menu))
 #define MENU_FSW_PARAMS           (M_MENUS + 13 * sizeof(Menu))
-#define MENU_FSW_PARAM            (M_MENUS + 14 * sizeof(Menu))
-#define MENU_FSW_COLOR            (M_MENUS + 15 * sizeof(Menu))
-#define MENU_FSW_LONGPRESS        (M_MENUS + 16 * sizeof(Menu))
+#define MENU_FSW_COLOR            (M_MENUS + 14 * sizeof(Menu))
+#define MENU_FSW_LONGPRESS        (M_MENUS + 15 * sizeof(Menu))
+#define MENU_FSW_PARAM            (M_MENUS + 16 * sizeof(Menu))
+#define MENU_FSW_PARAM_PEDAL      (M_MENUS + 17 * sizeof(Menu))
+#define MENU_FSW_PARAM_FEATURE    (M_MENUS + 18 * sizeof(Menu))
 struct Menu {
   char     name[TEXT_SZ]     = "UNTITLED    ";
   uint8_t  num_options       = 0;

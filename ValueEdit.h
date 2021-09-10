@@ -31,7 +31,7 @@ struct ValueEdit {
       else if ( IS_IN_PARTITION_FEATURES(active_parent_addr) ) {
         edit_type = E_EDIT_FEATURE_PITCH;
       }
-      else if ( IS_IN_PARTITION_PRESET_PARAMS(active_parent_addr) ) {
+      else if ( IS_IN_PARTITION_PRESET_PARAMS(active_parent_addr) ||  IS_IN_PARTITION_FSW_PARAMS(active_parent_addr) ) {
         edit_type = E_EDIT_PARAM_VELOCITY;
       }
       else {

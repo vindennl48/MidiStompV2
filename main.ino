@@ -92,7 +92,7 @@ void loop() {
       }
       else {
         if ( menu.loop() ) n.jump_to(E_RESET_SCREEN);
-        else if ( parents_used == 0b11 ) {
+        else if ( parents_used == 0b11 && menu.n.e() == E_MAIN ) {
           for (uint8_t i=0; i<NUM_FSW_PER_SUBMENU; i++) {
             if ( btns[i].is_pressed() ) {
               fsw_settings.id    = i+(NUM_FSW_PER_SUBMENU*submenu_id);
