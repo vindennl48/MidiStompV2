@@ -176,6 +176,9 @@ uint8_t f_fsw_params_run() {
   if ( fsw[fsw_settings.id].mode == FSW_MODE_SUBMENU && (GET_FSWSET_PARAM_ADDR(0) == active_parent_addr) ) {
     memcpy(text[TXT_BUF_2], "SUBMENU MODE", TEXT_SZ);
   }
+  else if ( fsw[fsw_settings.id].mode == FSW_MODE_PRESET && (GET_FSWSET_PARAM_ADDR(0) == active_parent_addr) ) {
+    memcpy(text[TXT_BUF_2], "PRESET MODE ", TEXT_SZ);
+  }
   else if ( pedal_id == NUM_PEDALS )
     memcpy(text[TXT_BUF_2], "EMPTY       ", TEXT_SZ);
   else {
@@ -192,7 +195,7 @@ uint8_t f_fsw_params_run() {
 }
 uint8_t f_fsw_params_save() {
   // if fsw is in submenu mode, we need to jump straight to editing the submenu value
-  if ( fsw[fsw_settings.id].mode == FSW_MODE_SUBMENU ) {
+  if ( fsw[fsw_settings.id].mode == FSW_MODE_SUBMENU || fsw[fsw_settings.id].mode == FSW_MODE_PRESET ) {
     if ( GET_FSWSET_PARAM_ADDR(0) == GET_ACTIVE_PARENT_NOT_OPTION ) {
       return CS_VALUE_EDIT_JUMP;
     }
@@ -232,6 +235,9 @@ uint8_t f_fsw_lp_params_run() {
   if ( fsw[fsw_settings.id].lp_mode == FSW_MODE_SUBMENU && (GET_FSWSET_PARAM_ADDR(0) == active_parent_addr) ) {
     memcpy(text[TXT_BUF_2], "SUBMENU MODE", TEXT_SZ);
   }
+  else if ( fsw[fsw_settings.id].lp_mode == FSW_MODE_PRESET && (GET_FSWSET_PARAM_ADDR(0) == active_parent_addr) ) {
+    memcpy(text[TXT_BUF_2], "PRESET MODE ", TEXT_SZ);
+  }
   else if ( pedal_id == NUM_PEDALS )
     memcpy(text[TXT_BUF_2], "EMPTY       ", TEXT_SZ);
   else {
@@ -248,7 +254,7 @@ uint8_t f_fsw_lp_params_run() {
 }
 uint8_t f_fsw_lp_params_save() {
   // if fsw is in submenu mode, we need to jump straight to editing the submenu value
-  if ( fsw[fsw_settings.id].lp_mode == FSW_MODE_SUBMENU ) {
+  if ( fsw[fsw_settings.id].lp_mode == FSW_MODE_SUBMENU || fsw[fsw_settings.id].lp_mode == FSW_MODE_PRESET ) {
     if ( GET_FSWSET_PARAM_ADDR(0) == GET_ACTIVE_PARENT_NOT_OPTION ) {
       return CS_VALUE_EDIT_JUMP;
     }

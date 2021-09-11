@@ -68,13 +68,13 @@ void loop() {
           for (uint8_t i=0; i<NUM_FSW_PER_SUBMENU; i++) {
             if ( btns[i].is_pressed() ) {
               if ( fsw[GET_FSW_PRESET_ID(i)].mode == FSW_MODE_SUBMENU ) {
-                submenu_id = (Parameter::get_velocity(GET_FSW_PARAM_ADDR(i, 0))+NUM_SUBMENUS_PER_PRESET) % NUM_SUBMENUS_PER_PRESET;
+                submenu_id = Parameter::get_velocity(GET_FSW_PARAM_ADDR(i, 0));
                 n.jump_to(E_RESET_SCREEN);
               }
-//              else if ( fsw[GET_FSW_PRESET_ID(i)].mode == FSW_MODE_PRESET ) {
-//                preset_id = (Parameter::get_velocity(GET_FSW_PARAM_ADDR(i, 0))+NUM_PRESETS) % NUM_PRESETS;
-//                n.jump_to(E_SETUP); // Change preset and reset everything
-//              }
+              else if ( fsw[GET_FSW_PRESET_ID(i)].mode == FSW_MODE_PRESET ) {
+                preset_id = Parameter::get_velocity(GET_FSW_PARAM_ADDR(i, 0));
+                n.jump_to(E_SETUP); // Change preset and reset everything
+              }
               else {
                 fsw[GET_FSW_PRESET_ID(i)].increase_state();
                 n.reinit();
@@ -87,10 +87,10 @@ void loop() {
                 submenu_id = Parameter::get_velocity(GET_FSW_LP_PARAM_ADDR(i, 0));
                 n.jump_to(E_RESET_SCREEN);
               }
-//              else if ( fsw[GET_FSW_PRESET_ID(i)].lp_mode == FSW_MODE_PRESET ) {
-//                preset_id = Parameter::get_velocity(GET_FSW_LP_PARAM_ADDR(i, 0));
-//                n.jump_to(E_SETUP); // Change preset and reset everything
-//              }
+              else if ( fsw[GET_FSW_PRESET_ID(i)].lp_mode == FSW_MODE_PRESET ) {
+                preset_id = Parameter::get_velocity(GET_FSW_LP_PARAM_ADDR(i, 0));
+                n.jump_to(E_SETUP); // Change preset and reset everything
+              }
               else {
                 n.reinit();
               }
