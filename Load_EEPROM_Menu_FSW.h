@@ -82,6 +82,7 @@ menu.return_addr       = MENU_FSW;
 menu.forward_addr      = MENU_FSW_PARAM;
 menu.callback_setup_id = F_FSW_PARAMS_SETUP; // setting alt_start_addr here
 menu.callback_run_id   = F_FSW_PARAMS_RUN;   // setting alt_start_addr here
+menu.callback_save_id  = F_FSW_PARAMS_SAVE;  // IF submenu mode is active
 write_data<Menu>(&menu, MENU_FSW_PARAMS);
 
   address               = MENU_FSW_PARAM;

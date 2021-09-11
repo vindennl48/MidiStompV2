@@ -44,10 +44,10 @@ uint8_t f_global() {
 
 /* :: PRESET :: */
 uint8_t f_preset_save() {
-  // Because we are going back to the same screen, MenuSystem won't delete it
-  // so we need to make sure active parent gets deleted manually.
-  deactivate_active_parent();
-
+  // Next, we have to load the footswitches
+  uint16_t start_fsw_addr = GET_CHILD(M_FSW, preset_id, 0, sizeof(Footswitch), NUM_FSW_PER_PRESET );
+  for (uint16_t i=start_fsw_addr, j=0; j<NUM_FSW_PER_PRESET; i+=sizeof(Footswitch), j++)
+    write_data<Footswitch>(&fsw[j], i);
   return true;
 }
 uint8_t f_preset_params_setup() {
@@ -163,18 +163,42 @@ uint8_t f_fsw_color_save() {
   return true;
 }
 uint8_t f_fsw_params_setup() {
-  DEBUG("M_FSW_PARAMS:       ", M_FSW_PARAMS);
-  DEBUG("fsw_settings.id:    ", fsw_settings.id);
-  DEBUG("preset_id:          ", preset_id);
-  DEBUG("fsw_settings.state: ", fsw_settings.state);
-  alt_start_addr = GET_CHILD(M_FSW_PARAMS, (fsw_settings.id+(preset_id*NUM_FSW_PER_PRESET)), (fsw_settings.state*NUM_FSW_PARAMS_PER_STATE), sizeof(Parameter), NUM_FSW_PARAMS_PER_STATE);
-  DEBUG("----", 0);
-  DEBUG("pedal_id: ", Parameter::get_pedal(alt_start_addr));
-  DEBUG("feature_id: ", Parameter::get_feature(alt_start_addr));
+  alt_start_addr = GET_CHILD(M_FSW_PARAMS, (fsw_settings.id+(preset_id*NUM_FSW_PER_PRESET)), (fsw_settings.state*NUM_FSW_PARAMS_PER_STATE), sizeof(Parameter), NUM_FSW_PARAMS_PER_FSW);
   return true;
 }
 uint8_t f_fsw_params_run() {
-  return f_preset_params_run();
+  uint16_t active_parent_addr  = GET_ACTIVE_PARENT_NOT_OPTION;
+  uint8_t  pedal_id            = Parameter::get_pedal(active_parent_addr);
+  uint8_t  feature_relative_id = Parameter::get_feature(active_parent_addr);
+  uint16_t start               = M_FSW_PARAMS + (fsw_settings.id*NUM_FSW_PARAMS_PER_FSW*sizeof(Parameter)) + (fsw_settings.state*NUM_FSW_PARAMS_PER_STATE*sizeof(Parameter));
+
+  if ( fsw[fsw_settings.id].mode == FSW_MODE_SUBMENU && !GET_ID_FROM_ADDR(start, active_parent_addr, sizeof(Parameter)) ) {
+    memcpy(text[TXT_BUF_2], "SUBMENU MODE", TEXT_SZ);
+  }
+  else if ( pedal_id == NUM_PEDALS )
+    memcpy(text[TXT_BUF_2], "EMPTY       ", TEXT_SZ);
+  else {
+    Pedal::get_name(GET_PARENT(M_PEDALS, pedal_id, sizeof(Pedal)), TXT_BUF_2);
+    Feature::get_name(GET_CHILD(M_FEATURES, pedal_id, feature_relative_id, sizeof(Feature), NUM_FEATURES_PER_PEDAL), TXT_BUF_1);
+
+    text[TXT_BUF_2][5] = ' ';
+    for (uint8_t i=6; i<TEXT_SZ; i++) {
+      text[TXT_BUF_2][i] = text[TXT_BUF_1][i-6];
+    }
+  }
+  return true;
+  //return f_preset_params_run();
+}
+uint8_t f_fsw_params_save() {
+  // if fsw is in submenu mode, we need to jump straight to editing the submenu value
+  if ( fsw[fsw_settings.id].mode == FSW_MODE_SUBMENU ) {
+    uint16_t start = M_FSW_PARAMS + (fsw_settings.id*NUM_FSW_PARAMS_PER_FSW*sizeof(Parameter)) + (fsw_settings.state*NUM_FSW_PARAMS_PER_STATE*sizeof(Parameter));
+
+    if ( !GET_ID_FROM_ADDR(start, GET_ACTIVE_PARENT_NOT_OPTION, sizeof(Parameter)) ) {
+      return CS_VALUE_EDIT_JUMP;
+    }
+  }
+  return true;
 }
 uint8_t f_fsw_param_pedal_setup() {
   return f_preset_param_pedal_setup();
@@ -208,10 +232,11 @@ uint8_t f_fsw_param_feature_save() {
 #define F_FSW_COLOR_SAVE             13
 #define F_FSW_PARAMS_RUN             14
 #define F_FSW_PARAMS_SETUP           15
-#define F_FSW_PARAM_PEDAL_SETUP      16
-#define F_FSW_PARAM_PEDAL_SAVE       17
-#define F_FSW_PARAM_FEATURE_SETUP    18
-#define F_FSW_PARAM_FEATURE_SAVE     19
+#define F_FSW_PARAMS_SAVE            16
+#define F_FSW_PARAM_PEDAL_SETUP      17
+#define F_FSW_PARAM_PEDAL_SAVE       18
+#define F_FSW_PARAM_FEATURE_SETUP    19
+#define F_FSW_PARAM_FEATURE_SAVE     20
 
 typedef uint8_t (*Callback)();
 
@@ -232,6 +257,7 @@ Callback get_callback(uint8_t id) {
     case F_FSW_COLOR_SAVE:             return &f_fsw_color_save;
     case F_FSW_PARAMS_RUN:             return &f_fsw_params_run;
     case F_FSW_PARAMS_SETUP:           return &f_fsw_params_setup;
+    case F_FSW_PARAMS_SAVE:            return &f_fsw_params_save;
     case F_FSW_PARAM_PEDAL_SETUP:      return &f_fsw_param_pedal_setup;
     case F_FSW_PARAM_PEDAL_SAVE:       return &f_fsw_param_pedal_save;
     case F_FSW_PARAM_FEATURE_SETUP:    return &f_fsw_param_feature_setup;

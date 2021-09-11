@@ -29,12 +29,8 @@ void loop() {
 
         // Next, we have to load the footswitches
         uint16_t start_fsw_addr = GET_CHILD(M_FSW, preset_id, 0, sizeof(Footswitch), NUM_FSW_PER_PRESET );
-        for (uint16_t i=start_fsw_addr, j=0; j<NUM_FSW_PER_PRESET; i+=sizeof(Footswitch), j++) {
+        for (uint16_t i=start_fsw_addr, j=0; j<NUM_FSW_PER_PRESET; i+=sizeof(Footswitch), j++)
           fsw[j] = read_data<Footswitch>(i);
-        }
-
-        fsw[0].lp_mode = FSW_MODE_ONESHOT;
-        fsw[0].mode    = FSW_MODE_CYCLE;
 
         // Reset the submenu
         submenu_id = 0;
@@ -55,34 +51,48 @@ void loop() {
       break;
 
     case E_MAIN:
-      if ( n.not_init() ) {
-        // Setup Buttons for Footswitches
-        for (uint8_t i=submenu_id*NUM_FSW_PER_SUBMENU, j=0; j<NUM_FSW_PER_SUBMENU; i++, j++) {
-          btns[j].set_press_type(fsw[i].press_type);
-          if ( fsw[i].mode != FSW_MODE_OFF ) {
-            leds[j].set(GET_RGB(fsw[i].color_id[fsw[i].state]));
-          }
-          else {
-            leds[j].set(0,0,0);
-          }
-        }
-      }
-      else {
-        for (uint8_t i=0; i<NUM_FSW_PER_SUBMENU; i++) {
-          if ( btns[i].is_pressed() ) {
-            fsw[i+(NUM_FSW_PER_SUBMENU*submenu_id)].increase_state();
-            n.reinit();
-          }
-          else if ( btns[i].is_long_pressed() ) {
-            fsw[i+(NUM_FSW_PER_SUBMENU*submenu_id)].run_long_press();
+      {
+        if ( n.not_init() ) {
+          // Setup Buttons for Footswitches
+          for (uint8_t i=submenu_id*NUM_FSW_PER_SUBMENU, j=0; j<NUM_FSW_PER_SUBMENU; i++, j++) {
+            btns[j].set_press_type(fsw[i].press_type);
+            if ( fsw[i].mode != FSW_MODE_OFF ) {
+              leds[j].set(GET_RGB(fsw[i].color_id[fsw[i].state]));
+            }
+            else {
+              leds[j].set(0,0,0);
+            }
           }
         }
+        else {
+          for (uint8_t i=0; i<NUM_FSW_PER_SUBMENU; i++) {
+            if ( btns[i].is_pressed() ) {
+              if ( fsw[i+(NUM_FSW_PER_SUBMENU*submenu_id)].mode == FSW_MODE_SUBMENU ) {
+                uint8_t velocity = Parameter::get_velocity(GET_CHILD(M_FSW_PARAMS, (i+(NUM_FSW_PER_SUBMENU*submenu_id)+(preset_id*NUM_FSW_PER_PRESET)), 0, sizeof(Parameter), NUM_FSW_PARAMS_PER_FSW));
+                submenu_id = velocity > NUM_SUBMENUS_PER_PRESET ? NUM_SUBMENUS_PER_PRESET % velocity : velocity;
+                n.jump_to(E_RESET_SCREEN);
+              }
+              else if ( fsw[i+(NUM_FSW_PER_SUBMENU*submenu_id)].mode == FSW_MODE_PRESET ) {
+                uint8_t velocity = Parameter::get_velocity(GET_CHILD(M_FSW_PARAMS, (i+(NUM_FSW_PER_SUBMENU*submenu_id)+(preset_id*NUM_FSW_PER_PRESET)), 0, sizeof(Parameter), NUM_FSW_PARAMS_PER_FSW));
+                preset_id = velocity > 0 ? NUM_PRESETS % velocity : velocity;
+                n.jump_to(E_SETUP); // Change preset and reset everything
+              }
+              else {
+                fsw[i+(NUM_FSW_PER_SUBMENU*submenu_id)].increase_state();
+                n.reinit();
+              }
+            }
+            else if ( btns[i].is_long_pressed() ) {
+              fsw[i+(NUM_FSW_PER_SUBMENU*submenu_id)].run_long_press();
+            }
+          }
 
-        if ( knob.is_long_pressed() ) {
-          n.jump_to(E_SETTINGS);
+          if ( knob.is_long_pressed() ) {
+            n.jump_to(E_SETTINGS);
+          }
+          else if ( knob.is_left() ) {}
+          else if ( knob.is_right() ) {}
         }
-        else if ( knob.is_left() ) {}
-        else if ( knob.is_right() ) {}
       }
       break;
 
@@ -92,7 +102,7 @@ void loop() {
       }
       else {
         if ( menu.loop() ) n.jump_to(E_RESET_SCREEN);
-        else if ( parents_used == 0b11 && menu.n.e() == E_MAIN ) {
+        else if ( parents_used == 0b11 && menu.n.e() == 0 ) {
           for (uint8_t i=0; i<NUM_FSW_PER_SUBMENU; i++) {
             if ( btns[i].is_pressed() ) {
               fsw_settings.id    = i+(NUM_FSW_PER_SUBMENU*submenu_id);
@@ -111,7 +121,10 @@ void loop() {
         menu.setup(MENU_FSW, true);
       }
       else {
-        if ( menu.loop() ) n.jump_to(E_RESET_SCREEN);
+        if ( menu.loop() ) {
+          f_preset_save();
+          n.jump_to(E_RESET_SCREEN);
+        }
         else if ( parents_used == 0b11 ) {
           for (uint8_t i=0; i<NUM_FSW_PER_SUBMENU; i++) {
             if ( btns[i].is_pressed() ) {

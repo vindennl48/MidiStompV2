@@ -263,6 +263,9 @@ struct Option {
 #define MENU_FSW_PARAM            (M_MENUS + 16 * sizeof(Menu))
 #define MENU_FSW_PARAM_PEDAL      (M_MENUS + 17 * sizeof(Menu))
 #define MENU_FSW_PARAM_FEATURE    (M_MENUS + 18 * sizeof(Menu))
+
+// CS return 0 and 1 already taken for general function
+#define CS_VALUE_EDIT_JUMP 2
 struct Menu {
   char     name[TEXT_SZ]     = "UNTITLED    ";
   uint8_t  num_options       = 0;

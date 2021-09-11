@@ -4,6 +4,7 @@
 #define E_EDIT_PEDAL_CHANNEL  2
 #define E_EDIT_FEATURE_PITCH  3
 #define E_EDIT_PARAM_VELOCITY 4
+#define E_EDIT_PARAM_SUBMENU  5
 // --
 
 struct ValueEdit {
@@ -32,7 +33,13 @@ struct ValueEdit {
         edit_type = E_EDIT_FEATURE_PITCH;
       }
       else if ( IS_IN_PARTITION_PRESET_PARAMS(active_parent_addr) ||  IS_IN_PARTITION_FSW_PARAMS(active_parent_addr) ) {
-        edit_type = E_EDIT_PARAM_VELOCITY;
+        uint16_t start = M_FSW_PARAMS + (fsw_settings.id*NUM_FSW_PARAMS_PER_FSW*sizeof(Parameter)) + (fsw_settings.state*NUM_FSW_PARAMS_PER_STATE*sizeof(Parameter));
+        if ( fsw[fsw_settings.id].mode == FSW_MODE_SUBMENU && !GET_ID_FROM_ADDR(start, active_parent_addr, sizeof(Parameter)) ) {
+          edit_type = E_EDIT_PARAM_SUBMENU;
+        }
+        else {
+          edit_type = E_EDIT_PARAM_VELOCITY;
+        }
       }
       else {
         edit_type = 0;
@@ -107,6 +114,10 @@ struct ValueEdit {
               min = 0;
               max = 128;
               break;
+            case E_EDIT_PARAM_SUBMENU:
+              min = 1;
+              max = 5;
+              break;
           };
         }
         else {
@@ -156,7 +167,9 @@ struct ValueEdit {
           value = Feature::get_pitch( GET_ACTIVE_PARENT_NOT_OPTION );
           break;
         case E_EDIT_PARAM_VELOCITY:
+        case E_EDIT_PARAM_SUBMENU:
           value = Parameter::get_velocity( GET_ACTIVE_PARENT_NOT_OPTION );
+          if ( !value ) value = 1;
           break;
       };
     }
@@ -184,6 +197,9 @@ struct ValueEdit {
           break;
         case E_EDIT_PARAM_VELOCITY:
           Parameter::set_velocity( GET_ACTIVE_PARENT_NOT_OPTION, value );
+          break;
+        case E_EDIT_PARAM_SUBMENU:
+          Parameter::set_velocity( GET_ACTIVE_PARENT_NOT_OPTION, value-1 );
           break;
       };
     }
@@ -232,3 +248,4 @@ struct ValueEdit {
 #undef E_EDIT_PEDAL_CHANNEL
 #undef E_EDIT_FEATURE_PITCH
 #undef E_EDIT_PARAM_VELOCITY
+#undef E_EDIT_PARAM_SUBMENU
