@@ -178,8 +178,6 @@ struct MenuSystem {
 
       case E_VALUE_EDIT:
         {
-          DEBUG("----> M_FSW_PARAMS:      ", M_FSW_PARAMS);
-          DEBUG("----> GET_ACTIVE_PARENT: ", GET_ACTIVE_PARENT);
           uint16_t new_menu_addr;
 
           if ( n.not_init() ) {

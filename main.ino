@@ -67,23 +67,33 @@ void loop() {
         else {
           for (uint8_t i=0; i<NUM_FSW_PER_SUBMENU; i++) {
             if ( btns[i].is_pressed() ) {
-              if ( fsw[i+(NUM_FSW_PER_SUBMENU*submenu_id)].mode == FSW_MODE_SUBMENU ) {
-                uint8_t velocity = Parameter::get_velocity(GET_CHILD(M_FSW_PARAMS, (i+(NUM_FSW_PER_SUBMENU*submenu_id)+(preset_id*NUM_FSW_PER_PRESET)), 0, sizeof(Parameter), NUM_FSW_PARAMS_PER_FSW));
-                submenu_id = velocity > NUM_SUBMENUS_PER_PRESET ? NUM_SUBMENUS_PER_PRESET % velocity : velocity;
+              if ( fsw[GET_FSW_PRESET_ID(i)].mode == FSW_MODE_SUBMENU ) {
+                submenu_id = (Parameter::get_velocity(GET_FSW_PARAM_ADDR(i, 0))+NUM_SUBMENUS_PER_PRESET) % NUM_SUBMENUS_PER_PRESET;
                 n.jump_to(E_RESET_SCREEN);
               }
-              else if ( fsw[i+(NUM_FSW_PER_SUBMENU*submenu_id)].mode == FSW_MODE_PRESET ) {
-                uint8_t velocity = Parameter::get_velocity(GET_CHILD(M_FSW_PARAMS, (i+(NUM_FSW_PER_SUBMENU*submenu_id)+(preset_id*NUM_FSW_PER_PRESET)), 0, sizeof(Parameter), NUM_FSW_PARAMS_PER_FSW));
-                preset_id = velocity > 0 ? NUM_PRESETS % velocity : velocity;
-                n.jump_to(E_SETUP); // Change preset and reset everything
-              }
+//              else if ( fsw[GET_FSW_PRESET_ID(i)].mode == FSW_MODE_PRESET ) {
+//                preset_id = (Parameter::get_velocity(GET_FSW_PARAM_ADDR(i, 0))+NUM_PRESETS) % NUM_PRESETS;
+//                n.jump_to(E_SETUP); // Change preset and reset everything
+//              }
               else {
-                fsw[i+(NUM_FSW_PER_SUBMENU*submenu_id)].increase_state();
+                fsw[GET_FSW_PRESET_ID(i)].increase_state();
                 n.reinit();
               }
             }
             else if ( btns[i].is_long_pressed() ) {
-              fsw[i+(NUM_FSW_PER_SUBMENU*submenu_id)].run_long_press();
+              fsw[GET_FSW_PRESET_ID(i)].run_long_press();
+
+              if ( fsw[GET_FSW_PRESET_ID(i)].lp_mode == FSW_MODE_SUBMENU ) {
+                submenu_id = Parameter::get_velocity(GET_FSW_LP_PARAM_ADDR(i, 0));
+                n.jump_to(E_RESET_SCREEN);
+              }
+//              else if ( fsw[GET_FSW_PRESET_ID(i)].lp_mode == FSW_MODE_PRESET ) {
+//                preset_id = Parameter::get_velocity(GET_FSW_LP_PARAM_ADDR(i, 0));
+//                n.jump_to(E_SETUP); // Change preset and reset everything
+//              }
+              else {
+                n.reinit();
+              }
             }
           }
 
@@ -105,8 +115,9 @@ void loop() {
         else if ( parents_used == 0b11 && menu.n.e() == 0 ) {
           for (uint8_t i=0; i<NUM_FSW_PER_SUBMENU; i++) {
             if ( btns[i].is_pressed() ) {
-              fsw_settings.id    = i+(NUM_FSW_PER_SUBMENU*submenu_id);
-              fsw_settings.state = 0;
+              fsw_settings.id        = i+(NUM_FSW_PER_SUBMENU*submenu_id);
+              fsw_settings.state     = 0;
+              fsw_settings.state_bup = fsw_settings.state;
 
               deactivate_active_parent();
               n.jump_to(E_FSW_SETTINGS);
@@ -129,11 +140,13 @@ void loop() {
           for (uint8_t i=0; i<NUM_FSW_PER_SUBMENU; i++) {
             if ( btns[i].is_pressed() ) {
               if ( fsw_settings.id % NUM_FSW_PER_SUBMENU != i ) {
-                fsw_settings.id    = i+(NUM_FSW_PER_SUBMENU*submenu_id);
-                fsw_settings.state = 0;
+                fsw_settings.id        = i+(NUM_FSW_PER_SUBMENU*submenu_id);
+                fsw_settings.state     = 0;
+                fsw_settings.state_bup = fsw_settings.state;
               }
               else {
-                fsw_settings.state = ROTATE(fsw_settings.state+1, 0, 3);
+                fsw_settings.state     = ROTATE(fsw_settings.state+1, 0, 3);
+                fsw_settings.state_bup = fsw_settings.state;
               }
               deactivate_active_parent();
               n.jump_to(E_FSW_SETTINGS);

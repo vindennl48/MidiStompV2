@@ -44,7 +44,7 @@
 #define NUM_FSW_PARAMS_PER_STATE     10
 #define NUM_FSW_PARAMS_PER_FSW       (NUM_STATES_PER_FSW * NUM_FSW_PARAMS_PER_STATE)
 #define NUM_FSW_PARAMS_TOTAL         (NUM_FSW_PARAMS_PER_FSW * NUM_FSW_TOTAL)
-#define NUM_MENUS                    20
+#define NUM_MENUS                    22
 #define NUM_OPTIONS_PER_MENU         10
 #define NUM_OPTIONS_TOTAL            (NUM_MENUS*NUM_OPTIONS_PER_MENU)
 /* :: END OBJECT COUNTS :: */
@@ -220,7 +220,7 @@ struct Footswitch {
 
 struct FSW_Settings {
   uint8_t id;
-  uint8_t state;
+  uint8_t state, state_bup;
 } fsw_settings;
 
 #define RESULT_MENU                0
@@ -229,7 +229,8 @@ struct FSW_Settings {
 #define RESULT_VALUE_EDIT          3
 #define RESULT_COLOR_EDIT          4
 #define RESULT_FSW_MODE_EDIT       5
-#define RESULT_FSW_PRESS_TYPE_EDIT 6
+#define RESULT_FSW_LP_MODE_EDIT    6
+#define RESULT_FSW_PRESS_TYPE_EDIT 7
 struct Option {
   char     name[TEXT_SZ]     = "UNTITLED    ";
   uint8_t  result            = RESULT_MENU;
@@ -259,10 +260,14 @@ struct Option {
 #define MENU_FSW                  (M_MENUS + 12 * sizeof(Menu))
 #define MENU_FSW_PARAMS           (M_MENUS + 13 * sizeof(Menu))
 #define MENU_FSW_COLOR            (M_MENUS + 14 * sizeof(Menu))
-#define MENU_FSW_LONGPRESS        (M_MENUS + 15 * sizeof(Menu))
-#define MENU_FSW_PARAM            (M_MENUS + 16 * sizeof(Menu))
-#define MENU_FSW_PARAM_PEDAL      (M_MENUS + 17 * sizeof(Menu))
-#define MENU_FSW_PARAM_FEATURE    (M_MENUS + 18 * sizeof(Menu))
+#define MENU_FSW_LP               (M_MENUS + 15 * sizeof(Menu))
+#define MENU_FSW_LP_PARAMS        (M_MENUS + 16 * sizeof(Menu))
+#define MENU_FSW_LP_PARAM         (M_MENUS + 17 * sizeof(Menu))
+#define MENU_FSW_PARAM            (M_MENUS + 18 * sizeof(Menu))
+#define MENU_FSW_PARAM_PEDAL      (M_MENUS + 19 * sizeof(Menu))
+#define MENU_FSW_PARAM_FEATURE    (M_MENUS + 20 * sizeof(Menu))
+#define MENU_FSW_LP_PARAM_PEDAL   (M_MENUS + 21 * sizeof(Menu))
+#define MENU_FSW_LP_PARAM_FEATURE (M_MENUS + 22 * sizeof(Menu))
 
 // CS return 0 and 1 already taken for general function
 #define CS_VALUE_EDIT_JUMP 2
@@ -333,4 +338,57 @@ uint8_t get_active_parent_id_not_option() {
 }
 #define GET_ACTIVE_PARENT_ID_NOT_OPTION get_active_parent_id_not_option()
 #define GET_ACTIVE_PARENT_NOT_OPTION    parents[GET_ACTIVE_PARENT_ID_NOT_OPTION]
+
+#define MOD(a, b) ((a+b)%b)
+
+// Find FSW/FSW_PARAM ID
+// fsw_submenu_id: footswitch 0-3 of the current submenu
+// returns the fsw_id of the given preset, 0-15
+#define GET_FSW_PRESET_ID(fsw_submenu_id) (fsw_submenu_id+(NUM_FSW_PER_SUBMENU*submenu_id))
+// fsw_submenu_id: footswitch 0-3 of the current submenu
+// returns the absolute fsw_id in EEPROM out of all presets/submenus, 0-450 or what ever the max is
+#define GET_FSW_ABS_ID(fsw_submenu_id) (GET_FSW_PRESET_ID(fsw_submenu_id)+(preset_id*NUM_FSW_PER_PRESET))
+
+// Find matching Parameter IDs for given fsw
+// fsw_submenu_id: footswitch 0-3 of the current submenu
+// returns absolute parameter id of the first parameter for the footswitch in EEPROM
+//   this takes into account the state of the fsw
+#define GET_FSW_ABS_PARAM_START_ID(fsw_submenu_id)    ((GET_FSW_ABS_ID(fsw_submenu_id)*NUM_FSW_PARAMS_PER_FSW)+(fsw[GET_FSW_PRESET_ID(fsw_submenu_id)].state*NUM_FSW_PARAMS_PER_STATE))
+#define GET_FSW_LP_ABS_PARAM_START_ID(fsw_submenu_id) ((GET_FSW_ABS_ID(fsw_submenu_id)*NUM_FSW_PARAMS_PER_FSW)+(3*NUM_FSW_PARAMS_PER_STATE))
+// fsw_submenu_id: footswitch 0-3 of the current submenu
+// param_id: relative id of parameter of the selected footswitch, 0-9
+// returns absolute parameter id of the relative parameter id for the selected footswitch in EEPROM
+//   this takes into account the state of the fsw
+#define GET_FSW_ABS_PARAM_ID(fsw_submenu_id, param_relative_id)    (GET_FSW_ABS_PARAM_START_ID(fsw_submenu_id)+param_relative_id)
+#define GET_FSW_LP_ABS_PARAM_ID(fsw_submenu_id, param_relative_id) (GET_FSW_LP_ABS_PARAM_START_ID(fsw_submenu_id)+param_relative_id)
+
+// Find FSW/FSW_PARAM ADDR
+#define GET_FSW_ADDR(fsw_submenu_id) (GET_PARENT(M_FSW, GET_FSW_ABS_ID(fsw_submenu_id), sizeof(Footswitch)))
+#define GET_FSW_PARAM_ADDR(fsw_submenu_id, param_relative_id)    (GET_PARENT(M_FSW_PARAMS, GET_FSW_ABS_PARAM_ID(fsw_submenu_id, param_relative_id), sizeof(Parameter)))
+#define GET_FSW_LP_PARAM_ADDR(fsw_submenu_id, param_relative_id) (GET_PARENT(M_FSW_PARAMS, GET_FSW_LP_ABS_PARAM_ID(fsw_submenu_id, param_relative_id), sizeof(Parameter)))
+// --
+
+
+
+// Find FSW_SETTINGS/FSW_SETTINGS PARAMS ID
+// Find FSW/FSW_PARAM ID
+// fsw_submenu_id: footswitch 0-3 of the current submenu
+// return absolute ID of fsw_settings selected fsw
+#define GET_FSWSET_ABS_ID (fsw_settings.id+(preset_id*NUM_FSW_PER_PRESET))
+
+// Find matching Parameter IDs for given fsw
+// fsw_submenu_id: footswitch 0-3 of the current submenu
+// returns absolute parameter id of the first parameter for the footswitch in EEPROM
+//   this takes into account the state of the fsw
+#define GET_FSWSET_ABS_PARAM_START_ID ((GET_FSWSET_ABS_ID*NUM_FSW_PARAMS_PER_FSW)+(fsw_settings.state*NUM_FSW_PARAMS_PER_STATE))
+// fsw_submenu_id: footswitch 0-3 of the current submenu
+// param_id: relative id of parameter of the selected footswitch, 0-9
+// returns absolute parameter id of the relative parameter id for the selected footswitch in EEPROM
+//   this takes into account the state of the fsw
+#define GET_FSWSET_ABS_PARAM_ID(param_relative_id) (GET_FSWSET_ABS_PARAM_START_ID+param_relative_id)
+
+// Find FSW/FSW_PARAM ADDR
+#define GET_FSWSET_ADDR (GET_PARENT(M_FSW, GET_FSWSET_ABS_ID, sizeof(Footswitch)))
+#define GET_FSWSET_PARAM_ADDR(param_relative_id) (GET_PARENT(M_FSW_PARAMS, GET_FSWSET_ABS_PARAM_ID(param_relative_id), sizeof(Parameter)))
+
 /* :: ENDEEPROM MACROS :: */

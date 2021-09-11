@@ -33,8 +33,11 @@ struct ValueEdit {
         edit_type = E_EDIT_FEATURE_PITCH;
       }
       else if ( IS_IN_PARTITION_PRESET_PARAMS(active_parent_addr) ||  IS_IN_PARTITION_FSW_PARAMS(active_parent_addr) ) {
-        uint16_t start = M_FSW_PARAMS + (fsw_settings.id*NUM_FSW_PARAMS_PER_FSW*sizeof(Parameter)) + (fsw_settings.state*NUM_FSW_PARAMS_PER_STATE*sizeof(Parameter));
-        if ( fsw[fsw_settings.id].mode == FSW_MODE_SUBMENU && !GET_ID_FROM_ADDR(start, active_parent_addr, sizeof(Parameter)) ) {
+        // If current state is not long_press
+        if ( (fsw_settings.state < 3) && (fsw[fsw_settings.id].mode == FSW_MODE_SUBMENU) && (GET_FSWSET_PARAM_ADDR(0) == active_parent_addr) ) {
+          edit_type = E_EDIT_PARAM_SUBMENU;
+        }
+        else if ( (fsw_settings.state == 3) && (fsw[fsw_settings.id].lp_mode == FSW_MODE_SUBMENU) && (GET_FSWSET_PARAM_ADDR(0) == active_parent_addr) ) {
           edit_type = E_EDIT_PARAM_SUBMENU;
         }
         else {
@@ -122,6 +125,7 @@ struct ValueEdit {
         }
         else {
           switch(result_type) {
+            case RESULT_FSW_LP_MODE_EDIT:
             case RESULT_FSW_MODE_EDIT:
               min = 0;
               max = 6;
@@ -138,8 +142,20 @@ struct ValueEdit {
         }
         else {
           if ( knob.is_left() || knob.is_right() ) {
-            if      ( knob.is_left() )  { value = CONTAIN((int)value-1, (int)min, (int)max); }
-            else if ( knob.is_right() ) { value = CONTAIN((int)value+1, (int)min, (int)max); }
+            if ( knob.is_left() )  {
+              value = CONTAIN((int)value-1, (int)min, (int)max); 
+              if ( result_type == RESULT_FSW_LP_MODE_EDIT ) {
+                if      ( value == FSW_MODE_TOGGLE ) value = FSW_MODE_OFF;
+                else if ( value == FSW_MODE_CYCLE )  value = FSW_MODE_OFF;
+              }
+            }
+            else if ( knob.is_right() ) {
+              value = CONTAIN((int)value+1, (int)min, (int)max); 
+              if ( result_type == RESULT_FSW_LP_MODE_EDIT ) {
+                if      ( value == FSW_MODE_TOGGLE ) value = FSW_MODE_ONESHOT;
+                else if ( value == FSW_MODE_CYCLE )  value = FSW_MODE_ONESHOT;
+              }
+            }
             n.reinit();
           }
           else if ( knob.is_pressed() ){
@@ -167,6 +183,8 @@ struct ValueEdit {
           value = Feature::get_pitch( GET_ACTIVE_PARENT_NOT_OPTION );
           break;
         case E_EDIT_PARAM_VELOCITY:
+          value = Parameter::get_velocity( GET_ACTIVE_PARENT_NOT_OPTION );
+          break;
         case E_EDIT_PARAM_SUBMENU:
           value = Parameter::get_velocity( GET_ACTIVE_PARENT_NOT_OPTION );
           if ( !value ) value = 1;
@@ -175,6 +193,9 @@ struct ValueEdit {
     }
     else {
       switch(result_type) {
+        case RESULT_FSW_LP_MODE_EDIT:
+          value = fsw[fsw_settings.id].lp_mode;
+          break;
         case RESULT_FSW_MODE_EDIT:
           value = fsw[fsw_settings.id].mode;
           break;
@@ -205,6 +226,9 @@ struct ValueEdit {
     }
     else {
       switch(result_type) {
+        case RESULT_FSW_LP_MODE_EDIT:
+          fsw[fsw_settings.id].lp_mode = value;
+          break;
         case RESULT_FSW_MODE_EDIT:
           fsw[fsw_settings.id].mode = value;
           break;
@@ -225,6 +249,7 @@ struct ValueEdit {
     }
     else {
       switch(result_type) {
+        case RESULT_FSW_LP_MODE_EDIT:
         case RESULT_FSW_MODE_EDIT:
           if      ( value == FSW_MODE_OFF )     PRINT(7, 0, F("OFF"));
           else if ( value == FSW_MODE_TOGGLE )  PRINT(7, 0, F("TOGGLE"));
