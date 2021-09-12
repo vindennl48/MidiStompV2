@@ -1,4 +1,4 @@
-//#define DISPLAY_DEBUG
+#define DISPLAY_DEBUG
 
 /* :: TYPEDEFS :: */
 typedef unsigned long Timer;
@@ -72,7 +72,7 @@ void debug(String title, String variable) {
 }
 #define DEBUG(title, variable) debug(String(title), String(variable))
 #define CONTAIN(i, min, max) (i>(min) ? (i<(max) ? i : (max-1)) : (min))
-#define ROTATE(i, min, max) (i>(min) ? (i<(max) ? i : (min)) : (max-1))
+#define ROTATE(i, min, max) (i>=(min) ? (i<(max) ? i : (min)) : (max-1))
 /* :: END HELPFUL MACROS :: */
 
 

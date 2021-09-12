@@ -14,6 +14,7 @@
 #include "Callbacks.h"
 #include "TextEdit.h"
 #include "ValueEdit.h"
+#include "ColorEdit.h"
 #include "Confirm.h"
 #include "MenuSystem.h"
 #include "Load_EEPROM.h"

@@ -30,7 +30,7 @@ struct Channel {
     }
   }
 
-  void set(uint8_t value, uint16_t time) {
+  void set(uint8_t value, uint16_t time=50) {
     uint8_t difference;
 
     setpoint = value;

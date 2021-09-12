@@ -44,7 +44,7 @@
 #define NUM_FSW_PARAMS_PER_STATE     10
 #define NUM_FSW_PARAMS_PER_FSW       (NUM_STATES_PER_FSW * NUM_FSW_PARAMS_PER_STATE)
 #define NUM_FSW_PARAMS_TOTAL         (NUM_FSW_PARAMS_PER_FSW * NUM_FSW_TOTAL)
-#define NUM_MENUS                    22
+#define NUM_MENUS                    23
 #define NUM_OPTIONS_PER_MENU         10
 #define NUM_OPTIONS_TOTAL            (NUM_MENUS*NUM_OPTIONS_PER_MENU)
 /* :: END OBJECT COUNTS :: */

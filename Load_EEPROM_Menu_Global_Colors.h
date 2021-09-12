@@ -1,39 +1,45 @@
 #ifdef LOAD_EEPROM
 #ifdef RESET_MENUS
 
-memcpy(text[0], "COLORS      ", TEXT_SZ);
-Menu::set_name              (MENU_COLORS, TXT_BUF_1);
-Menu::set_num_options       (MENU_COLORS, NUM_COLORS);
-Menu::set_start_addr        (MENU_COLORS, M_COLORS);
-Menu::set_size              (MENU_COLORS, COLOR_SZ);
-Menu::set_return_id         (MENU_COLORS, MENU_GLOBAL);
-Menu::set_forward_id        (MENU_COLORS, MENU_COLOR);  // This is going to be used
-Menu::set_callback_run_id   (MENU_COLORS, F_COLORS);
-Menu::set_callback_setup_id (MENU_COLORS, F_NONE);
-Menu::set_callback_save_id  (MENU_COLORS, F_NONE);
 
-memcpy(text[0], "COLOR       ", TEXT_SZ);
-Menu::set_name              (MENU_COLOR, TXT_BUF_1);
-Menu::set_num_options       (MENU_COLOR, 2);
-Menu::set_start_addr        (MENU_COLOR, GET_CHILD(M_OPTIONS, MENU_COLOR, 0, OPTION_SZ, NUM_OPTIONS_PER_MENU));
-Menu::set_size              (MENU_COLOR, OPTION_SZ);
-Menu::set_return_id         (MENU_COLOR, MENU_COLORS);
-Menu::set_forward_id        (MENU_COLOR, MENU_MAIN);  // not used, only used in list-loop
-Menu::set_callback_run_id   (MENU_COLOR, F_NONE);
-Menu::set_callback_setup_id (MENU_COLOR, F_NONE);
-Menu::set_callback_save_id  (MENU_COLOR, F_NONE);
+// Loop thru available pedals to edit
+menu = Menu();
+//-------------------------------------------------------------------------------- 
+memcpy(menu.name, "COLORS      ", TEXT_SZ);
+menu.num_options     = NUM_COLORS;
+menu.start_addr      = M_COLORS;
+menu.size            = sizeof(Color);
+menu.return_addr     = MENU_GLOBAL;
+menu.forward_addr    = MENU_COLOR;
+menu.callback_run_id = F_COLORS;
+write_data<Menu>(&menu, MENU_COLORS);
 
-  memcpy(text[0], "NAME        ", TEXT_SZ);
-  Option::set_name        (MENU_COLOR, 0, TXT_BUF_1);
-  Option::set_result      (MENU_COLOR, 0, RESULT_TEXT_EDIT);
-  Option::set_menu_id     (MENU_COLOR, 0, MENU_COLOR);
-  Option::set_callback_id (MENU_COLOR, 0, F_NONE);
+  address               = MENU_COLOR;
+  option_partition_addr = M_OPTIONS;
+  num_options_per_menu  = NUM_OPTIONS_PER_MENU;
+  menu = Menu();
+  //-------------------------------------------------------------------------------- 
+  memcpy(menu.name, "COLOR       ", TEXT_SZ);
+  menu.num_options = 2;
+  menu.start_addr  = option_partition_addr + ( GET_ID_FROM_ADDR(M_MENUS, address, sizeof(Menu)) * num_options_per_menu * sizeof(Option) );
+  menu.return_addr = MENU_COLORS;
+  write_data<Menu>(&menu, address);
 
-  memcpy(text[0], "VALUE       ", TEXT_SZ);
-  Option::set_name        (MENU_COLOR, 1, TXT_BUF_1);
-  Option::set_result      (MENU_COLOR, 1, RESULT_COLOR_EDIT);
-  Option::set_menu_id     (MENU_COLOR, 1, MENU_COLOR);
-  Option::set_callback_id (MENU_COLOR, 1, F_NONE);
+    address = menu.start_addr + ( 0 * sizeof(Option) );
+    option = Option();
+    //-------------------------------------------------------------------------------- 
+    memcpy(option.name, "NAME        ", TEXT_SZ);
+    option.result    = RESULT_TEXT_EDIT;
+    option.menu_addr = MENU_COLOR;
+    write_data<Option>(&option, address);
+
+    address = menu.start_addr + ( 1 * sizeof(Option) );
+    option = Option();
+    //-------------------------------------------------------------------------------- 
+    memcpy(option.name, "VALUE       ", TEXT_SZ);
+    option.result    = RESULT_COLOR_EDIT;
+    option.menu_addr = MENU_COLOR;
+    write_data<Option>(&option, address);
 
 #endif
 #endif

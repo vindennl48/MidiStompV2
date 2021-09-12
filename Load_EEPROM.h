@@ -1,16 +1,16 @@
 // Uncomment to use this program
-#define LOAD_EEPROM // <----
+//#define LOAD_EEPROM // <----
 
 #ifdef LOAD_EEPROM
 
 // -- LOADING OPTIONS --
-#define RESET_COLORS
-#define RESET_PEDALS
-#define RESET_FEATURES
-#define RESET_PRESETS
-#define RESET_PRESET_PARAMS
-#define RESET_FSW
-#define RESET_FSW_PARAMS
+//#define RESET_COLORS
+//#define RESET_PEDALS
+//#define RESET_FEATURES
+//#define RESET_PRESETS
+//#define RESET_PRESET_PARAMS
+//#define RESET_FSW
+//#define RESET_FSW_PARAMS
 #define RESET_MENUS
 // --
 
@@ -178,7 +178,7 @@ void setup() {
   #include "Load_EEPROM_Menu_Global_Pedals.h"
   #include "Load_EEPROM_Menu_Global_Pedal_Features.h"
   #include "Load_EEPROM_Menu_FSW.h"
-//  #include "Load_EEPROM_Menu_Global_Colors.h"
+  #include "Load_EEPROM_Menu_Global_Colors.h"
 }
 #endif // -- END MENUS --
 

@@ -18,6 +18,7 @@
 #define E_TEXT_EDIT  1
 #define E_VALUE_EDIT 2
 #define E_CONFIRM    3
+#define E_COLOR_EDIT 4
 // --
 
 struct MenuSystem {
@@ -135,6 +136,9 @@ struct MenuSystem {
                 else if ( Option::get_result(GET_ACTIVE_PARENT) == RESULT_TEXT_EDIT ) {
                   n.jump_to(E_TEXT_EDIT);
                 }
+                else if ( Option::get_result(GET_ACTIVE_PARENT) == RESULT_COLOR_EDIT ) {
+                  n.jump_to(E_COLOR_EDIT);
+                }
                 else if ( Option::get_result(GET_ACTIVE_PARENT) == RESULT_CONFIRM ) {
                   n.jump_to(E_CONFIRM);
                 }
@@ -149,6 +153,9 @@ struct MenuSystem {
                   uint8_t result = get_callback( callback_save_id )();
                   if ( result == CS_VALUE_EDIT_JUMP ) n.jump_to(E_VALUE_EDIT);
                   else setup( Menu::get_forward_addr(menu_addr) );
+                }
+                else {
+                  setup( Menu::get_forward_addr(menu_addr) );
                 }
               }
             }
@@ -221,6 +228,21 @@ struct MenuSystem {
               }
 
               // Reload MenuSystem with new menu_addr
+              uint16_t new_menu_addr = Option::get_menu_addr(GET_ACTIVE_PARENT);
+              if ( new_menu_addr == MENU_MAIN ) return true;
+              setup( new_menu_addr );
+            }
+          }
+        }
+        break;
+
+      case E_COLOR_EDIT:
+        {
+          if ( n.not_init() ) {
+            color_edit.setup();
+          }
+          else {
+            if ( color_edit.loop() ) {
               uint16_t new_menu_addr = Option::get_menu_addr(GET_ACTIVE_PARENT);
               if ( new_menu_addr == MENU_MAIN ) return true;
               setup( new_menu_addr );

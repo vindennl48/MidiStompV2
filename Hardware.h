@@ -29,6 +29,9 @@ LED              leds[NUM_LEDS];
 void leds_set(uint8_t r_new, uint8_t g_new, uint8_t b_new, uint16_t time=DEFAULT_LED_TIME_MS) {
   for (uint8_t i=0; i<NUM_LEDS; i++) leds[i].set(r_new, g_new, b_new, time);
 }
+void leds_set_red(uint8_t new_value)   { for (uint8_t i=0; i<NUM_LEDS; i++) leds[i].r.set(new_value); }
+void leds_set_green(uint8_t new_value) { for (uint8_t i=0; i<NUM_LEDS; i++) leds[i].g.set(new_value); }
+void leds_set_blue(uint8_t new_value)  { for (uint8_t i=0; i<NUM_LEDS; i++) leds[i].b.set(new_value); }
 
 void hw_setup() {
   SERIAL_MIDI_SETUP;

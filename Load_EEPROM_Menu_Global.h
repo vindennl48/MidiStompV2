@@ -25,7 +25,7 @@ write_data<Menu>(&menu, address);
   //-------------------------------------------------------------------------------- 
   memcpy(option.name, "COLORS      ", TEXT_SZ);
   option.result    = RESULT_MENU;
-  option.menu_addr = MENU_GLOBAL;
+  option.menu_addr = MENU_COLORS;
   write_data<Option>(&option, address);
 
 #endif
