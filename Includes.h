@@ -17,5 +17,6 @@
 #include "ColorEdit.h"
 #include "Confirm.h"
 #include "MenuSystem.h"
+#include "Midi.h"
 #include "Load_EEPROM.h"
 #include "Alt_Program.h"

@@ -11,7 +11,7 @@
 //#define RESET_PRESET_PARAMS
 //#define RESET_FSW
 //#define RESET_FSW_PARAMS
-#define RESET_MENUS
+//#define RESET_MENUS
 // --
 
 void setup() {

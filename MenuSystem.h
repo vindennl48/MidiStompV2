@@ -14,11 +14,12 @@
  * */
 
 // PRIVATE
-#define E_MAIN       0
-#define E_TEXT_EDIT  1
-#define E_VALUE_EDIT 2
-#define E_CONFIRM    3
-#define E_COLOR_EDIT 4
+#define E_MAIN           0
+#define E_TEXT_EDIT      1
+#define E_VALUE_EDIT     2
+#define E_CONFIRM        3
+#define E_COLOR_EDIT     4
+#define E_MIDI_TYPE_EDIT 5
 // --
 
 struct MenuSystem {
@@ -258,3 +259,7 @@ struct MenuSystem {
 
 #undef E_MAIN
 #undef E_TEXT_EDIT
+#undef E_VALUE_EDIT
+#undef E_CONFIRM
+#undef E_COLOR_EDIT
+#undef E_MIDI_TYPE_EDIT

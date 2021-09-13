@@ -79,6 +79,7 @@ void loop() {
                 fsw[GET_FSW_PRESET_ID(i)].increase_state();
                 n.reinit();
               }
+              send_fsw_midi(i);
             }
             else if ( btns[i].is_long_pressed() ) {
               fsw[GET_FSW_PRESET_ID(i)].run_long_press();

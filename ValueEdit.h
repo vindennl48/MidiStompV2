@@ -145,6 +145,10 @@ struct ValueEdit {
               min = 0;
               max = 2;
               break;
+            case RESULT_MIDI_TYPE_EDIT:
+              min = 0;
+              max = 3;
+              break;
           };
         }
 
@@ -214,6 +218,9 @@ struct ValueEdit {
         case RESULT_FSW_PRESS_TYPE_EDIT:
           value = fsw[fsw_settings.id].press_type;
           break;
+        case RESULT_MIDI_TYPE_EDIT:
+          value = Feature::get_type( GET_ACTIVE_PARENT_NOT_OPTION );
+          break;
       };
     }
   }
@@ -248,6 +255,9 @@ struct ValueEdit {
         case RESULT_FSW_PRESS_TYPE_EDIT:
           fsw[fsw_settings.id].press_type = value;
           break;
+        case RESULT_MIDI_TYPE_EDIT:
+          Feature::set_type( GET_ACTIVE_PARENT_NOT_OPTION, value );
+          break;
       };
     }
   }
@@ -274,6 +284,11 @@ struct ValueEdit {
         case RESULT_FSW_PRESS_TYPE_EDIT:
           if      ( value == PRESS_TYPE_UP )   PRINT(7, 0, F("ON UP"));
           else if ( value == PRESS_TYPE_DOWN ) PRINT(7, 0, F("ON DOWN"));
+          break;
+        case RESULT_MIDI_TYPE_EDIT:
+          if      ( value == MIDI_TYPE_NOTE ) PRINT(7, 0, F("NOTE"));
+          else if ( value == MIDI_TYPE_CC )   PRINT(7, 0, F("CTR CHNG"));
+          else if ( value == MIDI_TYPE_PC )   PRINT(7, 0, F("PRG CHNG"));
           break;
       };
     }

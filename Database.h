@@ -28,12 +28,12 @@
 
 
 /* :: OBJECT COUNTS :: */
-#define NUM_COLORS                   100
+#define NUM_COLORS                   50
 #define NUM_COLORS_PER_FSW           3
 #define NUM_PEDALS                   8
 #define NUM_FEATURES_PER_PEDAL       32
 #define NUM_FEATURES_TOTAL           (NUM_PEDALS * NUM_FEATURES_PER_PEDAL)
-#define NUM_PRESETS                  30
+#define NUM_PRESETS                  21
 #define NUM_PRESET_PARAMS_PER_PRESET 10
 #define NUM_PRESET_PARAMS_TOTAL      (NUM_PRESETS * NUM_PRESET_PARAMS_PER_PRESET)
 #define NUM_SUBMENUS_PER_PRESET      4
@@ -117,6 +117,9 @@ struct Pedal {
   BUILD_OBJ_VAR(channel, uint8_t, 13);
 };
 
+#define MIDI_TYPE_NOTE 0
+#define MIDI_TYPE_CC   1
+#define MIDI_TYPE_PC   2
 struct Feature {
   char    name[TEXT_SZ] = "UNTITLED ";
   uint8_t type          = 0;
@@ -208,14 +211,6 @@ struct Footswitch {
     }
   }
 
-//  void save(uint8_t preset_id, uint8_t submenu_id, uint8_t fsw_id) {
-//    return write_data<Footswitch>( this, GET_CHILD(M_FSW, preset_id, submenu_id*NUM_FSW_PER_SUBMENU+fsw_id, sizeof(Footswitch), NUM_FSW_PER_PRESET) );
-//  }
-//
-//  // STATIC
-//  static Footswitch get(uint8_t preset_id, uint8_t submenu_id, uint8_t fsw_id) {
-//    return read_data<Footswitch>( GET_CHILD(M_FSW, preset_id, submenu_id*NUM_FSW_PER_SUBMENU+fsw_id, sizeof(Footswitch), NUM_FSW_PER_PRESET) );
-//  }
 } fsw[NUM_FSW_PER_PRESET];
 
 struct FSW_Settings {
@@ -228,9 +223,10 @@ struct FSW_Settings {
 #define RESULT_TEXT_EDIT           2
 #define RESULT_VALUE_EDIT          3
 #define RESULT_COLOR_EDIT          4
-#define RESULT_FSW_MODE_EDIT       5
-#define RESULT_FSW_LP_MODE_EDIT    6
-#define RESULT_FSW_PRESS_TYPE_EDIT 7
+#define RESULT_MIDI_TYPE_EDIT      5
+#define RESULT_FSW_MODE_EDIT       6
+#define RESULT_FSW_LP_MODE_EDIT    7
+#define RESULT_FSW_PRESS_TYPE_EDIT 8
 struct Option {
   char     name[TEXT_SZ]     = "UNTITLED    ";
   uint8_t  result            = RESULT_MENU;
