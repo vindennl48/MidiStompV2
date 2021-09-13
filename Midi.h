@@ -38,7 +38,22 @@ void send_fsw_midi(uint8_t fsw_submenu_id) {
     skip_first = true;
   }
 
-  for ( uint16_t i=param_addr, j=0; j<NUM_FSW_PARAMS_PER_FSW; i+=sizeof(Parameter), j++ ) {
+  for ( uint16_t i=param_addr, j=0; j<NUM_FSW_PARAMS_PER_STATE; i+=sizeof(Parameter), j++ ) {
+    if ( !(j == 0 && skip_first) ) send_midi(i);
+  }
+}
+
+// fsw_submenu_id: 0-4
+void send_fsw_lp_midi(uint8_t fsw_submenu_id) {
+  uint16_t param_addr = GET_FSW_LP_PARAM_ADDR(fsw_submenu_id, 0);
+  uint8_t  skip_first = false;
+
+  if ( fsw[GET_FSW_PRESET_ID(fsw_submenu_id)].lp_mode == FSW_MODE_SUBMENU || fsw[GET_FSW_PRESET_ID(fsw_submenu_id)].lp_mode == FSW_MODE_PRESET ) {
+    // If we are using submenu or preset mode, the first parameter is not actually MIDI
+    skip_first = true;
+  }
+
+  for ( uint16_t i=param_addr, j=0; j<NUM_FSW_PARAMS_PER_STATE; i+=sizeof(Parameter), j++ ) {
     if ( !(j == 0 && skip_first) ) send_midi(i);
   }
 }

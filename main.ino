@@ -67,6 +67,8 @@ void loop() {
         else {
           for (uint8_t i=0; i<NUM_FSW_PER_SUBMENU; i++) {
             if ( btns[i].is_pressed() ) {
+              send_fsw_midi(i);
+
               if ( fsw[GET_FSW_PRESET_ID(i)].mode == FSW_MODE_SUBMENU ) {
                 submenu_id = Parameter::get_velocity(GET_FSW_PARAM_ADDR(i, 0));
                 n.jump_to(E_RESET_SCREEN);
@@ -79,9 +81,10 @@ void loop() {
                 fsw[GET_FSW_PRESET_ID(i)].increase_state();
                 n.reinit();
               }
-              send_fsw_midi(i);
             }
             else if ( btns[i].is_long_pressed() ) {
+              send_fsw_lp_midi(i);
+
               fsw[GET_FSW_PRESET_ID(i)].run_long_press();
 
               if ( fsw[GET_FSW_PRESET_ID(i)].lp_mode == FSW_MODE_SUBMENU ) {
