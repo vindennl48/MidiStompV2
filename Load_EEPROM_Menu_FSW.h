@@ -7,7 +7,7 @@ num_options_per_menu  = NUM_OPTIONS_PER_MENU;
 menu = Menu();
 //-------------------------------------------------------------------------------- 
 memcpy(menu.name, "FSW         ", TEXT_SZ);
-menu.num_options       = 5;
+menu.num_options       = 6;
 menu.start_addr        = option_partition_addr + ( GET_ID_FROM_ADDR(M_MENUS, address, sizeof(Menu)) * num_options_per_menu * sizeof(Option) );
 menu.return_addr       = MENU_MAIN;
 menu.callback_setup_id = F_FSW_SETUP;
@@ -53,6 +53,15 @@ write_data<Menu>(&menu, address);
   option.menu_addr = MENU_FSW_LP;
   write_data<Option>(&option, address);
 
+  address = menu.start_addr + ( 5 * sizeof(Option) );
+  option = Option();
+  //-------------------------------------------------------------------------------- 
+  memcpy(option.name, "RESET       ", TEXT_SZ);
+  option.result      = RESULT_CONFIRM;
+  option.menu_addr   = MENU_FSW_LP;
+  option.callback_id = F_FSW_RESET;
+  write_data<Option>(&option, address);
+
 
 // MENU 0, PEDAL CHOOSE
 // Loop thru available pedals
@@ -91,7 +100,7 @@ write_data<Menu>(&menu, MENU_FSW_PARAMS);
   menu = Menu();
   //-------------------------------------------------------------------------------- 
   memcpy(menu.name, "FSW PARAM   ", TEXT_SZ);
-  menu.num_options = 3;
+  menu.num_options = 4;
   menu.start_addr  = option_partition_addr + ( GET_ID_FROM_ADDR(M_MENUS, address, sizeof(Menu)) * num_options_per_menu * sizeof(Option) );
   menu.return_addr = MENU_FSW_PARAMS;
   write_data<Menu>(&menu, address);
@@ -118,6 +127,15 @@ write_data<Menu>(&menu, MENU_FSW_PARAMS);
     memcpy(option.name, "VELOCITY    ", TEXT_SZ);
     option.result    = RESULT_VALUE_EDIT;
     option.menu_addr = MENU_FSW_PARAM;
+    write_data<Option>(&option, address);
+
+    address = menu.start_addr + ( 3 * sizeof(Option) );
+    option = Option();
+    //-------------------------------------------------------------------------------- 
+    memcpy(option.name, "RESET       ", TEXT_SZ);
+    option.result      = RESULT_CONFIRM;
+    option.menu_addr   = MENU_FSW_PARAM;
+    option.callback_id = F_PARAM_RESET;
     write_data<Option>(&option, address);
 
 
@@ -199,7 +217,7 @@ write_data<Menu>(&menu, MENU_FSW_LP_PARAMS);
   menu = Menu();
   //-------------------------------------------------------------------------------- 
   memcpy(menu.name, "LP PARAM    ", TEXT_SZ);
-  menu.num_options = 3;
+  menu.num_options = 4;
   menu.start_addr  = option_partition_addr + ( GET_ID_FROM_ADDR(M_MENUS, address, sizeof(Menu)) * num_options_per_menu * sizeof(Option) );
   menu.return_addr = MENU_FSW_LP_PARAMS;
   write_data<Menu>(&menu, address);
@@ -226,6 +244,15 @@ write_data<Menu>(&menu, MENU_FSW_LP_PARAMS);
     memcpy(option.name, "VELOCITY    ", TEXT_SZ);
     option.result    = RESULT_VALUE_EDIT;
     option.menu_addr = MENU_FSW_LP_PARAM;
+    write_data<Option>(&option, address);
+
+    address = menu.start_addr + ( 3 * sizeof(Option) );
+    option = Option();
+    //-------------------------------------------------------------------------------- 
+    memcpy(option.name, "RESET       ", TEXT_SZ);
+    option.result      = RESULT_CONFIRM;
+    option.menu_addr   = MENU_FSW_LP_PARAM;
+    option.callback_id = F_PARAM_RESET;
     write_data<Option>(&option, address);
 
 

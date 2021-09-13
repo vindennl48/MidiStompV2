@@ -20,7 +20,7 @@ write_data<Menu>(&menu, MENU_PRESET_PARAMS);
   menu = Menu();
   //-------------------------------------------------------------------------------- 
   memcpy(menu.name, "PRST PARAM  ", TEXT_SZ);
-  menu.num_options = 3;
+  menu.num_options = 4;
   menu.start_addr  = option_partition_addr + ( GET_ID_FROM_ADDR(M_MENUS, address, sizeof(Menu)) * num_options_per_menu * sizeof(Option) );
   menu.return_addr = MENU_PRESET_PARAMS;
   write_data<Menu>(&menu, address);
@@ -47,6 +47,15 @@ write_data<Menu>(&menu, MENU_PRESET_PARAMS);
     memcpy(option.name, "VELOCITY    ", TEXT_SZ);
     option.result    = RESULT_VALUE_EDIT;
     option.menu_addr = MENU_PRESET_PARAM;
+    write_data<Option>(&option, address);
+
+    address = menu.start_addr + ( 3 * sizeof(Option) );
+    option = Option();
+    //-------------------------------------------------------------------------------- 
+    memcpy(option.name, "RESET       ", TEXT_SZ);
+    option.result      = RESULT_CONFIRM;
+    option.menu_addr   = MENU_PRESET_PARAM;
+    option.callback_id = F_PARAM_RESET;
     write_data<Option>(&option, address);
 
 // MENU 0, PEDAL CHOOSE

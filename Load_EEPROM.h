@@ -11,7 +11,7 @@
 //#define RESET_PRESET_PARAMS
 //#define RESET_FSW
 //#define RESET_FSW_PARAMS
-//#define RESET_MENUS
+#define RESET_MENUS
 // --
 
 void setup() {
@@ -118,7 +118,7 @@ void setup() {
 {
   PRINT_NLINE(11,0, NUM_PRESETS);
   print_nline(0, 1, "> PRESETS");
-  memcpy(text[0], "UNTITLED    ", TEXT_SZ);
+  memcpy(text[TXT_BUF_1], "UNTITLED    ", TEXT_SZ);
   for (uint16_t i=M_PRESETS, j=0; j<NUM_PRESETS; i+=sizeof(Preset), j++) {
     PRINT_NLINE(10,1, j);
     Preset::set_name(i, TXT_BUF_1);

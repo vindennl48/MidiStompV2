@@ -1,3 +1,12 @@
+/* :: PARAMETER :: */
+uint8_t f_param_reset() {
+  Parameter parameter;
+  write_data<Parameter>(&parameter, GET_ACTIVE_PARENT_NOT_OPTION);
+  return true;
+}
+/* :: END PARAMETER :: */
+
+
 /* :: PEDAL :: */
 uint8_t get_pedal_id_from_parents() {
   uint16_t pedal_addr = 0;
@@ -131,6 +140,25 @@ uint8_t f_preset_param_feature_save() {
 
   return true;
 }
+uint8_t f_preset_reset() {
+  PRINT_NLINE(0,0, "RESETTING");
+  PRINT_NLINE(0,1, "PRESET...");
+
+  // Reset Name
+  memcpy(text[TXT_BUF_1], "UNTITLED    ", TEXT_SZ);
+  Preset::set_name(preset_id, TXT_BUF_1);
+
+  // Reset FSW pedals
+  Footswitch new_fsw;
+  Parameter  parameter;
+  for (int i=0; i<NUM_FSW_PER_PRESET; i++) {
+    fsw[i] = new_fsw;
+    for (int j=0; j<NUM_FSW_PARAMS_PER_FSW; j++) {
+      write_data<Parameter>(&parameter, GET_CHILD(M_FSW_PARAMS, (i+(preset_id*NUM_FSW_PER_PRESET)), j, sizeof(Parameter), NUM_FSW_PARAMS_PER_FSW));
+    }
+  }
+  return true;
+}
 /* :: END PRESET :: */
 
 
@@ -261,6 +289,24 @@ uint8_t f_fsw_lp_params_save() {
   }
   return true;
 }
+uint8_t f_fsw_reset() {
+  // Need to reset state
+  fsw_settings.state     = 0;
+  fsw_settings.state_bup = 0;
+
+  {
+    Footswitch new_fsw;
+    fsw[fsw_settings.id] = new_fsw;
+  }
+
+  {
+    Parameter parameter;
+    for (uint16_t i=GET_FSWSET_PARAM_ADDR(0), j=0; j<NUM_FSW_PARAMS_PER_FSW; i+=sizeof(Parameter), j++) {
+      write_data<Parameter>(&parameter, i);
+    }
+  }
+  return true;
+}
 /* :: END FSW :: */
 
 
@@ -274,22 +320,25 @@ uint8_t f_fsw_lp_params_save() {
 #define F_PRESET_PARAM_PEDAL_SAVE    6
 #define F_PRESET_PARAM_FEATURE_SETUP 7
 #define F_PRESET_PARAM_FEATURE_SAVE  8
-#define F_FEATURES_SETUP             9
-#define F_GLOBAL                     10
-#define F_FSW_SETUP                  11
-#define F_FSW_COLOR_SETUP            12
-#define F_FSW_COLOR_SAVE             13
-#define F_FSW_PARAMS_RUN             14
-#define F_FSW_PARAMS_SETUP           15
-#define F_FSW_PARAMS_SAVE            16
-#define F_FSW_PARAM_PEDAL_SETUP      17
-#define F_FSW_PARAM_PEDAL_SAVE       18
-#define F_FSW_PARAM_FEATURE_SETUP    19
-#define F_FSW_PARAM_FEATURE_SAVE     20
-#define F_FSW_LP_SETUP               21
-#define F_FSW_LP_PARAMS_SETUP        22
-#define F_FSW_LP_PARAMS_RUN          23
-#define F_FSW_LP_PARAMS_SAVE         24
+#define F_PRESET_RESET               9
+#define F_PARAM_RESET                10
+#define F_FEATURES_SETUP             11
+#define F_GLOBAL                     12
+#define F_FSW_SETUP                  13
+#define F_FSW_COLOR_SETUP            14
+#define F_FSW_COLOR_SAVE             15
+#define F_FSW_PARAMS_RUN             16
+#define F_FSW_PARAMS_SETUP           17
+#define F_FSW_PARAMS_SAVE            18
+#define F_FSW_PARAM_PEDAL_SETUP      19
+#define F_FSW_PARAM_PEDAL_SAVE       20
+#define F_FSW_PARAM_FEATURE_SETUP    21
+#define F_FSW_PARAM_FEATURE_SAVE     22
+#define F_FSW_RESET                  23
+#define F_FSW_LP_SETUP               24
+#define F_FSW_LP_PARAMS_SETUP        25
+#define F_FSW_LP_PARAMS_RUN          26
+#define F_FSW_LP_PARAMS_SAVE         27
 
 typedef uint8_t (*Callback)();
 
@@ -303,6 +352,8 @@ Callback get_callback(uint8_t id) {
     case F_PRESET_PARAM_PEDAL_SAVE:    return &f_preset_param_pedal_save;
     case F_PRESET_PARAM_FEATURE_SETUP: return &f_preset_param_feature_setup;
     case F_PRESET_PARAM_FEATURE_SAVE:  return &f_preset_param_feature_save;
+    case F_PRESET_RESET:               return &f_preset_reset;
+    case F_PARAM_RESET:                return &f_param_reset;
     case F_FEATURES_SETUP:             return &f_features_setup;
     case F_GLOBAL:                     return &f_global;
     case F_FSW_SETUP:                  return &f_fsw_setup;
@@ -315,6 +366,7 @@ Callback get_callback(uint8_t id) {
     case F_FSW_PARAM_PEDAL_SAVE:       return &f_fsw_param_pedal_save;
     case F_FSW_PARAM_FEATURE_SETUP:    return &f_fsw_param_feature_setup;
     case F_FSW_PARAM_FEATURE_SAVE:     return &f_fsw_param_feature_save;
+    case F_FSW_RESET:                  return &f_fsw_reset;
     case F_FSW_LP_SETUP:               return &f_fsw_lp_setup;
     case F_FSW_LP_PARAMS_SETUP:        return &f_fsw_lp_params_setup;
     case F_FSW_LP_PARAMS_RUN:          return &f_fsw_lp_params_run;
