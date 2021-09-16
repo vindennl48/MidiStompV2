@@ -115,6 +115,9 @@ uint8_t f_preset_param_feature_setup() {
   // relative ID meaning the nth feature of the pedal_id, NOT the nth feature in the eeprom
   uint8_t  feature_relative_id = Parameter::get_feature(preset_param_addr);
 
+  // need to set alt start for this
+  alt_start_addr = GET_CHILD(M_FEATURES, pedal_id, 0, sizeof(Feature), NUM_FEATURES_PER_PEDAL);
+
   // Failsafe in case pedals is empty
   if ( pedal_id == NUM_PEDALS ) {
     pedal_id = 0;

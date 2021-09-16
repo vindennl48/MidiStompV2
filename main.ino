@@ -104,8 +104,19 @@ void loop() {
           if ( knob.is_long_pressed() ) {
             n.jump_to(E_SETTINGS);
           }
-          else if ( knob.is_left() ) {}
-          else if ( knob.is_right() ) {}
+          else if ( knob.is_left() ) {
+            if ( preset_id > 0 ) {
+              preset_id = CONTAIN((int)preset_id-1, (int)0, (int)NUM_PRESETS-1);
+              n.jump_to(E_SETUP); // Change preset and reset everything
+            }
+          }
+          else if ( knob.is_right() ) {
+            // Preset 21 is reserved for moving presets and things around
+            if ( preset_id < NUM_PRESETS ) {
+              preset_id = CONTAIN((int)preset_id+1, (int)0, (int)NUM_PRESETS-1);
+              n.jump_to(E_SETUP); // Change preset and reset everything
+            }
+          }
         }
       }
       break;

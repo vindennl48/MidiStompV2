@@ -15,11 +15,19 @@ struct Nav {
     init           = true;
     return !result; 
   }
-  void    reinit()           { init = false; }
-  uint8_t is_active()        { return active; }
-  void    activate()         { init = false; active = true; }
-  void    jump_to(uint8_t e) { data = 0; event = e; }
-  uint8_t back()             { data = 0; return true; }
-  uint8_t reset()            { return back(); }
-  uint8_t e()                { return event; }
+  void    reinit()           { serial_thru(); init = false; }
+  uint8_t is_active()        { serial_thru(); return active; }
+  void    activate()         { serial_thru(); init = false; active = true; }
+  void    jump_to(uint8_t e) { serial_thru(); data = 0; event = e; }
+  uint8_t back()             { serial_thru(); data = 0; return true; }
+  uint8_t reset()            { serial_thru(); return back(); }
+  uint8_t e()                { serial_thru(); return event; }
+
+  // This is the best place to put this, it will be triggered multiple times
+  // during a program loop.  This should be fast enough to catch all midi clock
+  // data coming thru
+  void serial_thru() {
+    // Might want to set a setting to stop thruput in the future
+    if (Serial.available() > 0) Serial.write(Serial.read());
+  }
 };

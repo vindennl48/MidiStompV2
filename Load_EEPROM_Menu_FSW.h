@@ -58,7 +58,7 @@ write_data<Menu>(&menu, address);
   //-------------------------------------------------------------------------------- 
   memcpy(option.name, "RESET       ", TEXT_SZ);
   option.result      = RESULT_CONFIRM;
-  option.menu_addr   = MENU_FSW_LP;
+  option.menu_addr   = MENU_FSW;
   option.callback_id = F_FSW_RESET;
   write_data<Option>(&option, address);
 

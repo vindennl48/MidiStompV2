@@ -158,14 +158,14 @@ struct ValueEdit {
         else {
           if ( knob.is_left() || knob.is_right() ) {
             if ( knob.is_left() )  {
-              value = CONTAIN((int)value-1, (int)min, (int)max); 
+              value = ROTATE((int)value-1, (int)min, (int)max); 
               if ( result_type == RESULT_FSW_LP_MODE_EDIT ) {
                 if      ( value == FSW_MODE_TOGGLE ) value = FSW_MODE_OFF;
                 else if ( value == FSW_MODE_CYCLE )  value = FSW_MODE_OFF;
               }
             }
             else if ( knob.is_right() ) {
-              value = CONTAIN((int)value+1, (int)min, (int)max); 
+              value = ROTATE((int)value+1, (int)min, (int)max); 
               if ( result_type == RESULT_FSW_LP_MODE_EDIT ) {
                 if      ( value == FSW_MODE_TOGGLE ) value = FSW_MODE_ONESHOT;
                 else if ( value == FSW_MODE_CYCLE )  value = FSW_MODE_ONESHOT;

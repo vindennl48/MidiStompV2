@@ -4,14 +4,14 @@
 #ifdef LOAD_EEPROM
 
 // -- LOADING OPTIONS --
-//#define RESET_COLORS
+#define RESET_COLORS
 //#define RESET_PEDALS
 //#define RESET_FEATURES
 //#define RESET_PRESETS
 //#define RESET_PRESET_PARAMS
 //#define RESET_FSW
 //#define RESET_FSW_PARAMS
-#define RESET_MENUS
+//#define RESET_MENUS
 // --
 
 void setup() {
@@ -73,6 +73,54 @@ void setup() {
         Color::set_red(  i, 0);
         Color::set_green(i, 0);
         Color::set_blue( i, 255);
+        break;
+
+      case 6:
+        memcpy(text[0], "ORANGE_ON   ", TEXT_SZ);
+        Color::set_name( i, TXT_BUF_1);
+        Color::set_red(  i, 255);
+        Color::set_green(i, 34);
+        Color::set_blue( i, 0);
+        break;
+
+      case 7:
+        memcpy(text[0], "ORANGE_OFF  ", TEXT_SZ);
+        Color::set_name( i, TXT_BUF_1);
+        Color::set_red(  i, 40);
+        Color::set_green(i, 6);
+        Color::set_blue( i, 0);
+        break;
+
+      case 8:
+        memcpy(text[0], "YELLOW_ON   ", TEXT_SZ);
+        Color::set_name( i, TXT_BUF_1);
+        Color::set_red(  i, 255);
+        Color::set_green(i, 94);
+        Color::set_blue( i, 0);
+        break;
+
+      case 9:
+        memcpy(text[0], "YELLOW_OFF  ", TEXT_SZ);
+        Color::set_name( i, TXT_BUF_1);
+        Color::set_red(  i, 25);
+        Color::set_green(i, 10);
+        Color::set_blue( i, 0);
+        break;
+
+      case 10:
+        memcpy(text[0], "PURPLE_ON   ", TEXT_SZ);
+        Color::set_name( i, TXT_BUF_1);
+        Color::set_red(  i, 255);
+        Color::set_green(i, 0);
+        Color::set_blue( i, 100);
+        break;
+
+      case 11:
+        memcpy(text[0], "PURPLE_OFF  ", TEXT_SZ);
+        Color::set_name( i, TXT_BUF_1);
+        Color::set_red(  i, 15);
+        Color::set_green(i, 0);
+        Color::set_blue( i, 10);
         break;
 
       default:

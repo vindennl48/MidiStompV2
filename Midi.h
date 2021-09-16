@@ -16,14 +16,26 @@ uint8_t send_midi(uint16_t parameter_addr) {
   else if ( feature.type ==  MIDI_TYPE_CC )   command += MIDI_TYPE_CC_OUT;
   else if ( feature.type ==  MIDI_TYPE_PC )   command += MIDI_TYPE_PC_OUT;
 
+#ifdef DISPLAY_DEBUG
+  if      ( feature.type ==  MIDI_TYPE_NOTE ) DEBUG("MIDI> Type:     ", "Note");
+  else if ( feature.type ==  MIDI_TYPE_CC )   DEBUG("MIDI> Type:     ", "CC");
+  else if ( feature.type ==  MIDI_TYPE_PC )   DEBUG("MIDI> Type:     ", "PC");
+  DEBUG("MIDI> Pitch:    ", feature.pitch);
+  if ( feature.type != MIDI_TYPE_PC ) {
+    DEBUG("MIDI> Velocity: ", parameter.velocity);
+  }
+#else
   // Note type and channel
   Serial.write(command);
 
   // Pitch
   Serial.write(feature.pitch);
 
-  // Velocity
-  Serial.write(parameter.velocity);
+  if ( feature.type != MIDI_TYPE_PC ) {
+    // Velocity
+    Serial.write(parameter.velocity);
+  }
+#endif
 
   return true;
 }
