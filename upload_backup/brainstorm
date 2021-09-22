@@ -1,0 +1,99 @@
+# This will be interpreted by a Python script that will then send the serial
+#  data to the MidiStomp.  Then the MidiStomp will interpret that serial data
+#  to write the information to the EEPROM.
+#
+# Use hash-tags as comments
+# Ignore empty lines
+# Name first of struct, use END as terminator
+
+COLOR
+# Color ID, Name, r, g, b
+  0,  RED_ON,     2, 0, 0
+  1,  RED_OFF,    2, 0, 0
+
+  2,  GREEN_ON,   2, 0, 0
+  3,  GREEN_OFF,  2, 0, 0
+
+  4,  BLUE_ON,    2, 0, 0
+  5,  BLUE_OFF,   2, 0, 0
+
+  6,  ORANGE_ON,  2, 0, 0
+  7,  ORANGE_OFF, 2, 0, 0
+
+  8,  YELLOW_ON,  2, 0, 0
+  9,  YELLOW_OFF, 2, 0, 0
+
+  10, PURPLE_ON,  2, 0, 0
+  11, PURPLE_OFF, 2, 0, 0
+END
+
+PEDAL
+# Pedal ID, Name, Channel
+#   Feature ID, Name, Type, Pitch
+#   Type: NOTE/CC/PC
+
+  0, STOMP, 1
+    0, FS1, CC, 49
+    1, FS2, CC, 50
+    2, FS3, CC, 51
+    3, FS4, CC, 52
+    4, FS5, CC, 53
+  END
+
+  1, ADAM, 2
+    0, CLEAN1, PC, 0
+    1, DIST1,  PC, 1
+    2, FUZZ1,  PC, 2
+  END
+
+  2,TEMPUS,3
+  END
+
+  3,MICROCOSM,4
+  END
+
+  7,COMPUTER,15
+  END
+END
+
+PRESET
+# Preset ID, Name
+#  PARAMS
+#    Pedal ID, Feature ID, Velocity
+#  FSW
+#    FSW ID, State ID, Menu ID
+#      Color ID, FSW Mode, Press Type
+#      FSW Mode: OFF/ONESHOT/TOGGLE/CYCLE/SUBMENU/PRESET
+#      Press Type: UP/DOWN
+#      LONGPRESS
+#        LP Mode: OFF/ONESHOT/SUBMENU/PRESET
+#        PARAMS
+#          Pedal ID, Feature ID, Velocity
+#      PARAMS
+#        Pedal ID, Feature ID, Velocity
+
+  0, STEEL
+    PARAMS
+    END
+
+    FSW
+
+      0, 0, 0
+        0, TOGGLE, UP
+
+        LONGPRESS
+          ONESHOT
+
+          PARAMS
+          END
+        END
+
+        PARAMS
+        END
+
+      END
+
+    END
+  END
+
+END

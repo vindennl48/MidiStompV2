@@ -3,7 +3,7 @@
 #define MIDI_TYPE_PC_OUT   0xC0
 
 uint8_t send_midi(uint16_t parameter_addr) {
-  uint8_t command;
+  uint8_t channel = 0;
   Parameter parameter = read_data<Parameter>(parameter_addr);
 
   // This means its an empty parameter
@@ -11,10 +11,10 @@ uint8_t send_midi(uint16_t parameter_addr) {
 
   Feature feature = read_data<Feature>(GET_CHILD(M_FEATURES, parameter.pedal, parameter.feature, sizeof(Feature), NUM_FEATURES_PER_PEDAL));
 
-  command = Pedal::get_channel(GET_PARENT(M_PEDALS, parameter.pedal, sizeof(Pedal)));
-  if      ( feature.type ==  MIDI_TYPE_NOTE ) command += MIDI_TYPE_NOTE_OUT;
-  else if ( feature.type ==  MIDI_TYPE_CC )   command += MIDI_TYPE_CC_OUT;
-  else if ( feature.type ==  MIDI_TYPE_PC )   command += MIDI_TYPE_PC_OUT;
+  channel = Pedal::get_channel(GET_PARENT(M_PEDALS, parameter.pedal, sizeof(Pedal)));
+  //feature.type = MIDI_TYPE_NOTE
+  //feature.type = MIDI_TYPE_CC
+  //feature.type = MIDI_TYPE_PC
 
 #ifdef DISPLAY_DEBUG
   if      ( feature.type ==  MIDI_TYPE_NOTE ) DEBUG("MIDI> Type:     ", "Note");
@@ -25,20 +25,59 @@ uint8_t send_midi(uint16_t parameter_addr) {
     DEBUG("MIDI> Velocity: ", parameter.velocity);
   }
 #else
-  // Note type and channel
-  Serial.write(command);
 
-  // Pitch
-  Serial.write(feature.pitch);
-
-  if ( feature.type != MIDI_TYPE_PC ) {
-    // Velocity
-    Serial.write(parameter.velocity);
+  if ( feature.type == MIDI_TYPE_NOTE ) {
+    MIDI.sendNoteOn(feature.pitch, parameter.velocity, channel);
   }
+  else if ( feature.type == MIDI_TYPE_CC ) {
+    MIDI.sendControlChange(feature.pitch, parameter.velocity, channel);
+  }
+  else if ( feature.type == MIDI_TYPE_PC ) {
+    MIDI.sendProgramChange(feature.pitch, channel);
+  }
+
 #endif
 
   return true;
 }
+
+// uint8_t send_midi(uint16_t parameter_addr) {
+//   uint8_t command;
+//   Parameter parameter = read_data<Parameter>(parameter_addr);
+// 
+//   // This means its an empty parameter
+//   if ( parameter.pedal == NUM_PEDALS ) return true;
+// 
+//   Feature feature = read_data<Feature>(GET_CHILD(M_FEATURES, parameter.pedal, parameter.feature, sizeof(Feature), NUM_FEATURES_PER_PEDAL));
+// 
+//   command = Pedal::get_channel(GET_PARENT(M_PEDALS, parameter.pedal, sizeof(Pedal)));
+//   if      ( feature.type ==  MIDI_TYPE_NOTE ) command += MIDI_TYPE_NOTE_OUT;
+//   else if ( feature.type ==  MIDI_TYPE_CC )   command += MIDI_TYPE_CC_OUT;
+//   else if ( feature.type ==  MIDI_TYPE_PC )   command += MIDI_TYPE_PC_OUT;
+// 
+// #ifdef DISPLAY_DEBUG
+//   if      ( feature.type ==  MIDI_TYPE_NOTE ) DEBUG("MIDI> Type:     ", "Note");
+//   else if ( feature.type ==  MIDI_TYPE_CC )   DEBUG("MIDI> Type:     ", "CC");
+//   else if ( feature.type ==  MIDI_TYPE_PC )   DEBUG("MIDI> Type:     ", "PC");
+//   DEBUG("MIDI> Pitch:    ", feature.pitch);
+//   if ( feature.type != MIDI_TYPE_PC ) {
+//     DEBUG("MIDI> Velocity: ", parameter.velocity);
+//   }
+// #else
+//   // Note type and channel
+//   Serial.write(command);
+// 
+//   // Pitch
+//   Serial.write(feature.pitch);
+// 
+//   if ( feature.type != MIDI_TYPE_PC ) {
+//     // Velocity
+//     Serial.write(parameter.velocity);
+//   }
+// #endif
+// 
+//   return true;
+// }
 
 // fsw_submenu_id: 0-4
 void send_fsw_midi(uint8_t fsw_submenu_id) {

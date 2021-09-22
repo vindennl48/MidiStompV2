@@ -34,7 +34,7 @@ void leds_set_green(uint8_t new_value) { for (uint8_t i=0; i<NUM_LEDS; i++) leds
 void leds_set_blue(uint8_t new_value)  { for (uint8_t i=0; i<NUM_LEDS; i++) leds[i].b.set(new_value); }
 
 void hw_setup() {
-  SERIAL_MIDI_SETUP;
+  //SERIAL_MIDI_SETUP;
 
   // Board LED
   LED_BOARD_SETUP;

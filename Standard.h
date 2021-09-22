@@ -10,7 +10,8 @@ typedef unsigned long Timer;
 #define RAM_TEXT_MAX 2
 #define TXT_BUF_1    0
 #define TXT_BUF_2    1
-char text[RAM_TEXT_MAX][TEXT_SZ] = {{' '}};
+char    text[RAM_TEXT_MAX][TEXT_SZ] = {{' '}};
+uint8_t is_eeprom_com               = false;  // for switching to computer communcations
 
 #define NUM_PARENTS_MAX 8
 uint8_t parents_used = 0;  // flip bit for parent being used
@@ -100,7 +101,12 @@ void debug(String title, String variable) {
 #ifdef DISPLAY_DEBUG
 #define SERIAL_MIDI_SETUP Serial.begin(9600)
 #else
-#define SERIAL_MIDI_SETUP Serial.begin(31250)
+// struct MySettings : public midi::DefaultSettings {
+//   static const long BaudRate = 9600;
+// };
+// MIDI_CREATE_CUSTOM_INSTANCE(HardwareSerial, Serial, MIDI, MySettings);
+MIDI_CREATE_DEFAULT_INSTANCE();
+//#define SERIAL_MIDI_SETUP Serial.begin(31250)
 #endif
 /* :: END SERIAL SETUP :: */
 

@@ -9,16 +9,20 @@
 #define E_MAIN         2
 #define E_SETTINGS     3
 #define E_FSW_SETTINGS 4
+#define E_EEPROM_COM   5
 // --
 
 Nav n;
 
 void setup() {
   hw_setup();
+  MIDI.begin();
 }
 
 void loop() {
   hw_loop();
+
+//  if ( is_eeprom_com && !(n.event == E_EEPROM_COM) ) n.jump_to(E_EEPROM_COM);
 
   switch(n.e()) {
     case E_SETUP:
@@ -167,6 +171,18 @@ void loop() {
               n.jump_to(E_FSW_SETTINGS);
             }
           }
+        }
+      }
+      break;
+
+    case E_EEPROM_COM:
+      if ( n.not_init() ) {
+        PRINT_NLINE(0,0, "EEPROM_COM");
+        PRINT_NLINE(0,1, "CONNECTED");
+      }
+      else {
+        if ( Serial.available() ) {
+          PRINT_NLINE(0,1, Serial.read());
         }
       }
       break;

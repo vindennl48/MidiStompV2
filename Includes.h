@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <LiquidCrystal_I2C.h>
+#include <MIDI.h>
 
 #include "Standard.h"
 #include "I2C_EEPROM.h"

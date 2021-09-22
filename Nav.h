@@ -27,7 +27,19 @@ struct Nav {
   // during a program loop.  This should be fast enough to catch all midi clock
   // data coming thru
   void serial_thru() {
-    // Might want to set a setting to stop thruput in the future
-    if (Serial.available() > 0) Serial.write(Serial.read());
+    // need to process the .read() function as well as check if we
+    MIDI.read();
+
+
+    // :: WORK IN PROGRESS ::
+    //  need to enter into an EEPROM communication state
+
+    //if ( MIDI.read() && MIDI.getType() == midi::PitchBend ) {
+    //}
+
+    // if ( !is_eeprom_com && Serial.available() ) {
+    //   LED_BOARD_TOGGLE;
+    //   is_eeprom_com = true;
+    // }
   }
 };

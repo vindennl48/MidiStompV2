@@ -4,7 +4,7 @@
 #ifdef LOAD_EEPROM
 
 // -- LOADING OPTIONS --
-#define RESET_COLORS
+//#define RESET_COLORS
 //#define RESET_PEDALS
 //#define RESET_FEATURES
 //#define RESET_PRESETS
