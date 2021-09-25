@@ -101,12 +101,17 @@ void debug(String title, String variable) {
 #ifdef DISPLAY_DEBUG
 #define SERIAL_MIDI_SETUP Serial.begin(9600)
 #else
-// struct MySettings : public midi::DefaultSettings {
-//   static const long BaudRate = 9600;
-// };
-// MIDI_CREATE_CUSTOM_INSTANCE(HardwareSerial, Serial, MIDI, MySettings);
-MIDI_CREATE_DEFAULT_INSTANCE();
+
+struct MySettings : public midi::DefaultSettings {
+  static const long BaudRate = 31250;
+  static const bool HandleNullVelocityNoteOnAsNoteOff = false;
+  static const bool Use1ByteParsing = false;
+  static const bool UseRunningStatus = false;
+};
+MIDI_CREATE_CUSTOM_INSTANCE(HardwareSerial, Serial, MIDI, MySettings);
+//MIDI_CREATE_DEFAULT_INSTANCE();
 //#define SERIAL_MIDI_SETUP Serial.begin(31250)
+
 #endif
 /* :: END SERIAL SETUP :: */
 
