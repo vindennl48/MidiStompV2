@@ -1,104 +1,176 @@
-#ifndef DATABASE_H
-#define DATABASE_H
+/* :: GENERAL DEFINES :: */
+#define NUM_CHAN 3  // Color channels, ie. red, green, blue
+/* :: END GENERAL DEFINES :: */
 
 
-/*  :: COLOR :: */
+/* :: HELPFUL MACROS :: */
+#define GET_NIBBLE(input, mask, shift)  ((mask & input) >> shift)
+
+// These help get the start address in eeprom
+#define GET_PARENT(start, id, size) (start + (id*size))
+#define GET_CHILD(start, parent_id, id, size, num_in_parent) (start + (parent_id*size*num_in_parent) + (id*size))
+#define GET_END(start, quantity, size) ((uint16_t)start + ((uint16_t)quantity*(uint16_t)size))
+
+#define GET_ID_FROM_ADDR(list_start, addr, size) ((addr-list_start) == 0 ? (uint16_t)0 : (uint16_t)((addr-list_start)/size))
+
+// Given the local ID of a child, this helps get the absolute ID of the child in the eeprom
+// For example: If we have fsw_id of 2, this means the 3rd physical footswitch..
+//              however, if we are on thie 3rd preset, 2nd submenu, the absolute ID is actually 38..
+//              4 fsw per submenu, 4 submenu per preset, which is 16 fsw per preset.
+//              3rd preset is preset_id=2, 16*2 = 32
+//              2nd submenu is submenu_id=1, 32+4*1 = 36
+//              fsw_id of 2, 36+2 = 38
+//              So in the EEPROM, this fsw is the 39th one, absolute fsw_id = 38
+#define GET_ABS_CHILD_ID(parent_id, child_id, num_children_in_parent) (parent_id*num_children_in_parent+child_id)
+#define GET_ABS_CHILD_ID_2(parent1_id, parent2_id, child_id, num_children_in_parent2, num_parent2_in_parent1) \
+  ((num_children_in_parent2*num_parent2_in_parent1*parent1_id) + (num_children_in_parent2*parent2_id) + child_id)
+/* :: END HELPFUL MACROS :: */
+
+
+/* :: OBJECT COUNTS :: */
+#define NUM_COLORS                   50
+#define NUM_COLORS_PER_FSW           3
+#define NUM_PEDALS                   8
+#define NUM_FEATURES_PER_PEDAL       32
+#define NUM_FEATURES_TOTAL           (NUM_PEDALS * NUM_FEATURES_PER_PEDAL)
+#define NUM_PRESETS                  21
+#define NUM_PRESET_PARAMS_PER_PRESET 10
+#define NUM_PRESET_PARAMS_TOTAL      (NUM_PRESETS * NUM_PRESET_PARAMS_PER_PRESET)
+#define NUM_SUBMENUS_PER_PRESET      4
+#define NUM_FSW_PER_SUBMENU          4
+#define NUM_FSW_PER_PRESET           (NUM_FSW_PER_SUBMENU * NUM_SUBMENUS_PER_PRESET)
+#define NUM_FSW_TOTAL                (NUM_FSW_PER_PRESET * NUM_PRESETS)
+#define NUM_STATES_PER_FSW           4  // 3 states plus one state for longpress
+#define NUM_FSW_PARAMS_PER_STATE     10
+#define NUM_FSW_PARAMS_PER_FSW       (NUM_STATES_PER_FSW * NUM_FSW_PARAMS_PER_STATE)
+#define NUM_FSW_PARAMS_TOTAL         (NUM_FSW_PARAMS_PER_FSW * NUM_FSW_TOTAL)
+#define NUM_MENUS                    23
+#define NUM_OPTIONS_PER_MENU         10
+#define NUM_OPTIONS_TOTAL            (NUM_MENUS*NUM_OPTIONS_PER_MENU)
+/* :: END OBJECT COUNTS :: */
+
+
+/* :: FUNC BUILDERS:: */
+// Takes an address of the object plus the text buffer to
+// write the name to.
+#define BUILD_OBJ_NAME \
+  static void get_name(uint16_t addr, uint8_t i) { \
+    eReadBlock( addr, (uint8_t*)text[i], TEXT_SZ ); \
+  } \
+  static void set_name(uint16_t addr, uint8_t i) { \
+    eWriteBlock( addr, (uint8_t*)text[i], TEXT_SZ ); \
+  }
+// Takes name you want the function to be
+//  obj_class of the return value
+//  addr of start of struct
+//  i is how many bytes to get thru struct to the var you want
+#define BUILD_OBJ_VAR(var_name, obj_class, i) \
+  static obj_class get_##var_name(uint16_t addr) { \
+    return read_data<obj_class>( addr + i ); \
+  } \
+  static void set_##var_name(uint16_t addr, obj_class new_var) { \
+    write_data<obj_class>( &new_var, addr + i ); \
+  }
+// Takes name you want the function to be
+//  nib_class is obj_class of how many bytes stores the nibble
+//  bit_mask of where the nibble is located in the nib_class
+//  addr of the start of struct
+//  i is how many bytes to get thru struct to the var you want
+#define BUILD_OBJ_VAR_NIBBLE(var_name, nib_class, bit_mask, num_bits_to_shift, i) \
+  static uint8_t get_##var_name(uint16_t addr) { \
+    nib_class result = 0; \
+    eReadBlock( (addr + i), (uint8_t*)&result, sizeof(nib_class) ); \
+    return (result & (bit_mask << num_bits_to_shift)) >> num_bits_to_shift; \
+  } \
+  static void set_##var_name(uint16_t addr, nib_class new_var) { \
+    nib_class result = 0; \
+    eReadBlock( (addr + i), (uint8_t*)&result, sizeof(nib_class) ); \
+    result = (result & ~(bit_mask<<num_bits_to_shift)) | (new_var << num_bits_to_shift); \
+    eWriteBlock( (addr + i), (uint8_t*)&result, sizeof(nib_class) ); \
+  }
+/* :: END FUNC BUILDERS:: */
+
+
+/* :: STRUCTS :: */
 struct Color {
-  // 16 bytes
-  char    name[STR_LEN_MAX] = "UNTITLED";
-  uint8_t r,g,b;
+  char    name[TEXT_SZ] = "UNTITLED ";
+  uint8_t red           = 0;
+  uint8_t green         = 0;
+  uint8_t blue          = 0;
 
-  Color() {
-    this->r = 255;
-    this->g = 0;
-    this->b = 0;
-  }
-} *color_p = nullptr;
+  BUILD_OBJ_NAME;
+  BUILD_OBJ_VAR(red,   uint8_t, 13);
+  BUILD_OBJ_VAR(green, uint8_t, 14);
+  BUILD_OBJ_VAR(blue,  uint8_t, 15);
+};
+#define GET_RGB_ADDR(color_addr) \
+  read_data<uint8_t>(color_addr+13), \
+  read_data<uint8_t>(color_addr+14), \
+  read_data<uint8_t>(color_addr+15)
+#define GET_RGB(color_id) GET_RGB_ADDR( GET_PARENT(M_COLORS, color_id, sizeof(Color)) )
 
-
-/*  :: PARAMETER :: */
-struct Param {
-  // 14 bytes
-  char name[STR_LEN_MAX] = "UNTITLED";
-
-  union {
-    struct {
-      unsigned type:3;   // 0=NONE, 1=Note, 2=CC, 3=PC
-      unsigned pitch:7;
-    };
-  };
-
-  Param() {
-    this->type  = 0;
-    this->pitch = 0;
-  }
-} *param_p = nullptr;
-
-
-/*  :: PEDAL :: */
 struct Pedal {
-  // 14 bytes
-  char     name[STR_LEN_MAX] = "UNTITLED";
-  unsigned channel:4;
-  // 32 params
+  char    name[TEXT_SZ] = "UNTITLED ";
+  uint8_t channel       = 0;
 
-  Pedal() { channel = 0; }
+  BUILD_OBJ_NAME;
+  BUILD_OBJ_VAR(channel, uint8_t, 13);
+};
 
-} *pedal_p = nullptr;
+#define MIDI_TYPE_NOTE 0
+#define MIDI_TYPE_CC   1
+#define MIDI_TYPE_PC   2
+struct Feature {
+  char    name[TEXT_SZ] = "UNTITLED ";
+  uint8_t type          = 0;
+  uint8_t pitch         = 0;
 
-// Pedal Param = PP
-struct PedalParam {
+  BUILD_OBJ_NAME;
+  BUILD_OBJ_VAR(type,  uint8_t, 13);
+  BUILD_OBJ_VAR(pitch, uint8_t, 14);
+};
+
+// For presets and fsw's
+struct Parameter {
   union {
+    uint16_t data;
     struct {
-      unsigned pedal:4; // EEP_NUM_PEDALS is Empty
-      unsigned param:5;
       unsigned velocity:7;
+      unsigned feature:5;
+      unsigned pedal:4;
     };
   };
 
-  PedalParam() {
-    this->pedal    = EEP_NUM_PEDALS;
-    this->param    = 0;
-    this->velocity = 0;
+  Parameter() {
+    pedal    = NUM_PEDALS;
+    feature  = 0;
+    velocity = 0;
   }
-} *pedal_param_p = nullptr;
 
-/*  :: FOOTSWITCH :: */
+  BUILD_OBJ_VAR_NIBBLE(pedal,    uint16_t, 0b1111,    12, 0);
+  BUILD_OBJ_VAR_NIBBLE(feature,  uint16_t, 0b11111,    7, 0);
+  BUILD_OBJ_VAR_NIBBLE(velocity, uint16_t, 0b1111111,  0, 0);
+
+  // Resets all nibbles
+  BUILD_OBJ_VAR(data, uint16_t, 0);
+};
+
+struct Preset {
+  char name[TEXT_SZ] = "UNTITLED ";
+  BUILD_OBJ_NAME;
+};
+
+#define FSW_MODE_OFF     0  // NONE
+#define FSW_MODE_TOGGLE  1  // Press once for on, 2x for off
+#define FSW_MODE_CYCLE   2  // Press once for on, 2x for on2, 3x for off
+#define FSW_MODE_ONESHOT 3  // Every press only sends one set of params, no cycling or toggle
+#define FSW_MODE_SUBMENU 4  // Change to a different submenu
+#define FSW_MODE_PRESET  5  // Change to a different preset
 struct Footswitch {
-/* Outline of Features
- *   - Activated by single press OR press and hold
- *     - Activate when button is pressed down (quicker reaction)
- *       will prevent press-and-hold feature
- *     - Otherwise, activate when button is pressed then released
- *   - When activated, up to 5 MIDI notes will be sent.
- *     A different set of 5 notes get sent depending on the state.
- *     (Up to 3 states)
- *   - 4 Modes
- *     - OFF:     Button is not in use
- *     - TOGGLE:  Button will switch between state 0 and state 1
- *     - CYCLE:   Button will switch between state 0, 1, and 2
- *     - ONESHOT: Button will only send out first bank of 5 MIDI notes
- *                on every press.
- *   - There is also a press-and-hold option to release 5 extra MIDI notes
- *     This is only available when the FSW activates after press down and release.
- *   - SPECIALTY FUNCTIONS
- *     - Instead of sending MIDI notes, alternatively, we can perform some special functions
- *       - SWITCH PRESET: This can either switch to a specific preset instantly, OR, can
- *                        jump to the next/next 10/next 20/previous/previous 10/ previous 20.
- *                        This number of jumps can be set in the first pedal_param value.
- *       - SWITCH SUBMENU: This allows switching submenus within the same preset.  The
- *                         submenu number is determined by the first pedal_param value.
- *       - LOOP QUANTIZE: Requires MIDI clock input; When pressing a FSW, this waits for
- *                        the next down-beat on the MIDI clock before sending out a MIDI
- *                        message to a looper pedal to start.  Essentially mimics quantize.
- * */
+  uint8_t color_id[NUM_COLORS_PER_FSW] = { 0, 1, 3 };
 
-  uint8_t colors[NUM_STATES] = { 0, 1, 11 };
-
-  // States of footswitch
   union {
     struct {
-      unsigned press_type:1; // 0 PRESS_TYPE_UP, 1 PRESS_TYPE_DOWN
       unsigned mode:3;       // 0 OFF, 1 Toggle, 2 Cycle, 3 OneShot
                              //   SPECIALTY: 
                              //     4 Switch Submenu,
@@ -111,14 +183,15 @@ struct Footswitch {
                              //     5 Jump to Preset x
                              //     6 Switch Preset by n number of presets,
       unsigned state:2;      // 0 OFF, 1 ON1, 2 ON2
+      unsigned press_type:1; // 0 PRESS_TYPE_UP, 1 PRESS_TYPE_DOWN
     };
   };
 
   Footswitch() {
-    this->press_type = PRESS_TYPE_UP;
-    this->mode       = FSW_MODE_TOGGLE;
-    this->lp_mode    = FSW_MODE_OFF;
-    this->state      = 0;
+    mode       = FSW_MODE_TOGGLE;
+    lp_mode    = FSW_MODE_OFF;
+    state      = 0;
+    press_type = PRESS_TYPE_UP;
   }
 
   void increase_state() {
@@ -131,92 +204,187 @@ struct Footswitch {
     }
     else if ( FSW_MODE_TOGGLE && state >= 2 ) state = 0;
   }
-} *fsw_p = nullptr;
 
-
-/*  :: PRESET :: */
-struct Preset {
-/* Outline of Features
- *   - Display Preset Name
- *   - Display Active Preset Submenu
- *   - On Preset Load, Send out up to 5(*) MIDI notes. (* might need more..)
- *   - Have 4 FSW and maintain their status / settings
- *   - Has 4 submenus of 4 FSW for added flexibility.
- *     (Essentially, each preset has 16 FSW to choose from)
- * */
-
-  // 14 bytes
-  char    name[STR_LEN_MAX] = "UNTITLED";
-  uint8_t is_dirty          = false;
-  // 4 footswitches
-  // 1 main footswitch menu + 3 footswitch sub-menus
-  // 10 pedal params on preset load
-} *preset_p = nullptr;
-
-
-/*  :: MENU STRUCTS :: */
-/* MenuOption 0 is always going to be a dummy option (impossible to select) */
-struct MenuOption {
-  char text[STR_LEN_MAX];
-
-  union {
-    struct {
-      unsigned type:2;    // 0=DUMMY, 1=SUBMENU, 2=FUNCTION, 3=FUNC THEN SUBMENU
-      unsigned value:8;   // submenu or function id to call
-      unsigned value2:8;  // value is function call, value2 is submenu (only in type 3)
-    };
-  };
-
-  MenuOption(const char text[STR_LEN_MAX], uint8_t type, uint8_t value=0, uint8_t value2=0) {
-    strcpy(this->text, text);
-    this->type   = type;
-    this->value  = value;
-    this->value2 = value2;
+  void run_long_press() {
+    if ( lp_mode > 0 ) {
+      flash();
+    }
   }
-  MenuOption() {}  // For pointers
+
+} fsw[NUM_FSW_PER_PRESET];
+
+struct FSW_Settings {
+  uint8_t id;
+  uint8_t state, state_bup;
+} fsw_settings;
+
+#define RESULT_MENU                0
+#define RESULT_CONFIRM             1
+#define RESULT_TEXT_EDIT           2
+#define RESULT_VALUE_EDIT          3
+#define RESULT_COLOR_EDIT          4
+#define RESULT_MIDI_TYPE_EDIT      5
+#define RESULT_FSW_MODE_EDIT       6
+#define RESULT_FSW_LP_MODE_EDIT    7
+#define RESULT_FSW_PRESS_TYPE_EDIT 8
+struct Option {
+  char     name[TEXT_SZ]     = "UNTITLED    ";
+  uint8_t  result            = RESULT_MENU;
+  uint16_t menu_addr         = 0;
+  uint8_t  callback_id       = 0;
+
+  BUILD_OBJ_NAME;
+  BUILD_OBJ_VAR(result,      uint8_t,  13);
+  BUILD_OBJ_VAR(menu_addr,   uint16_t, 14);
+  BUILD_OBJ_VAR(callback_id, uint8_t,  16);
 };
 
 
-struct SubMenu {
-  char    title[STR_LEN_MAX];
-  uint8_t num_options;
+#define MENU_MAIN                 0
+#define MENU_PRESET               (M_MENUS +  0 * sizeof(Menu))
+#define MENU_PRESET_PARAMS        (M_MENUS +  1 * sizeof(Menu))
+#define MENU_PRESET_PARAM         (M_MENUS +  2 * sizeof(Menu))
+#define MENU_PRESET_PARAM_PEDAL   (M_MENUS +  3 * sizeof(Menu))
+#define MENU_PRESET_PARAM_FEATURE (M_MENUS +  4 * sizeof(Menu))
+#define MENU_GLOBAL               (M_MENUS +  5 * sizeof(Menu))
+#define MENU_PEDALS               (M_MENUS +  6 * sizeof(Menu))
+#define MENU_PEDAL                (M_MENUS +  7 * sizeof(Menu))
+#define MENU_COLORS               (M_MENUS +  8 * sizeof(Menu))
+#define MENU_COLOR                (M_MENUS +  9 * sizeof(Menu))
+#define MENU_FEATURES             (M_MENUS + 10 * sizeof(Menu))
+#define MENU_FEATURE              (M_MENUS + 11 * sizeof(Menu))
+#define MENU_FSW                  (M_MENUS + 12 * sizeof(Menu))
+#define MENU_FSW_PARAMS           (M_MENUS + 13 * sizeof(Menu))
+#define MENU_FSW_COLOR            (M_MENUS + 14 * sizeof(Menu))
+#define MENU_FSW_LP               (M_MENUS + 15 * sizeof(Menu))
+#define MENU_FSW_LP_PARAMS        (M_MENUS + 16 * sizeof(Menu))
+#define MENU_FSW_LP_PARAM         (M_MENUS + 17 * sizeof(Menu))
+#define MENU_FSW_PARAM            (M_MENUS + 18 * sizeof(Menu))
+#define MENU_FSW_PARAM_PEDAL      (M_MENUS + 19 * sizeof(Menu))
+#define MENU_FSW_PARAM_FEATURE    (M_MENUS + 20 * sizeof(Menu))
+#define MENU_FSW_LP_PARAM_PEDAL   (M_MENUS + 21 * sizeof(Menu))
+#define MENU_FSW_LP_PARAM_FEATURE (M_MENUS + 22 * sizeof(Menu))
 
-  SubMenu(const char title[STR_LEN_MAX], uint8_t num_options) {
-    strcpy(this->title, title);
-    this->num_options = num_options;
+// CS return 0 and 1 already taken for general function
+#define CS_VALUE_EDIT_JUMP 2
+struct Menu {
+  char     name[TEXT_SZ]     = "UNTITLED    ";
+  uint8_t  num_options       = 0;
+  uint16_t start_addr        = 0;
+  uint8_t  size              = sizeof(Option);
+  uint16_t return_addr       = 0;
+  uint16_t forward_addr      = 0;
+  uint8_t  callback_setup_id = 0;
+  uint8_t  callback_run_id   = 0;
+  uint8_t  callback_save_id  = 0;
+
+  BUILD_OBJ_NAME;
+  BUILD_OBJ_VAR(num_options,       uint8_t,  13);
+  BUILD_OBJ_VAR(start_addr,        uint16_t, 14);
+  BUILD_OBJ_VAR(size,              uint8_t,  16);
+  BUILD_OBJ_VAR(return_addr,       uint16_t, 17);
+  BUILD_OBJ_VAR(forward_addr,      uint16_t, 19);
+  BUILD_OBJ_VAR(callback_setup_id, uint8_t,  21);
+  BUILD_OBJ_VAR(callback_run_id,   uint8_t,  22);
+  BUILD_OBJ_VAR(callback_save_id,  uint8_t,  23);
+};
+/* :: END STRUCTS :: */
+
+
+/* :: EEPROM MAP :: */
+#define M_COLORS        0
+#define M_PEDALS        GET_END(M_COLORS,        NUM_COLORS,              sizeof(Color))
+#define M_FEATURES      GET_END(M_PEDALS,        NUM_PEDALS,              sizeof(Pedal))
+#define M_PRESETS       GET_END(M_FEATURES,      NUM_FEATURES_TOTAL,      sizeof(Feature))
+#define M_PRESET_PARAMS GET_END(M_PRESETS,       NUM_PRESETS,             sizeof(Preset))
+#define M_FSW           GET_END(M_PRESET_PARAMS, NUM_PRESET_PARAMS_TOTAL, sizeof(Parameter))
+#define M_FSW_PARAMS    GET_END(M_FSW,           NUM_FSW_TOTAL,           sizeof(Footswitch))
+#define M_MENUS         GET_END(M_FSW_PARAMS,    NUM_FSW_PARAMS_TOTAL,    sizeof(Parameter))
+#define M_OPTIONS       GET_END(M_MENUS,         NUM_MENUS,               sizeof(Menu))
+#define M_END           GET_END(M_OPTIONS,       NUM_OPTIONS_TOTAL,       sizeof(Option))
+/* :: END EEPROM MAP :: */
+
+
+/* :: EEPROM MACROS :: */
+#define IS_IN_PARTITION(part_start, part_end, address) ((part_start<=address && address<part_end) ? true : false)
+#define IS_IN_LIST(start_addr, num_items, size, address) ((start_addr<=address && address<=(start_addr+(num_items*size))) ? true : false)
+#define IS_IN_PARTITION_COLORS(address)        IS_IN_PARTITION(M_COLORS,        M_PEDALS,        address)
+#define IS_IN_PARTITION_PEDALS(address)        IS_IN_PARTITION(M_PEDALS,        M_FEATURES,      address)
+#define IS_IN_PARTITION_FEATURES(address)      IS_IN_PARTITION(M_FEATURES,      M_PRESETS,       address)
+#define IS_IN_PARTITION_PRESETS(address)       IS_IN_PARTITION(M_PRESETS,       M_PRESET_PARAMS, address)
+#define IS_IN_PARTITION_PRESET_PARAMS(address) IS_IN_PARTITION(M_PRESET_PARAMS, M_FSW,           address)
+#define IS_IN_PARTITION_FSW(address)           IS_IN_PARTITION(M_FSW,           M_FSW_PARAMS,    address)
+#define IS_IN_PARTITION_FSW_PARAMS(address)    IS_IN_PARTITION(M_FSW_PARAMS,    M_MENUS,         address)
+#define IS_IN_PARTITION_MENUS(address)         IS_IN_PARTITION(M_MENUS,         M_OPTIONS,       address)
+#define IS_IN_PARTITION_OPTIONS(address)       IS_IN_PARTITION(M_OPTIONS,       M_END,           address)
+
+// Get active parent that is not an option struct
+// Cant put it earlier since we need the above macros
+uint8_t get_active_parent_id_not_option() {
+  // This function gets the newest parent that is not an option struct
+  // Used for finding the newest object to edit
+  // Cant make this in Standard.h, need macros above
+  uint8_t result = 0;
+  for (uint8_t i=0; i<=GET_ACTIVE_PARENT_ID; i++) {
+    result = GET_ACTIVE_PARENT_ID-i;
+    if ( !IS_IN_PARTITION_OPTIONS(parents[result]) )
+      return result;
   }
-  SubMenu() {}  // For pointers
-};
-/*  :: END MENU STRUCTS :: */
+  return 0;
+}
+#define GET_ACTIVE_PARENT_ID_NOT_OPTION get_active_parent_id_not_option()
+#define GET_ACTIVE_PARENT_NOT_OPTION    parents[GET_ACTIVE_PARENT_ID_NOT_OPTION]
+
+#define MOD(a, b) ((a+b)%b)
+
+// Find FSW/FSW_PARAM ID
+// fsw_submenu_id: footswitch 0-3 of the current submenu
+// returns the fsw_id of the given preset, 0-15
+#define GET_FSW_PRESET_ID(fsw_submenu_id) (fsw_submenu_id+(NUM_FSW_PER_SUBMENU*submenu_id))
+// fsw_submenu_id: footswitch 0-3 of the current submenu
+// returns the absolute fsw_id in EEPROM out of all presets/submenus, 0-450 or what ever the max is
+#define GET_FSW_ABS_ID(fsw_submenu_id) (GET_FSW_PRESET_ID(fsw_submenu_id)+(preset_id*NUM_FSW_PER_PRESET))
+
+// Find matching Parameter IDs for given fsw
+// fsw_submenu_id: footswitch 0-3 of the current submenu
+// returns absolute parameter id of the first parameter for the footswitch in EEPROM
+//   this takes into account the state of the fsw
+#define GET_FSW_ABS_PARAM_START_ID(fsw_submenu_id)    ((GET_FSW_ABS_ID(fsw_submenu_id)*NUM_FSW_PARAMS_PER_FSW)+(fsw[GET_FSW_PRESET_ID(fsw_submenu_id)].state*NUM_FSW_PARAMS_PER_STATE))
+#define GET_FSW_LP_ABS_PARAM_START_ID(fsw_submenu_id) ((GET_FSW_ABS_ID(fsw_submenu_id)*NUM_FSW_PARAMS_PER_FSW)+(3*NUM_FSW_PARAMS_PER_STATE))
+// fsw_submenu_id: footswitch 0-3 of the current submenu
+// param_id: relative id of parameter of the selected footswitch, 0-9
+// returns absolute parameter id of the relative parameter id for the selected footswitch in EEPROM
+//   this takes into account the state of the fsw
+#define GET_FSW_ABS_PARAM_ID(fsw_submenu_id, param_relative_id)    (GET_FSW_ABS_PARAM_START_ID(fsw_submenu_id)+param_relative_id)
+#define GET_FSW_LP_ABS_PARAM_ID(fsw_submenu_id, param_relative_id) (GET_FSW_LP_ABS_PARAM_START_ID(fsw_submenu_id)+param_relative_id)
+
+// Find FSW/FSW_PARAM ADDR
+#define GET_FSW_ADDR(fsw_submenu_id) (GET_PARENT(M_FSW, GET_FSW_ABS_ID(fsw_submenu_id), sizeof(Footswitch)))
+#define GET_FSW_PARAM_ADDR(fsw_submenu_id, param_relative_id)    (GET_PARENT(M_FSW_PARAMS, GET_FSW_ABS_PARAM_ID(fsw_submenu_id, param_relative_id), sizeof(Parameter)))
+#define GET_FSW_LP_PARAM_ADDR(fsw_submenu_id, param_relative_id) (GET_PARENT(M_FSW_PARAMS, GET_FSW_LP_ABS_PARAM_ID(fsw_submenu_id, param_relative_id), sizeof(Parameter)))
+// --
 
 
 
-/* :: DATABASE STRUCT :: */
-struct DB {
-  EEP_FUNC(color,  Color,   EEP_START_COLORS);
+// Find FSW_SETTINGS/FSW_SETTINGS PARAMS ID
+// Find FSW/FSW_PARAM ID
+// fsw_submenu_id: footswitch 0-3 of the current submenu
+// return absolute ID of fsw_settings selected fsw
+#define GET_FSWSET_ABS_ID (fsw_settings.id+(preset_id*NUM_FSW_PER_PRESET))
 
-  EEP_FUNC(pedal,  Pedal,   EEP_START_PEDALS);
-  EEP_FUNC_EXTEND(param, Param, EEP_START_PARAMS, NUM_PEDAL_PARAMS);
+// Find matching Parameter IDs for given fsw
+// fsw_submenu_id: footswitch 0-3 of the current submenu
+// returns absolute parameter id of the first parameter for the footswitch in EEPROM
+//   this takes into account the state of the fsw
+#define GET_FSWSET_ABS_PARAM_START_ID ((GET_FSWSET_ABS_ID*NUM_FSW_PARAMS_PER_FSW)+(fsw_settings.state*NUM_FSW_PARAMS_PER_STATE))
+// fsw_submenu_id: footswitch 0-3 of the current submenu
+// param_id: relative id of parameter of the selected footswitch, 0-9
+// returns absolute parameter id of the relative parameter id for the selected footswitch in EEPROM
+//   this takes into account the state of the fsw
+#define GET_FSWSET_ABS_PARAM_ID(param_relative_id) (GET_FSWSET_ABS_PARAM_START_ID+param_relative_id)
 
-  EEP_FUNC(preset, Preset,  EEP_START_PRESETS);
-  EEP_FUNC_EXTEND(preset_param, PedalParam, EEP_START_PRESET_PARAMS, NUM_PRESET_PARAMS);
+// Find FSW/FSW_PARAM ADDR
+#define GET_FSWSET_ADDR (GET_PARENT(M_FSW, GET_FSWSET_ABS_ID, sizeof(Footswitch)))
+#define GET_FSWSET_PARAM_ADDR(param_relative_id) (GET_PARENT(M_FSW_PARAMS, GET_FSWSET_ABS_PARAM_ID(param_relative_id), sizeof(Parameter)))
 
-  // Parent: preset_id, ID: FSW 1-16 (NUM_FSW_PER_PRESET)
-  EEP_FUNC_EXTEND(fsw,   Footswitch, EEP_START_FSW,    (NUM_FSW*NUM_SUB_MENUS));
-  // Parent: i + preset_id*NUM_FSW*NUM_SUB_MENUS, ID: PedalParam 1-10 (NUM_PARAMS_PER_FSW)
-  EEP_FUNC_EXTEND(fsw_param,   PedalParam, EEP_START_FSW_PARAMS, (NUM_PARAMS_PER_FSW*(NUM_STATES+1)));
-
-  EEP_FUNC(sub_menu, SubMenu, EEP_START_MENUS);
-  EEP_FUNC_EXTEND(menu_option, MenuOption, EEP_START_OPTS, NUM_MENU_ITEMS);
-
-  static void menu_item_at(uint8_t menu_id, uint8_t id, char *menu_item) { eReadBlock( EEP_START_OPTS + STR_LEN_MAX * NUM_MENU_ITEMS * menu_id + STR_LEN_MAX * id, (uint8_t*)menu_item, STR_LEN_MAX ); }
-  //static void    menu_item_save(uint8_t menu_id, uint8_t id, uint8_t new_obj) { return set_data<uint8_t>( &new_obj, EEP_START_MENUS + STR_LEN_MAX * NUM_MENU_ITEMS * menu_id + STR_LEN_MAX * id ); }
-
-  static char letter_at(uint8_t id) { return get_data<char>( EEP_START_LETTERS + id ); }
-  //static void text_at(char *text, uint8_t id)                { eeprom_read_block( text, (void*)( EEP_START_MENUS + STR_LEN_MAX * id ), STR_LEN_MAX ); }
-  //static void text_save(char *text, uint8_t id)              { eeprom_write_block((const void*)text, (void*)(EEP_START_MENUS + (STR_LEN_MAX * id)), STR_LEN_MAX); }
-};
-
-
-
-#endif
+/* :: ENDEEPROM MACROS :: */
