@@ -1,9 +1,10 @@
 #include <Arduino.h>
+#include "Nav.h"
 #include "Components.h"
 
+Nav n;
+
 void setup() {
-  Pedal pedal;
-  Feature feature = pedal.feature(0);
 }
 
 void loop() {
