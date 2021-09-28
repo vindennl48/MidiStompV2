@@ -1,6 +1,9 @@
 #include "Components.h"
 #include "I2C_EEPROM.h"
 
+Footswitch footswitches[NUM_FSW_PER_PRESET];
+
+
 /* :: COLOR :: */
 Color::Color() : id(0) {}
 Color::Color(uint16_t id) : id(id) {}
@@ -159,3 +162,31 @@ void Footswitch::lp_send_midi() {
   for (int i=0; i<NUM_PARAMS_PER_STATE; i++) lp_param(i).send_midi();
 }
 /* :: END FSW :: */
+
+
+
+/* :: PRESET :: */
+Preset::Preset() : id(0), submenu_id(0) {}
+Preset::Preset(uint16_t id) : id(id), submenu_id(0) {}
+
+uint16_t Preset::addr() {
+  return ( MAP_PRESET + (id * PRESET_SZ) );
+}
+
+Footswitch* Preset::fsw(uint8_t n) {
+  return fsw(submenu_id, n);
+}
+Footswitch* Preset::fsw(uint8_t s, uint8_t n) {
+  return &footswitches[n + (submenu_id * NUM_FSW_PER_SUBMENU)];
+}
+
+Footswitch Preset::get_fsw_from_eeprom(uint8_t n) {
+  return get_fsw_from_eeprom(submenu_id, n);
+}
+Footswitch Preset::get_fsw_from_eeprom(uint8_t s, uint8_t n) {
+  return Footswitch(
+    n + (id * NUM_FSW_PER_PRESET) +
+      (submenu_id * NUM_FSW_PER_SUBMENU)
+  );
+}
+/* :: END PRESET :: */

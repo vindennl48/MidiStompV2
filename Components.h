@@ -148,8 +148,24 @@ struct Footswitch {
   void update_state();  // run when fsw is pressed
   void send_midi();     // Send midi for current state
   void lp_send_midi();  // Send midi for current state
-};
+} extern footswitches[NUM_FSW_PER_PRESET];
 
 #define PRESET_SZ 13
+struct Preset : ObjName {
+  uint16_t id;
+  uint8_t  submenu_id;
+
+  Preset();
+  Preset(uint16_t);
+
+  uint16_t addr();                    // Get the eeprom addr of current
+  Footswitch* fsw(uint8_t);           // Get fsw from RAM with state assumed
+  Footswitch* fsw(uint8_t, uint8_t);  // Get fsw from RAM with providing state
+
+  // Get fsw from eeprom with state assumed
+  Footswitch get_fsw_from_eeprom(uint8_t);
+  // Get fsw from eeprom with providing state
+  Footswitch get_fsw_from_eeprom(uint8_t, uint8_t);
+};
 
 #endif
