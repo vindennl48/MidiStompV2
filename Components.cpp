@@ -1,7 +1,6 @@
 #include "Components.h"
-#include "I2C_EEPROM.h"
+#include "I2C_EPROM.h"
 
-Footswitch footswitches[NUM_FSW_PER_PRESET];
 
 
 /* :: COLOR :: */
@@ -11,10 +10,10 @@ uint16_t Color::addr() {
   return ( MAP_COLOR + (id * COLOR_SZ) );
 }
 uint8_t Color::at(uint8_t n) {
-  return EEPROM::read_uint8_t( addr() + TEXT_SZ + MOD(n,3) );
+  return EPROM::read_uint8_t( addr() + TEXT_SZ + MOD(n,3) );
 }
 void Color::set_at(uint8_t n, uint8_t x) {
-  EEPROM::write_uint8_t( addr() + TEXT_SZ + MOD(n,3), x );
+  EPROM::write_uint8_t( addr() + TEXT_SZ + MOD(n,3), x );
 }
 /* :: END COLOR :: */
 
@@ -28,16 +27,16 @@ uint16_t Feature::addr() {
   return ( MAP_FEATURE + (id * FEATURE_SZ) );
 }
 uint8_t Feature::type() {
-  return EEPROM::read_uint8_t( addr() + TEXT_SZ );
+  return EPROM::read_uint8_t( addr() + TEXT_SZ );
 }
 void Feature::set_type(uint8_t x) {
-  EEPROM::write_uint8_t( addr() + TEXT_SZ, x );
+  EPROM::write_uint8_t( addr() + TEXT_SZ, x );
 }
 uint8_t Feature::pitch() {
-  return EEPROM::read_uint8_t( addr() + TEXT_SZ + 1 );
+  return EPROM::read_uint8_t( addr() + TEXT_SZ + 1 );
 }
 void Feature::set_pitch(uint8_t x) {
-  EEPROM::write_uint8_t( addr() + TEXT_SZ + 1, x );
+  EPROM::write_uint8_t( addr() + TEXT_SZ + 1, x );
 }
 /* :: END FEATURE :: */
 
@@ -51,10 +50,10 @@ uint16_t Pedal::addr() {
   return ( MAP_PEDAL + (id * PEDAL_SZ) );
 }
 uint8_t Pedal::channel() {
-  return EEPROM::read_uint8_t( addr() + TEXT_SZ );
+  return EPROM::read_uint8_t( addr() + TEXT_SZ );
 }
 void Pedal::set_channel(uint8_t x) {
-  EEPROM::write_uint8_t( addr() + TEXT_SZ, x );
+  EPROM::write_uint8_t( addr() + TEXT_SZ, x );
 }
 Feature Pedal::feature(uint8_t n) {
   return Feature( n + (id * NUM_PEDALS) );
@@ -67,7 +66,7 @@ Feature Pedal::feature(uint8_t n) {
 Param::Param() : id(0), is_preset(false), data(0) {}
 Param::Param(uint16_t id, uint8_t is_preset)
   : id(id), is_preset(is_preset), data(0) {
-  data = EEPROM::read_uint16_t( addr() );
+  data = EPROM::read_uint16_t( addr() );
 }
 
 uint16_t Param::addr() {
@@ -77,7 +76,7 @@ uint16_t Param::addr() {
     return ( MAP_PARAM + (id * PARAM_SZ) );
 }
 void Param::save() {
-  EEPROM::write_uint16_t( addr(), data );
+  EPROM::write_uint16_t( addr(), data );
 }
 Pedal Param::pedal() {
   return Pedal(d_pedal_id);
@@ -108,6 +107,8 @@ void Param::send_midi() {}
 
 
 /* :: FSW :: */
+Footswitch footswitches[NUM_FSW_PER_PRESET];
+
 Footswitch::Footswitch() : id(0) { setup(); }
 Footswitch::Footswitch(uint16_t id) : id(id) { setup(); }
 
@@ -115,10 +116,10 @@ uint16_t Footswitch::addr() {
   return ( MAP_FSW + (id * FSW_SZ) );
 }
 void Footswitch::setup() {
-  color[0] = EEPROM::read_uint8_t ( addr() );
-  color[1] = EEPROM::read_uint8_t ( addr() + 1 );
-  color[2] = EEPROM::read_uint8_t ( addr() + 2 );
-  data     = EEPROM::read_uint16_t( addr() + 3 );
+  color[0] = EPROM::read_uint8_t ( addr() );
+  //color[1] = EPROM::read_uint8_t ( addr() + 1 );
+  //color[2] = EPROM::read_uint8_t ( addr() + 2 );
+  //data     = EPROM::read_uint16_t( addr() + 3 );
 }
 Param Footswitch::param(uint8_t n) {
   return param(d_state, n);
@@ -139,10 +140,10 @@ uint8_t Footswitch::press_type()              { return d_press_type; }
 void    Footswitch::set_press_type(uint8_t x) { d_press_type = x & 0b1; }
 
 void Footswitch::save() {
-  EEPROM::write_uint8_t ( addr()    , color[0] );
-  EEPROM::write_uint8_t ( addr() + 1, color[1] );
-  EEPROM::write_uint8_t ( addr() + 2, color[2] );
-  EEPROM::write_uint16_t( addr() + 3, data );
+  EPROM::write_uint8_t ( addr()    , color[0] );
+  EPROM::write_uint8_t ( addr() + 1, color[1] );
+  EPROM::write_uint8_t ( addr() + 2, color[2] );
+  EPROM::write_uint16_t( addr() + 3, data );
 }
 
 void Footswitch::update_state() {

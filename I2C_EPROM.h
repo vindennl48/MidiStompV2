@@ -1,12 +1,12 @@
-#ifndef I2C_EEPROM_H
-#define I2C_EEPROM_H
+#ifndef I2C_EPROM_H
+#define I2C_EPROM_H
 
 #include <Arduino.h>
 #include "Helpers.h"
 
 #define EEP_ADDRESS 0x50
 
-struct EEPROM {
+struct EPROM {
   static uint8_t read_uint8_t(uint16_t);
   static void    write_uint8_t(uint16_t, uint8_t);
 

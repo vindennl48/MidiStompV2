@@ -148,7 +148,7 @@ struct Footswitch {
   void update_state();  // run when fsw is pressed
   void send_midi();     // Send midi for current state
   void lp_send_midi();  // Send midi for current state
-} extern footswitches[NUM_FSW_PER_PRESET];
+}; // extern footswitches[NUM_FSW_PER_PRESET];
 
 #define PRESET_SZ 13
 struct Preset : ObjName {
