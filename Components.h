@@ -152,9 +152,10 @@ struct Footswitch {
 
 #define PRESET_SZ 13
 struct Preset : ObjName {
+  static Footswitch footswitches[NUM_FSW_PER_PRESET];
+
   uint16_t   id;
   uint8_t    submenu_id;
-  Footswitch footswitches[NUM_FSW_PER_PRESET];
 
   Preset();
   Preset(uint16_t);

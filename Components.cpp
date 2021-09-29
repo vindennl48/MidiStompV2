@@ -166,6 +166,8 @@ void Footswitch::lp_send_midi() {
 
 
 /* :: PRESET :: */
+Footswitch Preset::footswitches[NUM_FSW_PER_PRESET];
+
 Preset::Preset() : id(0), submenu_id(0) {}
 Preset::Preset(uint16_t id) : id(id) { load(id); }
 
