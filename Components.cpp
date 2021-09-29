@@ -107,19 +107,18 @@ void Param::send_midi() {}
 
 
 /* :: FSW :: */
-Footswitch footswitches[NUM_FSW_PER_PRESET];
-
-Footswitch::Footswitch() : id(0) { setup(); }
-Footswitch::Footswitch(uint16_t id) : id(id) { setup(); }
+Footswitch::Footswitch() : id(0) {}
+Footswitch::Footswitch(uint16_t id) { load(id); }
 
 uint16_t Footswitch::addr() {
   return ( MAP_FSW + (id * FSW_SZ) );
 }
-void Footswitch::setup() {
+void Footswitch::load(uint16_t n) {
+  id       = n;
   color[0] = EPROM::read_uint8_t ( addr() );
-  //color[1] = EPROM::read_uint8_t ( addr() + 1 );
-  //color[2] = EPROM::read_uint8_t ( addr() + 2 );
-  //data     = EPROM::read_uint16_t( addr() + 3 );
+  color[1] = EPROM::read_uint8_t ( addr() + 1 );
+  color[2] = EPROM::read_uint8_t ( addr() + 2 );
+  data     = EPROM::read_uint16_t( addr() + 3 );
 }
 Param Footswitch::param(uint8_t n) {
   return param(d_state, n);
@@ -168,7 +167,7 @@ void Footswitch::lp_send_midi() {
 
 /* :: PRESET :: */
 Preset::Preset() : id(0), submenu_id(0) {}
-Preset::Preset(uint16_t id) : id(id), submenu_id(0) {}
+Preset::Preset(uint16_t id) : id(id) { load(id); }
 
 uint16_t Preset::addr() {
   return ( MAP_PRESET + (id * PRESET_SZ) );
@@ -181,6 +180,15 @@ Footswitch* Preset::fsw(uint8_t s, uint8_t n) {
   return &footswitches[n + (submenu_id * NUM_FSW_PER_SUBMENU)];
 }
 
+void Preset::load(uint8_t n) {
+  id         = n;
+  submenu_id = 0;
+
+  for (int i=0; i<NUM_FSW_PER_PRESET; i++)
+    footswitches[i].load(i + (id * NUM_FSW_PER_PRESET));
+}
+
+/* dont really need these anymore */
 Footswitch Preset::get_fsw_from_eeprom(uint8_t n) {
   return get_fsw_from_eeprom(submenu_id, n);
 }

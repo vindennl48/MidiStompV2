@@ -7,11 +7,10 @@ uint8_t EPROM::read_uint8_t(uint16_t addr) {
   Wire.beginTransmission(EEP_ADDRESS);
   Wire.write(addr >> 8);
   Wire.write(addr & 0xFF);
-  //Wire.endTransmission();
+  Wire.endTransmission();
 
-  //Wire.requestFrom(EEP_ADDRESS, 1);
-  //return Wire.read();
-  return 0;
+  Wire.requestFrom(EEP_ADDRESS, 1);
+  return Wire.read();
 }
 
 void EPROM::write_uint8_t(uint16_t addr, uint8_t x) {

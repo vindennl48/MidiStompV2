@@ -132,7 +132,7 @@ struct Footswitch {
   Footswitch(uint16_t);
 
   uint16_t addr();                  // Get the eeprom addr of current
-  void     setup();                 // setup for creation
+  void     load(uint16_t);          // setup for creation
   Param    param(uint8_t);          // Get param with state assumed
   Param    param(uint8_t, uint8_t); // Get param with providing state
   Param    lp_param(uint8_t);       // Get param from long press
@@ -148,12 +148,13 @@ struct Footswitch {
   void update_state();  // run when fsw is pressed
   void send_midi();     // Send midi for current state
   void lp_send_midi();  // Send midi for current state
-}; // extern footswitches[NUM_FSW_PER_PRESET];
+};
 
 #define PRESET_SZ 13
 struct Preset : ObjName {
-  uint16_t id;
-  uint8_t  submenu_id;
+  uint16_t   id;
+  uint8_t    submenu_id;
+  Footswitch footswitches[NUM_FSW_PER_PRESET];
 
   Preset();
   Preset(uint16_t);
@@ -161,6 +162,8 @@ struct Preset : ObjName {
   uint16_t addr();                    // Get the eeprom addr of current
   Footswitch* fsw(uint8_t);           // Get fsw from RAM with state assumed
   Footswitch* fsw(uint8_t, uint8_t);  // Get fsw from RAM with providing state
+
+  void load(uint8_t);
 
   // Get fsw from eeprom with state assumed
   Footswitch get_fsw_from_eeprom(uint8_t);
