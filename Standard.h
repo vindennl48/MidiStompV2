@@ -1,7 +1,7 @@
 #ifndef STANDARD_H
 #define STANDARD_H
 
-//#define RUN_DEBUG
+#define RUN_DEBUG
 
 
 /* :: TYPEDEFS :: */
@@ -21,7 +21,7 @@ typedef unsigned long Timer;
 //     Serial.println(title + variable);
 //   #endif
 //   }
-#define DEBUG(title, variable) debug(String(title), String(variable))
+//#define DEBUG(title, variable) debug(String(title), String(variable))
 #define CONTAIN(i, min, max) (i>(min) ? (i<(max) ? i : (max-1)) : (min))
 #define ROTATE(i, min, max) (i>=(min) ? (i<(max) ? i : (min)) : (max-1))
 /* :: END HELPFUL MACROS :: */
