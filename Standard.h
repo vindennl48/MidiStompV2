@@ -1,7 +1,7 @@
 #ifndef STANDARD_H
 #define STANDARD_H
 
-//#define DISPLAY_DEBUG
+//#define RUN_DEBUG
 
 
 /* :: TYPEDEFS :: */
@@ -17,7 +17,7 @@ typedef unsigned long Timer;
 
 /* :: HELPFUL MACROS :: */
 //   void debug(String title, String variable) {
-//   #ifdef DISPLAY_DEBUG
+//   #ifdef RUN_DEBUG
 //     Serial.println(title + variable);
 //   #endif
 //   }
@@ -28,7 +28,7 @@ typedef unsigned long Timer;
 
 
 /* :: SERIAL SETUP :: */
-#ifdef DISPLAY_DEBUG
+#ifdef RUN_DEBUG
 #define SERIAL_MIDI_SETUP Serial.begin(9600)
 #else
 #define SERIAL_MIDI_SETUP Serial.begin(31250)

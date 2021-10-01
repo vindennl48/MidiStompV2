@@ -20,12 +20,13 @@
 #define NUM_PARAMS_PER_FSW      (NUM_PARAMS_PER_STATE*NUM_STATES_PER_FSW)
 
 #define MAP_COLOR        10
-#define MAP_PRESET       (MAP_COLOR        + (NUM_COLORS            * COLOR_SZ)   + 1)
-#define MAP_PEDAL        (MAP_PRESET       + (NUM_PRESETS           * PRESET_SZ)  + 1)
+#define MAP_PEDAL        (MAP_COLOR        + (NUM_COLORS            * COLOR_SZ)   + 1)
 #define MAP_FEATURE      (MAP_PEDAL        + (NUM_PEDALS            * PEDAL_SZ)   + 1)
-#define MAP_FSW          (MAP_FEATURE      + (NUM_FEATURES          * FEATURE_SZ) + 1)
-#define MAP_PRESET_PARAM (MAP_FSW          + (NUM_FSW               * FSW_SZ)     + 1)
-#define MAP_PARAM        (MAP_PRESET_PARAM + (NUM_PARAMS_PER_PRESET * PARAM_SZ)   + 1)
+#define MAP_PRESET       (MAP_FEATURE      + (NUM_FEATURES          * FEATURE_SZ) + 1)
+#define MAP_PRESET_PARAM (MAP_PRESET       + (NUM_PRESETS           * PRESET_SZ)  + 1)
+#define MAP_FSW          (MAP_PRESET_PARAM + (NUM_PARAMS_PER_PRESET * PARAM_SZ)   + 1)
+#define MAP_PARAM        (MAP_FSW          + (NUM_FSW               * FSW_SZ)     + 1)
+#define MAP_END          (MAP_PARAM        + (NUM_PARAMS_PER_FSW    * PARAM_SZ)   + 1)
 /* END EEPROM MAP */
 
 
