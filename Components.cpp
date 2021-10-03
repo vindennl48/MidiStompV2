@@ -1,5 +1,63 @@
 #include "Components.h"
+#include "Hardware.h"
 #include "I2C_EPROM.h"
+
+
+
+/* :: OPTION :: */
+Option::Option() : id(0) {}
+Option::Option(uint16_t id) : id(id) {}
+
+uint16_t Option::addr() {
+  return ( MAP_OPTION + (id * OPTION_SZ) );
+}
+Text Option::title() {
+  return EPROM::read_text( addr() );
+}
+/* :: END OPTION :: */
+
+
+
+/* :: MENU :: */
+Menu::Menu() : id(0) {}
+Menu::Menu(uint16_t id) : id(id) {}
+
+uint16_t Menu::addr() {
+  return ( MAP_MENU + (id * MENU_SZ) );
+}
+
+Text Menu::title() {
+  return EPROM::read_text( addr() );
+}
+uint8_t Menu::num_options() {
+  return EPROM::read_uint8_t( addr() + 13 );
+}
+Option Menu::option(uint8_t n) {
+  if ( n < num_options() )  return Option(n + (id * NUM_OPTIONS_PER_MENU));
+  else                      return Option(id * NUM_OPTIONS_PER_MENU);
+}
+void Menu::loop_setup() {
+  // print to screen
+  //option(selected).title();
+}
+uint8_t Menu::loop() {
+  if ( HW::knob.is_left() || HW::knob.is_right() ) {
+    if ( HW::knob.is_left() )
+      selected = CONTAIN((int)(selected-1), (int)0, (int)num_options());
+    else if ( HW::knob.is_right() )
+      selected = CONTAIN((int)(selected+1), (int)0, (int)num_options());
+
+    loop_setup();  // refresh screen
+  }
+  else if ( HW::knob.is_pressed() ) return selected+1;
+  else if ( HW::knob.is_long_pressed() ) {
+    selected = 0;
+    return NUM_OPTIONS_PER_MENU+1;
+  }
+
+  return false;
+}
+/* :: END MENU :: */
 
 
 
@@ -168,8 +226,8 @@ void Footswitch::lp_send_midi() {
 /* :: PRESET :: */
 Footswitch Preset::footswitches[NUM_FSW_PER_PRESET];
 
-Preset::Preset() : id(0), submenu_id(0) {}
-Preset::Preset(uint16_t id) : id(id) { load(id); }
+Preset::Preset() : id(0), submenu_id(0), menu(0) {}
+Preset::Preset(uint16_t id) : id(id), menu(0) { load(id); }
 
 uint16_t Preset::addr() {
   return ( MAP_PRESET + (id * PRESET_SZ) );
@@ -181,6 +239,9 @@ Footswitch* Preset::fsw(uint8_t n) {
 Footswitch* Preset::fsw(uint8_t s, uint8_t n) {
   return &footswitches[n + (submenu_id * NUM_FSW_PER_SUBMENU)];
 }
+Param Preset::param(uint8_t n) {
+  return Param( n + (id * NUM_PARAMS_PER_PRESET), true );
+}
 
 void Preset::load(uint8_t n) {
   id         = n;
@@ -188,6 +249,25 @@ void Preset::load(uint8_t n) {
 
   for (int i=0; i<NUM_FSW_PER_PRESET; i++)
     footswitches[i].load(i + (id * NUM_FSW_PER_PRESET));
+}
+
+uint8_t Preset::settings() {
+  switch(nav.e()) {
+    case 0: // MAIN
+      if ( nav.not_init() ) menu.loop_setup();
+      else nav.jump_to( menu.loop() );
+      break;
+    case 1: // NAME
+    case 2: // PARAMS
+    case 3: // RESET
+
+    default: // BACK
+      nav.reset();
+      return true;
+      break;
+  };
+
+  return false;
 }
 
 /* dont really need these anymore */

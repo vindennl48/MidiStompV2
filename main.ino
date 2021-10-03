@@ -32,3 +32,11 @@ void loop() {
     };
   }
 }
+
+
+/*
+
+One way to do the history/menu system is to build the menus right into the
+components.  Run a member function right off of the component you want to edit.
+
+ */

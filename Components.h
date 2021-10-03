@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include "Helpers.h"
+#include "Nav.h"
 
 /* EEPROM MAP */
 #define NUM_PRESETS             20
@@ -18,6 +19,8 @@
 #define NUM_STATES_PER_FSW      4  // 3 plus 1 for Long Press
 #define NUM_PARAMS_PER_STATE    (NUM_PARAMS_PER_PRESET)
 #define NUM_PARAMS_PER_FSW      (NUM_PARAMS_PER_STATE*NUM_STATES_PER_FSW)
+#define NUM_MENUS               25
+#define NUM_OPTIONS_PER_MENU    10
 
 #define MAP_COLOR        10
 #define MAP_PEDAL        (MAP_COLOR        + (NUM_COLORS            * COLOR_SZ)   + 1)
@@ -26,8 +29,45 @@
 #define MAP_PRESET_PARAM (MAP_PRESET       + (NUM_PRESETS           * PRESET_SZ)  + 1)
 #define MAP_FSW          (MAP_PRESET_PARAM + (NUM_PARAMS_PER_PRESET * PARAM_SZ)   + 1)
 #define MAP_PARAM        (MAP_FSW          + (NUM_FSW               * FSW_SZ)     + 1)
-#define MAP_END          (MAP_PARAM        + (NUM_PARAMS_PER_FSW    * PARAM_SZ)   + 1)
+#define MAP_MENU         (MAP_PARAM        + (NUM_PARAMS_PER_FSW    * PARAM_SZ)   + 1)
+#define MAP_OPTION       (MAP_MENU         + (NUM_MENUS             * MENU_SZ)    + 1)
+#define MAP_END          (MAP_OPTION       + (NUM_OPTIONS_PER_MENU  * OPTION_SZ)  + 1)
 /* END EEPROM MAP */
+
+
+
+#define OPTION_SZ 13
+struct Option {
+  uint16_t id;
+
+  Option();
+  Option(uint16_t);
+
+  uint16_t addr();
+  Text     title(); // Get title of option
+};
+
+/* Helpful macro for setting menu locations */
+#define GET_MENU_START(n) (MAP_MENU + (n * MENU_SZ))
+
+#define MENU_SZ 14
+#define MENU_PRESET       GET_MENU_START(0)
+#define MENU_PRESET_PARAM GET_MENU_START(1)
+struct Menu {
+  uint16_t id;       // Menu ID
+  uint8_t  selected; // option currently selected
+
+  Menu();
+  Menu(uint16_t);
+
+  uint16_t addr();
+  Text     title();         // Get title of menu
+  uint8_t  num_options();
+  Option   option(uint8_t); // Get option n from current menu
+  void     loop_setup();    // Menu loop screen setup
+  uint8_t  loop();          // Menu loop
+};
+
 
 
 #define COLOR_SZ 16
@@ -155,17 +195,23 @@ struct Footswitch {
 struct Preset : ObjName {
   static Footswitch footswitches[NUM_FSW_PER_PRESET];
 
-  uint16_t   id;
-  uint8_t    submenu_id;
+  uint16_t id;
+  uint8_t  submenu_id;
+
+  // For settings
+  Nav  nav;
+  Menu menu;
 
   Preset();
   Preset(uint16_t);
 
-  uint16_t addr();                    // Get the eeprom addr of current
-  Footswitch* fsw(uint8_t);           // Get fsw from RAM with state assumed
-  Footswitch* fsw(uint8_t, uint8_t);  // Get fsw from RAM with providing state
+  uint16_t    addr();                // Get the eeprom addr of current
+  Footswitch* fsw(uint8_t);          // Get fsw from RAM with state assumed
+  Footswitch* fsw(uint8_t, uint8_t); // Get fsw from RAM with providing state
+  Param       param(uint8_t);        // Get param from eeprom
 
-  void load(uint8_t);
+  void    load(uint8_t);
+  uint8_t settings();
 
   // Get fsw from eeprom with state assumed
   Footswitch get_fsw_from_eeprom(uint8_t);
