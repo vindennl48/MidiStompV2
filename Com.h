@@ -8,9 +8,9 @@ struct COM {
   static Nav     n;
   static uint8_t is_socket;
 
-  static void thru();
-  static void socket();
-  static void debug(String);
+  static void    thru();
+  static uint8_t socket();
+  static void    debug(String);
 };
 
 #define DEBUG(text) COM::debug(String(text))

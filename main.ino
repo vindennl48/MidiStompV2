@@ -6,7 +6,9 @@
 
 Nav n;
 
-void setup() { board_setup(); }
+void setup() {
+  HW::setup();
+}
 
 void loop() {
   HW::loop();

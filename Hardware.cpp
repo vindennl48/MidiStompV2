@@ -14,6 +14,7 @@ Screen HW::screen;
 
 void HW::setup() {
   LED_BOARD_SETUP;
+  SERIAL_MIDI_SETUP;
 
   btns[0].setup(PIN_B0);
   btns[1].setup(PIN_D7);

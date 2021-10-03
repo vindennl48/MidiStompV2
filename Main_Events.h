@@ -9,7 +9,6 @@
 #define E_SETTINGS     3
 #define E_FSW_SETTINGS 4
 
-void board_setup();
 void e_setup(Nav*);
 void e_tx_rx(Nav*);
 void e_main(Nav*);

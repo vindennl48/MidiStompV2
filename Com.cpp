@@ -17,12 +17,12 @@ void COM::thru() {
 
       if ( value == 0xFF ) {
         // Socket mode initiated by Serial in
-        Serial.write(0xFF);  // Confirm packet
+        //Serial.write(0xFF);  // Confirm packet
         is_socket = true;    // Tell main.ino to go into socket mode
       }
       else {
 #ifdef RUN_DEBUG
-        Serial.write( String("THRU>> ") + String(value) );
+        Serial.println( String("THRU>> ") + String(value) );
 #else
         Serial.write( value );
 #endif
@@ -48,12 +48,13 @@ void COM::thru() {
 #define E_WRITE_UINT8_T  4
 #define E_WRITE_UINT16_T 5
 #define E_WRITE_TEXT     6
-void COM::socket() {
+uint8_t COM::socket() {
   switch(n.e()) {
     default:
     case E_WAITING:
       if ( n.not_init() ) {
         HW::screen.print_nline(0, 0, ">CONNECTED");
+        Serial.write(0xFF); // Confirm
       }
       else {
         if ( Serial.available() == 1 ) {
@@ -64,7 +65,7 @@ void COM::socket() {
           }
           else {
             // We are done connecting
-            is_socket = false;
+            return true;
           }
         }
       }
@@ -132,6 +133,8 @@ void COM::socket() {
       }
       break;
   };
+
+  return false;
 }
 
 void COM::debug(String text) {
