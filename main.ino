@@ -12,17 +12,16 @@ void setup() {
 
 void loop() {
   HW::loop();
-  COM::thru();
 
   // Connect to PC
   if ( COM::is_socket ) {
     if ( COM::socket() ) {
-      COM::is_socket = false;
       n.reset();
     }
   }
-
   else {
+    COM::thru();
+
     switch(n.e()) {
       case E_SETUP:        e_setup(&n);        break;
       /*case E_TX_RX:        e_tx_rx(&n);        break;*/

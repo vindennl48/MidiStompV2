@@ -45,9 +45,11 @@ void COM::thru() {
 #define E_READ_UINT8_T   1
 #define E_READ_UINT16_T  2
 #define E_READ_TEXT      3
-#define E_WRITE_UINT8_T  4
-#define E_WRITE_UINT16_T 5
-#define E_WRITE_TEXT     6
+#define E_READ_BLOCK     4
+#define E_WRITE_UINT8_T  5
+#define E_WRITE_UINT16_T 6
+#define E_WRITE_TEXT     7
+#define E_WRITE_BLOCK    8
 uint8_t COM::socket() {
   switch(n.e()) {
     default:
@@ -60,11 +62,13 @@ uint8_t COM::socket() {
         if ( Serial.available() == 1 ) {
           uint8_t value = Serial.read();
           if ( value != 0 ) {
-            Serial.write(0xFF); // Confirm
             n.jump_to(value);
           }
           else {
             // We are done connecting
+            n.reset();
+            is_socket = false;
+            Serial.write(0xFF); // Confirm
             return true;
           }
         }
@@ -72,64 +76,108 @@ uint8_t COM::socket() {
       break;
 
     case E_READ_UINT8_T:
-      if ( Serial.available() == 2 ) {
-        Serial.write(
-          EPROM::read_uint8_t( Serial.read()<<8 | Serial.read() )
-        );
+      if ( n.not_init() ) {
+        Serial.write(0xFF); // Confirm
+      }
+      else {
+        if ( Serial.available() == 2 ) {
+          Serial.write(
+            EPROM::read_uint8_t( Serial.read()<<8 | Serial.read() )
+          );
 
-        n.jump_to(E_WAITING);
+          n.jump_to(E_WAITING);
+        }
       }
       break;
 
     case E_READ_UINT16_T:
-      if ( Serial.available() == 2 ) {
-        uint8_t addr = Serial.read()<<8 | Serial.read();
-        Serial.write( EPROM::read_uint8_t(addr) );
-        Serial.write( EPROM::read_uint8_t(addr + 1) );
+      if ( n.not_init() ) {
+        Serial.write(0xFF); // Confirm
+      }
+      else {
+        if ( Serial.available() == 2 ) {
+          uint16_t addr = Serial.read()<<8 | Serial.read();
+          Serial.write( EPROM::read_uint8_t(addr) );
+          Serial.write( EPROM::read_uint8_t(addr + 1) );
 
-        n.jump_to(E_WAITING);
+          n.jump_to(E_WAITING);
+        }
       }
       break;
 
     case E_READ_TEXT:
-      if ( Serial.available() == 2 ) {
-        uint16_t addr = Serial.read()<<8 | Serial.read();
-        for (int i=0; i<TEXT_SZ-1; i++)
-          Serial.write( EPROM::read_uint8_t(addr) );
+      if ( n.not_init() ) {
+        Serial.write(0xFF); // Confirm
+      }
+      else {
+        if ( Serial.available() == 2 ) {
+          uint16_t addr = Serial.read()<<8 | Serial.read();
+          for (int i=0; i<TEXT_SZ-1; i++)
+            Serial.write( EPROM::read_uint8_t(addr) );
 
-        n.jump_to(E_WAITING);
+          n.jump_to(E_WAITING);
+        }
+      }
+      break;
+
+    case E_READ_BLOCK:
+      if ( n.not_init() ) {
+        Serial.write(0xFF); // Confirm
+      }
+      else {
+        if ( Serial.available() == 4 ) {
+          HW::screen.print(15, 1, "H");
+          uint16_t addr = Serial.read()<<8 | Serial.read();
+          uint16_t sz   = Serial.read()<<8 | Serial.read();
+
+          for (uint16_t i=0; i<sz; i++)
+            Serial.write( EPROM::read_uint8_t(addr + i) );
+          n.jump_to(E_WAITING);
+        }
       }
       break;
 
     case E_WRITE_UINT8_T:
-      if ( Serial.available() == 3 ) {
-        EPROM::write_uint8_t(Serial.read()<<8 | Serial.read(), Serial.read());
+      if ( n.not_init() ) {
         Serial.write(0xFF); // Confirm
+      }
+      else {
+        if ( Serial.available() == 3 ) {
+          EPROM::write_uint8_t(Serial.read()<<8 | Serial.read(), Serial.read());
 
-        n.jump_to(E_WAITING);
+          n.jump_to(E_WAITING);
+        }
       }
       break;
 
     case E_WRITE_UINT16_T:
-      if ( Serial.available() == 4 ) {
-        EPROM::write_uint16_t(
-          Serial.read()<<8 | Serial.read(),
-          Serial.read()<<8 | Serial.read()
-        );
+      if ( n.not_init() ) {
         Serial.write(0xFF); // Confirm
+      }
+      else {
+        if ( Serial.available() == 4 ) {
+          EPROM::write_uint16_t(
+            Serial.read()<<8 | Serial.read(),
+            Serial.read()<<8 | Serial.read()
+          );
 
-        n.jump_to(E_WAITING);
+          n.jump_to(E_WAITING);
+        }
       }
       break;
 
     case E_WRITE_TEXT:
-      if ( Serial.available() == (TEXT_SZ+1) ) {
-        uint16_t addr = Serial.read()<<8 | Serial.read();
-        for (int i=0; i<TEXT_SZ-1; i++)
-          EPROM::write_uint8_t( addr, Serial.read() );
+      if ( n.not_init() ) {
         Serial.write(0xFF); // Confirm
+      }
+      else {
+        if ( Serial.available() == (TEXT_SZ+1) ) {
+          uint16_t addr = Serial.read()<<8 | Serial.read();
+          for (int i=0; i<TEXT_SZ-1; i++)
+            EPROM::write_uint8_t( addr, Serial.read() );
 
-        n.jump_to(E_WAITING);
+          n.jump_to(E_WAITING);
+        }
       }
       break;
   };
