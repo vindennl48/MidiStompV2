@@ -126,7 +126,6 @@ uint8_t COM::socket() {
       }
       else {
         if ( Serial.available() == 4 ) {
-          HW::screen.print(15, 1, "H");
           uint16_t addr = Serial.read()<<8 | Serial.read();
           uint16_t sz   = Serial.read()<<8 | Serial.read();
 
