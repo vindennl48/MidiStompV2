@@ -69,6 +69,13 @@ def read():
 def write(data):
     com.write( to_bte(data) )
 
+def text_fix(text, encode=True):
+    result = (text.upper().ljust(12)[0:12]+'\0')
+    if encode:
+        return result.encode('utf-8')
+    else:
+        return result
+
 def read_block(addr, size=64):
     ## Returns as byte array
     serial_mode(MODE_READ_BLOCK)
