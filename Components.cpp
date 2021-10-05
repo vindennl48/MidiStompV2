@@ -242,6 +242,10 @@ Footswitch* Preset::fsw(uint8_t s, uint8_t n) {
 Param Preset::param(uint8_t n) {
   return Param( n + (id * NUM_PARAMS_PER_PRESET), true );
 }
+void Preset::print_main_screen() {
+  buffer[TXT_BUF_1] += "HI";
+  HW::screen.print(0, 0, buffer[TXT_BUF_1].str());
+}
 
 void Preset::load(uint8_t n) {
   id         = n;
@@ -255,7 +259,10 @@ uint8_t Preset::settings() {
   switch(nav.e()) {
     case 0: // MAIN
       if ( nav.not_init() ) menu.loop_setup();
-      else nav.jump_to( menu.loop() );
+      else {
+        uint8_t result = menu.loop();
+        if ( result ) nav.jump_to(result);
+      }
       break;
     case 1: // NAME
     case 2: // PARAMS
@@ -280,4 +287,6 @@ Footswitch Preset::get_fsw_from_eeprom(uint8_t s, uint8_t n) {
       (submenu_id * NUM_FSW_PER_SUBMENU)
   );
 }
+
+Preset preset;
 /* :: END PRESET :: */

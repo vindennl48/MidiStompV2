@@ -209,6 +209,7 @@ struct Preset : ObjName {
   Footswitch* fsw(uint8_t);          // Get fsw from RAM with state assumed
   Footswitch* fsw(uint8_t, uint8_t); // Get fsw from RAM with providing state
   Param       param(uint8_t);        // Get param from eeprom
+  void        print_main_screen();
 
   void    load(uint8_t);
   uint8_t settings();
@@ -218,5 +219,7 @@ struct Preset : ObjName {
   // Get fsw from eeprom with providing state
   Footswitch get_fsw_from_eeprom(uint8_t, uint8_t);
 };
+
+extern Preset preset;
 
 #endif
