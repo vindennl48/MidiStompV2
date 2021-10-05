@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include "I2C_EPROM.h"
-#include "Helpers.h"
 
 uint8_t EPROM::read_uint8_t(uint16_t addr) {
   Wire.beginTransmission(EEP_ADDRESS);
@@ -30,5 +29,5 @@ void EPROM::write_uint16_t(uint16_t addr, uint16_t x) {
   write_uint8_t(addr, (x<<8)>>8);  // shift up 8 to remove top byte
 }
 
-Text EPROM::read_text(uint16_t addr) {}
-void EPROM::write_text(uint16_t addr, Text t) {}
+String EPROM::read_text(uint16_t addr) {}
+void   EPROM::write_text(uint16_t addr, String t) {}

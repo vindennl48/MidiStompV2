@@ -11,7 +11,7 @@ Option::Option(uint16_t id) : id(id) {}
 uint16_t Option::addr() {
   return ( MAP_OPTION + (id * OPTION_SZ) );
 }
-Text Option::title() {
+String Option::title() {
   return EPROM::read_text( addr() );
 }
 /* :: END OPTION :: */
@@ -26,7 +26,7 @@ uint16_t Menu::addr() {
   return ( MAP_MENU + (id * MENU_SZ) );
 }
 
-Text Menu::title() {
+String Menu::title() {
   return EPROM::read_text( addr() );
 }
 uint8_t Menu::num_options() {

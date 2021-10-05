@@ -44,7 +44,7 @@ struct Option {
   Option(uint16_t);
 
   uint16_t addr();
-  Text     title(); // Get title of option
+  String   title(); // Get title of option
 };
 
 /* Helpful macro for setting menu locations */
@@ -61,7 +61,7 @@ struct Menu {
   Menu(uint16_t);
 
   uint16_t addr();
-  Text     title();         // Get title of menu
+  String   title();         // Get title of menu
   uint8_t  num_options();
   Option   option(uint8_t); // Get option n from current menu
   void     loop_setup();    // Menu loop screen setup

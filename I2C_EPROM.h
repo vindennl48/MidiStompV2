@@ -2,7 +2,6 @@
 #define I2C_EPROM_H
 
 #include <Arduino.h>
-#include "Helpers.h"
 
 #define EEP_ADDRESS 0x50
 
@@ -13,8 +12,8 @@ struct EPROM {
   static uint16_t read_uint16_t(uint16_t);
   static void     write_uint16_t(uint16_t, uint16_t);
 
-  static Text read_text(uint16_t);
-  static void write_text(uint16_t, Text);
+  static String read_text(uint16_t);
+  static void   write_text(uint16_t, String);
 };
 
 #endif
