@@ -2,11 +2,10 @@
 #define TEXT_H
 
 #include <Arduino.h>
-#include "Helpers.h"
 #include "Nav.h"
 
 /* EEPROM MAP */
-#define NUM_PRESETS             20
+#define NUM_PRESETS             21
 #define NUM_COLORS              50
 #define NUM_PEDALS              8
 #define NUM_FEATURES_PER_PEDAL  32
@@ -22,7 +21,7 @@
 #define NUM_MENUS               25
 #define NUM_OPTIONS_PER_MENU    10
 
-#define MAP_COLOR        10
+#define MAP_COLOR        0
 #define MAP_PEDAL        (MAP_COLOR        + (NUM_COLORS            * COLOR_SZ)   + 1)
 #define MAP_FEATURE      (MAP_PEDAL        + (NUM_PEDALS            * PEDAL_SZ)   + 1)
 #define MAP_PRESET       (MAP_FEATURE      + (NUM_FEATURES          * FEATURE_SZ) + 1)
@@ -32,9 +31,9 @@
 #define MAP_MENU         (MAP_PARAM        + (NUM_PARAMS_PER_FSW    * PARAM_SZ)   + 1)
 #define MAP_OPTION       (MAP_MENU         + (NUM_MENUS             * MENU_SZ)    + 1)
 #define MAP_END          (MAP_OPTION       + (NUM_OPTIONS_PER_MENU  * OPTION_SZ)  + 1)
+
+#define MOD(absolute, div_by) ((absolute+div_by)%div_by) // returns relative pos
 /* END EEPROM MAP */
-
-
 
 #define OPTION_SZ 13
 struct Option {
@@ -71,26 +70,30 @@ struct Menu {
 
 
 #define COLOR_SZ 16
-struct Color : ObjName {
+struct Color {
   uint16_t id;
 
   Color();
   Color(uint16_t);
 
   uint16_t addr();                    // Get the eeprom addr of current
+  String   name();
+  void     set_name(String);
   uint8_t  at(uint8_t);               // Select color channel 1-3/RGB
   void     set_at(uint8_t, uint8_t);  // Set color channel 1-3/RGB
 };
 
 
 #define FEATURE_SZ 15
-struct Feature : ObjName {
+struct Feature {
   uint16_t id;
 
   Feature();
   Feature(uint16_t);
 
   uint16_t addr();              // Get the eeprom addr of current
+  String   name();
+  void     set_name(String);
   uint8_t  type();              // Get type for current Feature
   void     set_type(uint8_t);   // Set type for current Feature
   uint8_t  pitch();             // Get pitch for current Feature
@@ -98,13 +101,15 @@ struct Feature : ObjName {
 };
 
 #define PEDAL_SZ 14
-struct Pedal : ObjName {
+struct Pedal {
   uint16_t id;
 
   Pedal();
   Pedal(uint16_t);
 
   uint16_t addr();               // Get the eeprom addr of current
+  String   name();
+  void     set_name(String);
   uint8_t  channel();            // Get chan for current pedal
   void     set_channel(uint8_t); // Change chan of Pedal midi output
   Feature  feature(uint8_t);     // Select feature of pedal 1-32
@@ -192,7 +197,7 @@ struct Footswitch {
 };
 
 #define PRESET_SZ 13
-struct Preset : ObjName {
+struct Preset {
   static Footswitch footswitches[NUM_FSW_PER_PRESET];
 
   uint16_t id;
@@ -206,6 +211,8 @@ struct Preset : ObjName {
   Preset(uint16_t);
 
   uint16_t    addr();                // Get the eeprom addr of current
+  String      name();
+  void        set_name(String);
   Footswitch* fsw(uint8_t);          // Get fsw from RAM with state assumed
   Footswitch* fsw(uint8_t, uint8_t); // Get fsw from RAM with providing state
   Param       param(uint8_t);        // Get param from eeprom

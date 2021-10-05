@@ -2,8 +2,6 @@
 #include "Hardware.h"
 #include "I2C_EPROM.h"
 
-
-
 /* :: OPTION :: */
 Option::Option() : id(0) {}
 Option::Option(uint16_t id) : id(id) {}
@@ -67,6 +65,8 @@ Color::Color(uint16_t id) : id(id) {}
 uint16_t Color::addr() {
   return ( MAP_COLOR + (id * COLOR_SZ) );
 }
+String Color::name() { return EPROM::read_text(addr()); }
+void Color::set_name(String text) { EPROM::write_text(addr(), text); }
 uint8_t Color::at(uint8_t n) {
   return EPROM::read_uint8_t( addr() + TEXT_SZ + MOD(n,3) );
 }
@@ -84,6 +84,8 @@ Feature::Feature(uint16_t id) : id(id) {}
 uint16_t Feature::addr() {
   return ( MAP_FEATURE + (id * FEATURE_SZ) );
 }
+String Feature::name() { return EPROM::read_text(addr()); }
+void Feature::set_name(String text) { EPROM::write_text(addr(), text); }
 uint8_t Feature::type() {
   return EPROM::read_uint8_t( addr() + TEXT_SZ );
 }
@@ -107,6 +109,8 @@ Pedal::Pedal(uint16_t id) : id(id) {}
 uint16_t Pedal::addr() {
   return ( MAP_PEDAL + (id * PEDAL_SZ) );
 }
+String Pedal::name() { return EPROM::read_text(addr()); }
+void Pedal::set_name(String text) { EPROM::write_text(addr(), text); }
 uint8_t Pedal::channel() {
   return EPROM::read_uint8_t( addr() + TEXT_SZ );
 }
@@ -232,6 +236,8 @@ Preset::Preset(uint16_t id) : id(id), menu(0) { load(id); }
 uint16_t Preset::addr() {
   return ( MAP_PRESET + (id * PRESET_SZ) );
 }
+String Preset::name() { return EPROM::read_text(addr()); }
+void Preset::set_name(String text) { EPROM::write_text(addr(), text); }
 
 Footswitch* Preset::fsw(uint8_t n) {
   return fsw(submenu_id, n);
@@ -243,8 +249,10 @@ Param Preset::param(uint8_t n) {
   return Param( n + (id * NUM_PARAMS_PER_PRESET), true );
 }
 void Preset::print_main_screen() {
-  buffer[TXT_BUF_1] += "HI";
-  HW::screen.print(0, 0, buffer[TXT_BUF_1].str());
+  //HW::screen.print_nline(0, 0, String(id+1) + ".");
+  HW::screen.print_nline(0, 0, String(id+1) + "." + name());
+  HW::screen.print_nline(0, 1, " ");
+  HW::screen.print(10, 1, "MENU " + String(submenu_id+1));
 }
 
 void Preset::load(uint8_t n) {

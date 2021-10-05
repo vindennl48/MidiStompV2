@@ -29,5 +29,10 @@ void EPROM::write_uint16_t(uint16_t addr, uint16_t x) {
   write_uint8_t(addr, (x<<8)>>8);  // shift up 8 to remove top byte
 }
 
-String EPROM::read_text(uint16_t addr) {}
+String EPROM::read_text(uint16_t addr) {
+  String result;
+  for (int i=0; i<12; i++)
+    result += (char)read_uint8_t(addr + i);
+  return result;
+}
 void   EPROM::write_text(uint16_t addr, String t) {}

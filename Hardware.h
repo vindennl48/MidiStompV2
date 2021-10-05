@@ -6,6 +6,11 @@
 #include "Screen.h"
 #include "LED.h"
 
+#define TEXT_SZ   13
+#define TXT_BUF_1 0
+#define TXT_BUF_2 1
+extern char buffer[2][TEXT_SZ];
+
 #define NUM_BTNS 4
 #define NUM_LEDS (NUM_BTNS)
 

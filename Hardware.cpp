@@ -7,6 +7,8 @@
 #define LED3_SR_PINS 11, 10, 9
 #define LED4_SR_PINS 15, 14, 13
 
+char buffer[2][TEXT_SZ] = {{' '}};
+
 Button HW::btns[NUM_BTNS];
 LED    HW::leds[NUM_LEDS];
 Knob   HW::knob;
