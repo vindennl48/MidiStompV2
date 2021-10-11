@@ -1,0 +1,2 @@
+- Need to set up a way to reset the values in EEPROM
+- Need to re-name all the EEPROM struct stuff throughout

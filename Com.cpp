@@ -41,15 +41,20 @@ void COM::thru() {
  *   - Have custom written functions below to write to EEPROM for the variety of
  *     different components we have..
  * */
-#define E_WAITING        0
-#define E_READ_UINT8_T   1
-#define E_READ_UINT16_T  2
-#define E_READ_TEXT      3
-#define E_READ_BLOCK     4
-#define E_WRITE_UINT8_T  5
-#define E_WRITE_UINT16_T 6
-#define E_WRITE_TEXT     7
-#define E_WRITE_BLOCK    8
+#define E_WAITING          0
+#define E_READ_UINT8_T     1
+#define E_READ_UINT16_T    2
+#define E_READ_TEXT        3
+#define E_READ_BLOCK       4
+#define E_WRITE_UINT8_T    5
+#define E_WRITE_UINT16_T   6
+#define E_WRITE_TEXT       7
+#define E_WRITE_BLOCK_INIT 8
+#define E_WRITE_BLOCK      9
+
+uint8_t  write_block_size = 0;
+uint16_t write_block_addr = 0;
+
 uint8_t COM::socket() {
   switch(n.e()) {
     default:
@@ -177,6 +182,27 @@ uint8_t COM::socket() {
 
           n.jump_to(E_WAITING);
         }
+      }
+      break;
+
+    case E_WRITE_BLOCK_INIT:
+      if ( n.not_init() ) {
+        Serial.write(0xFF); // Confirm
+      }
+      else {
+        if ( Serial.available() >= 4 ) {
+          write_block_addr = (uint16_t)(Serial.read()<<8 | Serial.read());
+          write_block_size =  (uint8_t)(Serial.read()<<8 | Serial.read());
+          n.jump_to(E_WRITE_BLOCK);
+        }
+      }
+      break;
+
+    case E_WRITE_BLOCK:
+      if ( Serial.available() >= write_block_size ) {
+        for (uint16_t i=0; i<write_block_size; i++)
+          EPROM::write_uint8_t(write_block_addr + i, Serial.read());
+        n.jump_to(E_WAITING);
       }
       break;
   };

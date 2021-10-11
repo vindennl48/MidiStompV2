@@ -22,6 +22,11 @@ struct HW {
 
   static void setup();
   static void loop();
+
+  static void leds_set(Color);
+  static void leds_set(Color, uint16_t);
+  static void leds_set(uint8_t, uint8_t, uint8_t);
+  static void leds_set(uint8_t, uint8_t, uint8_t, uint16_t);
 };
 
 #endif

@@ -9,7 +9,7 @@ Option::Option(uint16_t id) : id(id) {}
 uint16_t Option::addr() {
   return ( MAP_OPTION + (id * OPTION_SZ) );
 }
-String Option::title() {
+String Option::name() {
   return EPROM::read_text( addr() );
 }
 /* :: END OPTION :: */
@@ -118,7 +118,7 @@ void Pedal::set_channel(uint8_t x) {
   EPROM::write_uint8_t( addr() + TEXT_SZ, x );
 }
 Feature Pedal::feature(uint8_t n) {
-  return Feature( n + (id * NUM_PEDALS) );
+  return Feature( n + (id * NUM_FEATURES_PER_PEDAL) );
 }
 /* :: END PEDAL :: */
 
@@ -200,6 +200,10 @@ void    Footswitch::set_lp_mode(uint8_t x)    { d_lp_mode  = x & 0b111; }
 uint8_t Footswitch::press_type()              { return d_press_type; }
 void    Footswitch::set_press_type(uint8_t x) { d_press_type = x & 0b1; }
 
+Color Footswitch::get_color() {
+  return Color(d_state);
+}
+
 void Footswitch::save() {
   EPROM::write_uint8_t ( addr()    , color[0] );
   EPROM::write_uint8_t ( addr() + 1, color[1] );
@@ -216,6 +220,7 @@ void Footswitch::update_state() {
     d_state = 0;
   }
   else if ( FSW_MODE_TOGGLE && d_state >= 2 ) d_state = 0;
+  else d_state = 0;  // safety
 }
 void Footswitch::send_midi() {
   for (int i=0; i<NUM_PARAMS_PER_STATE; i++) param(i).send_midi();
@@ -253,6 +258,11 @@ void Preset::print_main_screen() {
   HW::screen.print_nline(0, 0, String(id+1) + "." + name());
   HW::screen.print_nline(0, 1, " ");
   HW::screen.print(10, 1, "MENU " + String(submenu_id+1));
+}
+void Preset::update_colors() {
+  // Need to set led's to what the fsw are
+  for (int i=0; i<NUM_LEDS; i++)
+    HW::leds[i].set( fsw(i)->get_color() );
 }
 
 void Preset::load(uint8_t n) {

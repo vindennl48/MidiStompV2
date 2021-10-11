@@ -73,6 +73,12 @@ void LED::loop() {
   b.loop();
 }
 
+void LED::set(Color c) {
+  set(c, DEFAULT_LED_TIME_MS);
+}
+void LED::set(Color c, uint16_t time) {
+  set(c.at(0), c.at(1), c.at(2), time);
+}
 void LED::set(uint8_t r_new, uint8_t g_new, uint8_t b_new) {
   set(r_new, g_new, b_new, DEFAULT_LED_TIME_MS);
 }

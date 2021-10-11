@@ -21,7 +21,7 @@
 #define NUM_MENUS               25
 #define NUM_OPTIONS_PER_MENU    10
 
-#define MAP_COLOR        0
+#define MAP_COLOR        10
 #define MAP_PEDAL        (MAP_COLOR        + (NUM_COLORS            * COLOR_SZ)   + 1)
 #define MAP_FEATURE      (MAP_PEDAL        + (NUM_PEDALS            * PEDAL_SZ)   + 1)
 #define MAP_PRESET       (MAP_FEATURE      + (NUM_FEATURES          * FEATURE_SZ) + 1)
@@ -43,7 +43,7 @@ struct Option {
   Option(uint16_t);
 
   uint16_t addr();
-  String   title(); // Get title of option
+  String   name(); // Get name of option
 };
 
 /* Helpful macro for setting menu locations */
@@ -84,7 +84,10 @@ struct Color {
 };
 
 
-#define FEATURE_SZ 15
+#define FEATURE_SZ     15
+#define MIDI_TYPE_NOTE 0
+#define MIDI_TYPE_CC   1
+#define MIDI_TYPE_PC   2
 struct Feature {
   uint16_t id;
 
@@ -190,6 +193,7 @@ struct Footswitch {
   uint8_t press_type();             // Get press_type
   void    set_press_type(uint8_t);  // Set press_type
   void    save();                   // save all the nibbles at once
+  Color   get_color();              // Return current color of fsw
 
   void update_state();  // run when fsw is pressed
   void send_midi();     // Send midi for current state
@@ -216,7 +220,8 @@ struct Preset {
   Footswitch* fsw(uint8_t);          // Get fsw from RAM with state assumed
   Footswitch* fsw(uint8_t, uint8_t); // Get fsw from RAM with providing state
   Param       param(uint8_t);        // Get param from eeprom
-  void        print_main_screen();
+  void        print_main_screen();   // Setup the LCD screen
+  void        update_colors();       // Setup the LED lights
 
   void    load(uint8_t);
   uint8_t settings();

@@ -39,7 +39,6 @@ struct Button {
   uint8_t is_long_pressed();
   void    set_press_type(uint8_t);
   uint8_t get_pin_state();
-
 };
 
 #endif

@@ -38,3 +38,17 @@ void HW::loop() {
   knob.loop();
   screen.loop();
 }
+
+void HW::leds_set(Color c) {
+  leds_set(c, DEFAULT_LED_TIME_MS);
+}
+void HW::leds_set(Color c, uint16_t time) {
+  leds_set(c.at(0), c.at(1), c.at(2), time);
+}
+void HW::leds_set(uint8_t r_new, uint8_t g_new, uint8_t b_new) {
+  leds_set(r_new, g_new, b_new, DEFAULT_LED_TIME_MS);
+}
+void HW::leds_set(uint8_t r_new, uint8_t g_new, uint8_t b_new, uint16_t time) {
+  for (int i=0; i<NUM_LEDS; i++)
+    leds[i].set(r_new, g_new, b_new, time);
+}

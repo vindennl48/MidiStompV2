@@ -1,7 +1,7 @@
-Data = {}
+data = {}
 
 
-Data["Colors"] = [
+data["colors"] = [
     {"id": 0,  "name": "red_off",     "channels": [2,   0,   0]},
     {"id": 1,  "name": "red_on",      "channels": [255, 0,   0]},
 
@@ -25,7 +25,7 @@ Data["Colors"] = [
 ]
 
 
-Data["Pedals"] = [
+data["pedals"] = [
     {
         "id"      : 0,
         "name"    : "HXSTOMP",

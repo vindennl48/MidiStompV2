@@ -7,7 +7,7 @@ PARAM_SZ   = 2
 FSW_SZ     = 5
 PRESET_SZ  = 13
 
-NUM_PRESETS             = 20
+NUM_PRESETS             = 21
 NUM_COLORS              = 50
 NUM_PEDALS              = 8
 NUM_FEATURES_PER_PEDAL  = 32
@@ -33,3 +33,7 @@ MAP_PARAM        = (MAP_FSW          + (NUM_FSW               * FSW_SZ)     + 1)
 MAP_MENU         = (MAP_PARAM        + (NUM_PARAMS_PER_FSW    * PARAM_SZ)   + 1)
 MAP_OPTION       = (MAP_MENU         + (NUM_MENUS             * MENU_SZ)    + 1)
 MAP_END          = (MAP_OPTION       + (NUM_OPTIONS_PER_MENU  * OPTION_SZ)  + 1)
+
+MIDI_TYPE_NOTE = 0
+MIDI_TYPE_CC   = 1
+MIDI_TYPE_PC   = 2

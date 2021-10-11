@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include "ShiftRegisterPWM.h"
+#include "Components.h"
 
 // PUBLIC DEFINES
 #define DEFAULT_LED_TIME_MS 50
@@ -26,6 +27,8 @@ struct LED {
 
   void setup(uint8_t, uint8_t, uint8_t);
   void loop();
+  void set(Color);
+  void set(Color, uint16_t);
   void set(uint8_t, uint8_t, uint8_t);
   void set(uint8_t, uint8_t, uint8_t, uint16_t);
 };
